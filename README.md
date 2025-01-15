@@ -10,13 +10,11 @@ Simple implementation of Auth.js with Prisma in Next.js 15
 
 1. **Clone the repository**
 
-```bash
-# For tutorial
-git clone -b starter
-
 # For complete code
+
 git clone
-```
+
+````
 
 2. **Install & Run**
 
@@ -24,7 +22,7 @@ git clone
 npm install
 npm run db:migrate
 npm run dev
-```
+````
 
 ## Tech Stack
 
