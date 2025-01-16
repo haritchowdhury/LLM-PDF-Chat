@@ -23,6 +23,6 @@ Happy coding! 🚀
 - Chain Pipeline:
 
 1. https://github.com/dabit3/semantic-search-nextjs-pinecone-langchain-chatgpt/tree/main
-2. https://github.com/dabit3/semantic-search-nextjs-pinecone-langchain-chatgpt/tree/main
+2. https://github.com/mayooear/gpt4-pdf-chatbot-langchain/tree/feat/chroma
 
 # LLM-PDF-Chat
