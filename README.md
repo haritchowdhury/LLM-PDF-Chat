@@ -16,4 +16,13 @@ Simple implementation of Auth.js with Prisma in Next.js 15
 
 Happy coding! 🚀
 
+## Sources
+
+- Auth SDK: https://github.com/codegenixdev/auth-nextjs-tutorial
+- Upstash Pipeline: https://github.com/upstash/nerdcoach
+- Chain Pipeline:
+
+1. https://github.com/dabit3/semantic-search-nextjs-pinecone-langchain-chatgpt/tree/main
+2. https://github.com/dabit3/semantic-search-nextjs-pinecone-langchain-chatgpt/tree/main
+
 # LLM-PDF-Chat
