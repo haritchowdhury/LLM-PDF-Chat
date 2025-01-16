@@ -40,7 +40,7 @@ const MemoizedMD = ({ message }) => {
         },
       }}
       className={clsx(
-        "prose dark:prose-invert prose-p:leading-relaxed prose-pre:p-0 mt-4 w-full break-words border-t pt-4"
+        "bg-gray-100 font-semibold prose dark:prose-invert prose-p:leading-relaxed prose-pre:p-0 mt-4 w-full break-words border-t pt-0.1"
       )}
     >
       {message}

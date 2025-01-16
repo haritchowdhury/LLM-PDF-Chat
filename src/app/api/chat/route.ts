@@ -9,7 +9,6 @@ export const fetchCache = "force-no-store";
 export const maxDuration = 30;
 
 //import type { Message } from "ai";
-import ragChat from "@/lib/rag.server";
 import { Index } from "@upstash/vector";
 import { aiUseChatAdapter } from "@upstash/rag-chat/nextjs";
 import getUserSession from "@/lib/user.server";
@@ -34,13 +33,12 @@ export async function POST(request: Request) {
     token: process.env.UPSTASH_VECTOR_REST_TOKEN,
   });
 
-  const text = await queryUpstashAndLLM(index, namespace, question);
-  //console.log(text);
-
-  const response = await ragChat.chat(question, {
-    streaming: true,
+  const response = await queryUpstashAndLLM(
+    index,
     namespace,
-    //sessionId,
-  });
+    sessionId,
+    question
+  );
+
   return aiUseChatAdapter(response);
 }

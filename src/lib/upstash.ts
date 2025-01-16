@@ -9,8 +9,8 @@ export const updateUpstash = async (index, namespace, docs) => {
     counter = counter + 1;
 
     const textSplitter = new RecursiveCharacterTextSplitter({
-      chunkSize: 1000,
-      chunkOverlap: 200,
+      chunkSize: 500,
+      chunkOverlap: 100,
     });
     const chunks = await textSplitter.createDocuments([text]);
     const embeddingsArrays =
@@ -18,7 +18,7 @@ export const updateUpstash = async (index, namespace, docs) => {
         chunks.map((chunk) => chunk.pageContent.replace(/\n/g, " "))
       );
     const batchSize = 100;
-    let batch: any = [];
+    let batch = [];
     let pageContent = "";
     for (let idx = 0; idx < chunks.length; idx++) {
       const vector = {
@@ -46,7 +46,12 @@ export const updateUpstash = async (index, namespace, docs) => {
   }
 };
 
-export const queryUpstashAndLLM = async (index, namespace, question) => {
+export const queryUpstashAndLLM = async (
+  index,
+  namespace,
+  sessionId,
+  question
+) => {
   const embeddingsArrays =
     await new HuggingFaceInferenceEmbeddings().embedDocuments([question]);
   const queryResponse = await index.query(
@@ -59,26 +64,29 @@ export const queryUpstashAndLLM = async (index, namespace, question) => {
     { namespace: namespace }
   );
   //console.log(queryResponse[0].metadata.content);
-  let context = "";
   if (queryResponse.length >= 1) {
     //let promiseList = [];
     for (let idx = 0; idx < queryResponse.length; idx++) {
       try {
-        context += queryResponse[0].metadata.content;
+        const context = queryResponse[0].metadata.content;
+        await ragChat.context.add({
+          type: "text",
+          data: context,
+          options: { namespace: namespace },
+        });
       } catch (err) {
         console.log(`There was an error ${err}`);
       }
     }
   }
-  console.log(context);
-  await ragChat.context.add({
-    type: "text",
-    data: context,
-    options: { namespace: namespace },
-  });
-  return "Ok:200";
-};
 
-function sleep(ms: number) {
-  return new Promise((resolve) => setTimeout(resolve, ms));
-}
+  const response = await ragChat.chat(question, {
+    streaming: true,
+    namespace,
+    sessionId,
+    similarityThreshold: 0.7,
+    historyLength: 5,
+    topK: 5,
+  });
+  return response;
+};

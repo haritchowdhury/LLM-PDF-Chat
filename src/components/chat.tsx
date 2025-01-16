@@ -1,7 +1,7 @@
 "use client";
 import { useRouter } from "next/navigation";
 import { useToast } from "@/hooks/use-toast";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { useChat } from "ai/react";
 import { Input } from "@/components/ui/input";
 //import { Button } from "@/components/ui/button";
@@ -14,7 +14,12 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 
-const Chat = ({ email, name }) => {
+const Chat = ({ email }) => {
+  const messagesEndRef = useRef(null);
+  const scrollToBottom = () => {
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  };
+
   const router = useRouter();
   if (!email) {
     router.push("/sign-in");
@@ -35,11 +40,12 @@ const Chat = ({ email, name }) => {
     }
   }, [email]);
 
+  useEffect(() => {
+    scrollToBottom();
+  }, [messages]);
+
   return (
     <>
-      <div className="mx-auto flex w-full max-w-md flex-col py-8">
-        <small>{name} is chatting ...</small>
-      </div>
       <input
         type="file"
         id="fileInput"
@@ -86,26 +92,38 @@ const Chat = ({ email, name }) => {
         }}
       />
 
-      <div className="flex flex-row items-start justify-between">
-        <span className="text-xl font-semibold"> Cheat Code</span>
+      <div className="flex flex-column items-start justify-between">
+        <h6 className="font-bold"> DocWhisperer</h6>
       </div>
-      {email ? (
-        disabled ? (
-          <div className="mt-8 flex flex-col gap-y-2">
-            <div className="h-[30px] animate-pulse bg-black/10" />
-            <div className="h-[30px] animate-pulse bg-black/10" />
-            <div className="h-[30px] animate-pulse bg-black/10" />
-          </div>
+      <div
+        className="mx-auto flex w-full flex-col overflow-y-auto  "
+        style={{
+          maxHeight: "calc(100vh - 400px)",
+          paddingBottom: "8px",
+          maxWidth: "calc(100vw - 100px)",
+          margin: "0 auto",
+          padding: "0",
+        }}
+      >
+        {email ? (
+          disabled ? (
+            <div className="mt-8 flex flex-col gap-y-2">
+              <div className="h-[30px] animate-pulse bg-black/10" />
+              <div className="h-[30px] animate-pulse bg-black/10" />
+              <div className="h-[30px] animate-pulse bg-black/10" />
+            </div>
+          ) : (
+            messages.map(({ content }, idx) => (
+              <MemoizedMD key={idx} message={content} />
+            ))
+          )
         ) : (
-          messages.map(({ content }, idx) => (
-            <MemoizedMD key={idx} message={content} />
-          ))
-        )
-      ) : (
-        <div className="mt-8 flex max-w-max flex-col justify-center">{}</div>
-      )}
-      <div className="fixed bottom-0 mb-8 flex w-full max-w-[82vw] flex-row items-center shadow sm:max-w-md">
-        <div className="cursor-pointer border bg-white px-2 py-1 pt-2 text-gray-400 hover:text-gray-800">
+          <div className="mt-8 flex max-w-max flex-col justify-center">{}</div>
+        )}
+        <div ref={messagesEndRef} />
+      </div>
+      <div className="fixed bottom-0  mb-20 flex w-full max-w-[82vw] flex-row items-center shadow sm:max-w-md">
+        <div className="cursor-pointer border px-2 py-1 pt-2 text-gray-400 hover:text-gray-800">
           <TooltipProvider>
             <Tooltip>
               <TooltipTrigger
