@@ -1,5 +1,6 @@
 import { RecursiveCharacterTextSplitter } from "@langchain/textsplitters";
 import { HuggingFaceInferenceEmbeddings } from "@langchain/community/embeddings/hf";
+import ragChat from "@/lib/rag.server";
 
 export const updateUpstash = async (index, namespace, docs) => {
   let counter = 0;
@@ -57,9 +58,27 @@ export const queryUpstashAndLLM = async (index, namespace, question) => {
     },
     { namespace: namespace }
   );
-  console.log(queryResponse[0].metadata.content);
-  /*if (queryResponse.matches.length) {
-  }*/
-
-  return queryResponse;
+  //console.log(queryResponse[0].metadata.content);
+  let context = "";
+  if (queryResponse.length >= 1) {
+    //let promiseList = [];
+    for (let idx = 0; idx < queryResponse.length; idx++) {
+      try {
+        context += queryResponse[0].metadata.content;
+      } catch (err) {
+        console.log(`There was an error ${err}`);
+      }
+    }
+  }
+  console.log(context);
+  await ragChat.context.add({
+    type: "text",
+    data: context,
+    options: { namespace: namespace },
+  });
+  return "Ok:200";
 };
+
+function sleep(ms: number) {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}

@@ -35,12 +35,12 @@ export async function POST(request: Request) {
   });
 
   const text = await queryUpstashAndLLM(index, namespace, question);
-  console.log(text);
+  //console.log(text);
 
   const response = await ragChat.chat(question, {
     streaming: true,
     namespace,
-    sessionId,
+    //sessionId,
   });
   return aiUseChatAdapter(response);
 }
