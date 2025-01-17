@@ -1,11 +1,10 @@
 "use client";
+import clsx from "clsx";
 import { useRouter } from "next/navigation";
 import { useToast } from "@/hooks/use-toast";
 import { useEffect, useState, useRef } from "react";
 import { useChat } from "ai/react";
 import { Input } from "@/components/ui/input";
-//import { Button } from "@/components/ui/button";
-import MemoizedMD from "@/components/memoized-react-markdown";
 import { Upload } from "lucide-react";
 import {
   Tooltip,
@@ -13,9 +12,11 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-
-const Chat = ({ email }) => {
-  const messagesEndRef = useRef(null);
+type User = {
+  email: string;
+};
+const Chat = ({ email }: User) => {
+  const messagesEndRef = useRef<HTMLDivElement | null>(null);
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   };
@@ -42,7 +43,7 @@ const Chat = ({ email }) => {
 
   useEffect(() => {
     scrollToBottom();
-  }, [messages]);
+  }, [messages, setMessages]);
 
   return (
     <>
@@ -115,7 +116,18 @@ const Chat = ({ email }) => {
             </div>
           ) : (
             messages.map(({ content }, idx) => (
-              <MemoizedMD key={idx} message={content} />
+              <div
+                key={idx}
+                className={clsx(
+                  "font-sans-semibold text-sm prose dark:prose-invert prose-p:leading-relaxed prose-pre:p-0 mt-4 w-full break-words border-t pt-0.1",
+                  idx % 2 == 0
+                    ? "text-white bg-black self-end"
+                    : "text-black bg-white self-start"
+                )}
+              >
+                {" "}
+                {content}
+              </div>
             ))
           )
         ) : (

@@ -34,7 +34,7 @@ const Page = async () => {
           await executeAction({
             actionFn: async () => {
               try {
-                response = await signIn("credentials", formData);
+                await signIn("credentials", formData);
               } catch {
                 redirect("/error");
               }

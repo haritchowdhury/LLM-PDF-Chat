@@ -2,8 +2,31 @@ import { RecursiveCharacterTextSplitter } from "@langchain/textsplitters";
 import { HuggingFaceInferenceEmbeddings } from "@langchain/community/embeddings/hf";
 import ragChat from "@/lib/rag.server";
 import { Redis } from "@upstash/redis";
+import { Index } from "@upstash/vector";
+import { Document } from "langchain/document";
 
-export const updateUpstash = async (index, namespace, docs) => {
+interface Vector {
+  id: string;
+  values: number[];
+}
+
+interface Conntent {
+  content: string;
+}
+
+interface QueryResponse {
+  id: string;
+  score: string;
+  metadata: {
+    content: Conntent;
+  };
+}
+
+export const updateUpstash = async (
+  index: Index,
+  namespace: string,
+  docs: Document[]
+) => {
   let counter = 0;
   for (let i = 0; i < docs.length; i++) {
     const text = docs[i]["pageContent"];
@@ -19,7 +42,7 @@ export const updateUpstash = async (index, namespace, docs) => {
         chunks.map((chunk) => chunk.pageContent.replace(/\n/g, " "))
       );
     const batchSize = 100;
-    let batch = [];
+    let batch: Vector[] = [];
     let pageContent = "";
     for (let idx = 0; idx < chunks.length; idx++) {
       const vector = {
@@ -48,14 +71,14 @@ export const updateUpstash = async (index, namespace, docs) => {
 };
 
 export const queryUpstashAndLLM = async (
-  index,
-  namespace,
-  sessionId,
-  question
+  index: Index,
+  namespace: string,
+  sessionId: string,
+  question: string
 ) => {
   const embeddingsArrays =
     await new HuggingFaceInferenceEmbeddings().embedDocuments([question]);
-  const queryResponse = await index.query(
+  const queryResponse: any[] = await index.query(
     {
       topK: 10,
       vector: embeddingsArrays[0],
@@ -64,7 +87,8 @@ export const queryUpstashAndLLM = async (
     },
     { namespace: namespace }
   );
-  console.log(queryResponse[0].metadata);
+  console.log(queryResponse);
+  //console.log(queryResponse[0].metadata);
   if (queryResponse.length >= 1) {
     //let promiseList = [];
     for (let idx = 0; idx < queryResponse.length; idx++) {
@@ -92,7 +116,11 @@ export const queryUpstashAndLLM = async (
   return response;
 };
 
-export const deleteUpstashRedis = async (index, namespace, sessionId) => {
+export const deleteUpstashRedis = async (
+  index: Index,
+  namespace: string,
+  sessionId: string
+) => {
   const redis = new Redis({
     url: process.env.UPSTASH_REDIS_REST_URL,
     token: process.env.UPSTASH_REDIS_REST_TOKEN,

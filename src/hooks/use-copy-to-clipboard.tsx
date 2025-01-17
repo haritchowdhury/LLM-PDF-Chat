@@ -4,7 +4,7 @@ import * as React from "react";
 
 export function useCopyToClipboard({ timeout = 2000 }) {
   const [isCopied, setIsCopied] = React.useState(false);
-  const copyToClipboard = (value) => {
+  const copyToClipboard = (value: string) => {
     if (
       typeof window === "undefined" ||
       !navigator.clipboard?.writeText ||
