@@ -1,5 +1,4 @@
 import { auth } from "@/lib/auth";
-
 import { signIn } from "@/lib/auth";
 import { GithubSignIn } from "@/components/github-sign-in";
 import { Button } from "@/components/ui/button";
@@ -11,7 +10,6 @@ import { redirect } from "next/navigation";
 const Page = async () => {
   const session = await auth();
   if (session) redirect("/");
-
   return (
     <div className="w-full max-w-sm mx-auto space-y-6">
       <h6 className="font-semibold"> DocWhisperer</h6>
@@ -35,7 +33,11 @@ const Page = async () => {
           "use server";
           await executeAction({
             actionFn: async () => {
-              await signIn("credentials", formData);
+              try {
+                response = await signIn("credentials", formData);
+              } catch {
+                redirect("/error");
+              }
             },
           });
         }}

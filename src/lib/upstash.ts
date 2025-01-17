@@ -1,6 +1,7 @@
 import { RecursiveCharacterTextSplitter } from "@langchain/textsplitters";
 import { HuggingFaceInferenceEmbeddings } from "@langchain/community/embeddings/hf";
 import ragChat from "@/lib/rag.server";
+import { Redis } from "@upstash/redis";
 
 export const updateUpstash = async (index, namespace, docs) => {
   let counter = 0;
@@ -63,7 +64,7 @@ export const queryUpstashAndLLM = async (
     },
     { namespace: namespace }
   );
-  //console.log(queryResponse[0].metadata.content);
+  console.log(queryResponse[0].metadata);
   if (queryResponse.length >= 1) {
     //let promiseList = [];
     for (let idx = 0; idx < queryResponse.length; idx++) {
@@ -89,4 +90,19 @@ export const queryUpstashAndLLM = async (
     topK: 5,
   });
   return response;
+};
+
+export const deleteUpstashRedis = async (index, namespace, sessionId) => {
+  const redis = new Redis({
+    url: process.env.UPSTASH_REDIS_REST_URL,
+    token: process.env.UPSTASH_REDIS_REST_TOKEN,
+  });
+  const history = await redis.keys(`${sessionId}*`);
+  for (const key of history) {
+    await redis.del(key);
+  }
+  const context = await redis.keys(`${namespace}*`);
+  for (const key of context) {
+    await redis.del(key);
+  }
 };

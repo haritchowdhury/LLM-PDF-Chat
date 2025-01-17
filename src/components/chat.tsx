@@ -81,6 +81,7 @@ const Chat = ({ email }) => {
                 duration: 2000,
                 description: "Added the PDF to AI's knowledge succesfully.",
               });
+              setMessages([]);
             } else {
               toast({
                 duration: 2000,

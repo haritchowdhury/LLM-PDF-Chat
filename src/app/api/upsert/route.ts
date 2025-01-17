@@ -11,7 +11,7 @@ import { NextRequest } from "next/server";
 import getUserSession from "@/lib/user.server";
 import { PDFLoader } from "@langchain/community/document_loaders/fs/pdf";
 import { Index } from "@upstash/vector";
-import { updateUpstash } from "@/lib/upstash";
+import { updateUpstash, deleteUpstashRedis } from "@/lib/upstash";
 
 export async function POST(request: NextRequest) {
   const user = await getUserSession();
@@ -21,7 +21,7 @@ export async function POST(request: NextRequest) {
   if (!file) return new Response(null, { status: 400 });
   if (!user) return new Response(null, { status: 403 });
 
-  const namespace = user[1];
+  const [sessionId, namespace] = user;
   const arrayBuffer = await file.arrayBuffer();
   const fileSource = new Blob([arrayBuffer], { type: file.type });
   const loader = new PDFLoader(fileSource, {
@@ -33,6 +33,11 @@ export async function POST(request: NextRequest) {
     url: process.env.UPSTASH_VECTOR_REST_URL,
     token: process.env.UPSTASH_VECTOR_REST_TOKEN,
   });
+  try {
+    deleteUpstashRedis(index, namespace, sessionId);
+  } catch (err) {
+    console.log("error: ", err);
+  }
   try {
     await updateUpstash(index, namespace, docs);
   } catch (err) {

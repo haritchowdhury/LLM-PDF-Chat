@@ -17,7 +17,7 @@ const Footer = () => {
     >
       <Link
         href="https://github.com/iminparallel"
-        className="inline-block bg-gray-300 hover:bg-blue-600 text-black font-semibold py-2 px-4 rounded transition duration-300"
+        className="inline-block bg-gray-300 hover:bg-gray-800 text-black font-semibold py-2 px-4 rounded transition duration-300"
       >
         Harit Chowdhury
       </Link>
