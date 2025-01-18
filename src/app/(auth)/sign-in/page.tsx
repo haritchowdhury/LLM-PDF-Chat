@@ -33,11 +33,11 @@ const Page = async () => {
           "use server";
           await executeAction({
             actionFn: async () => {
-              try {
-                await signIn("credentials", formData);
-              } catch {
+              /* try {*/
+              await signIn("credentials", formData);
+              /* } catch {
                 redirect("/error");
-              }
+              }*/
             },
           });
         }}
