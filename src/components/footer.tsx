@@ -15,12 +15,9 @@ const Footer = () => {
         boxShadow: "0 2px 5px rgba(0, 0, 0, 0.1)", // Optional: Adds a shadow
       }}
     >
-      <Link
-        href="https://github.com/iminparallel"
-        className="inline-block bg-gray-300 hover:bg-gray-800 text-black font-semibold py-2 px-4 rounded transition duration-300"
-      >
+      <small className="inline-block bg-gray-300 hover:bg-gray-800 text-black font-semibold py-2 px-4 rounded transition duration-300">
         Harit Chowdhury
-      </Link>
+      </small>
     </footer>
   );
 };
