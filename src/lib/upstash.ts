@@ -87,7 +87,6 @@ export const queryUpstashAndLLM = async (
     },
     { namespace: namespace }
   );
-  console.log(queryResponse);
   //console.log(queryResponse[0].metadata);
   if (queryResponse.length >= 1) {
     //let promiseList = [];

@@ -27,6 +27,7 @@ const Chat = ({ email }: User) => {
   }
   const { toast } = useToast();
   const [disabled, setDisabled] = useState(true);
+  const [loading, setLoading] = useState(true);
   const { messages, input, handleInputChange, handleSubmit, setMessages } =
     useChat();
 
@@ -35,7 +36,10 @@ const Chat = ({ email }: User) => {
       fetch("/api/chat/history")
         .then((res) => res.json())
         .then((res) => {
-          if (res?.messages?.length > 0) setMessages(res.messages);
+          if (res?.messages?.length > 0) {
+            setMessages(res.messages);
+            setLoading(false);
+          }
         })
         .finally(() => setDisabled(false));
     }
@@ -43,7 +47,7 @@ const Chat = ({ email }: User) => {
 
   useEffect(() => {
     scrollToBottom();
-  }, [messages, setMessages]);
+  }, [messages, setMessages, loading]);
 
   return (
     <>
@@ -94,8 +98,11 @@ const Chat = ({ email }: User) => {
         }}
       />
 
-      <div className="flex flex-column items-start justify-between">
-        <h6 className="font-bold"> DocWhisperer</h6>
+      <div className="flex flex-column items-start justify-between py-2">
+        <h6 className="font-bold text-white bg-gray-400 self-start px-2 rounded-lg text-justify">
+          {" "}
+          DocWhisperer
+        </h6>
       </div>
       <div
         className="mx-auto flex w-full flex-col overflow-y-auto  "
@@ -119,10 +126,10 @@ const Chat = ({ email }: User) => {
               <div
                 key={idx}
                 className={clsx(
-                  "font-sans-semibold text-sm prose dark:prose-invert prose-p:leading-relaxed prose-pre:p-0 mt-4 w-full break-words border-t pt-0.1",
+                  "font-sans-semibold text-sm prose dark:prose-invert prose-p:leading-relaxed prose-pre:p-0 mt-4 w-full break-words pt-0.1",
                   idx % 2 == 0
-                    ? "text-white bg-black self-end"
-                    : "text-black bg-white self-start"
+                    ? "text-white bg-black self-end p-2 rounded-lg text-justify"
+                    : "text-white bg-gray-900 self-start p-2 rounded-lg text-justify"
                 )}
               >
                 {" "}
