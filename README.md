@@ -1,6 +1,12 @@
-# NextJS 15 Authentication Tutorial
+# LLM PDF CHAT
 
-Simple implementation of Auth.js with Prisma in Next.js 15
+1. Simple implementation of Auth.js with Prisma in Next.js 15
+2. Upload pdf and strore it in Upstash Vectors
+3. Store chat memory and context in Redis cache
+4. Use vector search for similarity search on the vector store
+5. Feed the result to an AI agent
+6. Return the answer
+7. Repeat from 3
 
 ## Run this project
 
