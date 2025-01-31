@@ -1,6 +1,6 @@
 "use client";
 import { quizCreationSchema } from "@/schemas/forms/quiz";
-import { React, useState } from "react";
+import { useState } from "react";
 import { z } from "zod";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -27,7 +27,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-
+import axios, { AxiosError } from "axios";
 type Props = {
   topic: string;
 };
@@ -39,7 +39,7 @@ const QuizForm = ({ topic: topicParam }: Props) => {
   const [showLoader, setShowLoader] = useState(false);
   const [finishedLoading, setFinishedLoading] = useState(false);
   const { toast } = useToast();
-  const { mutate: getQuestions, isLoading } = useMutation({
+  const { mutate: getQuestions, status } = useMutation({
     mutationFn: async ({ amount, topic, type }: Input) => {
       console.log(type);
       const response = await axios.post("/api/game", { amount, topic, type });
@@ -128,9 +128,7 @@ const QuizForm = ({ topic: topicParam }: Props) => {
                 <BookOpen className="w-4 h-4 mr-2" /> Open Ended
               </Button>
             </div>
-            <Button disabled={isLoading} type="submit">
-              Submit
-            </Button>
+            <Button /*disabled={}*/ type="submit">Submit</Button>
           </form>
         </Form>
       </Card>
