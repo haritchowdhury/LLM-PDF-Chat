@@ -123,16 +123,22 @@ export const queryUpstashAndLLM = async (
 export const deleteUpstashRedis = async (
   index: Index,
   namespace: string,
-  sessionId: string
+  sessionId: string,
+  taskId: number
 ) => {
   const redis = new Redis({
     url: process.env.UPSTASH_REDIS_REST_URL,
     token: process.env.UPSTASH_REDIS_REST_TOKEN,
   });
-  /* const history = await redis.keys(`${sessionId}*`);
+  if (taskId == 1) {
+    const responseReset = await index.reset({ namespace: namespace });
+    console.log(responseReset);
+  }
+  //const responseDelete = await index.delete({ namespace: "my-namespace" });
+  const history = await redis.keys(`${sessionId}*`);
   for (const key of history) {
     await redis.del(key);
-  } */
+  }
   const context = await redis.keys(`${namespace}*`);
   for (const key of context) {
     await redis.del(key);

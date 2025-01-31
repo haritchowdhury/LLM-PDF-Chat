@@ -18,6 +18,7 @@ export default new RAGChat({
   present in Vector Store and provided context.  
   Vary your responses and avoid starting answers with the same phrasing repeatedly.  
   Make each response natural and engaging. 
+  Answer only from ${chatHistory} and ${context}.
   ------
   Chat history:
   ${chatHistory}

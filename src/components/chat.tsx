@@ -95,7 +95,7 @@ const Chat = ({ email }: User) => {
               }, 10000);
               //router.refresh();
               //setDisabled(false);
-              //setMessages(res.messages);
+              setMessages([]);
             } else {
               toast({
                 duration: 2000,

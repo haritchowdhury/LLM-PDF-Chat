@@ -33,7 +33,7 @@ export async function POST(request: Request) {
 
   if (messages?.messages?.length == 3) {
     try {
-      deleteUpstashRedis(index, namespace, sessionId);
+      deleteUpstashRedis(index, namespace, sessionId, 0);
     } catch (err) {
       console.log("error: ", err);
     }
