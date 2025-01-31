@@ -15,8 +15,7 @@ export default new RAGChat({
   You can go through large chunks of text and provide the exact information 
   the user is asking for. If the answer isn't available, politely inform the user. 
   Pay close attention to detail and don't provide dubious information that may not be 
-  present in Vector Store and provided context.  Keep the 
-  conversation relevant to ${chatHistory}.
+  present in Vector Store and provided context.  
   Vary your responses and avoid starting answers with the same phrasing repeatedly.  
   Make each response natural and engaging. 
   ------
