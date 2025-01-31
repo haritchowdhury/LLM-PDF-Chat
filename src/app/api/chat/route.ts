@@ -12,7 +12,7 @@ import type { Message } from "ai";
 import { Index } from "@upstash/vector";
 import { aiUseChatAdapter } from "@upstash/rag-chat/nextjs";
 import getUserSession from "@/lib/user.server";
-import { queryUpstashAndLLM } from "@/lib/upstash";
+import { queryUpstashAndLLM, deleteUpstashRedis } from "@/lib/upstash";
 
 export async function POST(request: Request) {
   const user = await getUserSession();
@@ -23,18 +23,24 @@ export async function POST(request: Request) {
   const question: string | undefined = (messages["messages"] as Message[]).at(
     -1
   )?.content;
-
   if (!question) return new Response("No question in the request.");
   const [sessionId, namespace] = user;
-
-  if (!namespaceList.includes(namespace)) {
-    return new Response(null, { status: 404 });
-  }
 
   const index = new Index({
     url: process.env.UPSTASH_VECTOR_REST_URL,
     token: process.env.UPSTASH_VECTOR_REST_TOKEN,
   });
+
+  if (messages?.messages?.length == 3) {
+    try {
+      deleteUpstashRedis(index, namespace, sessionId);
+    } catch (err) {
+      console.log("error: ", err);
+    }
+  }
+  if (!namespaceList.includes(namespace)) {
+    return new Response(null, { status: 404 });
+  }
 
   const response = await queryUpstashAndLLM(
     index,

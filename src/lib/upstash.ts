@@ -129,10 +129,10 @@ export const deleteUpstashRedis = async (
     url: process.env.UPSTASH_REDIS_REST_URL,
     token: process.env.UPSTASH_REDIS_REST_TOKEN,
   });
-  const history = await redis.keys(`${sessionId}*`);
+  /* const history = await redis.keys(`${sessionId}*`);
   for (const key of history) {
     await redis.del(key);
-  }
+  } */
   const context = await redis.keys(`${namespace}*`);
   for (const key of context) {
     await redis.del(key);
