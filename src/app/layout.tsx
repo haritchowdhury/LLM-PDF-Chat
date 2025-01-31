@@ -3,7 +3,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "@/app/globals.css";
 import { ReactNode } from "react";
 import { Toaster } from "@/components/ui/toaster";
-
+import Providers from "@/components/providers";
 const geistSans = Geist({
   variable: "--font-geist-sans",
   subsets: ["latin"],
@@ -22,19 +22,23 @@ const metadata: Metadata = {
 type LayoutProps = {
   children: ReactNode;
 };
+//const queryClient = new QueryClient();
+
 const Layout = ({ children }: LayoutProps) => {
   return (
     <html lang="en">
-      <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
-      >
-        <main className="flex items-center justify-center min-h-screen bg-black">
-          <div className="bg-white p-8 rounded-lg shadow-md w-full max-w-md">
+      <Providers>
+        <body
+          className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+        >
+          <div className="flex items-center justify-center min-h-screen bg-black">
+            {/*<div className="bg-white p-8 rounded-lg shadow-md w-full max-w-md"> */}
             {children}
             <Toaster />
+            {/*</div> */}
           </div>
-        </main>
-      </body>
+        </body>
+      </Providers>
     </html>
   );
 };

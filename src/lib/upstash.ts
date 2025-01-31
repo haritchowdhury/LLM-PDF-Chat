@@ -62,6 +62,11 @@ export const updateUpstash = async (
           },
           { namespace: namespace }
         );
+        await ragChat.context.add({
+          type: "text",
+          data: pageContent,
+          options: { namespace: namespace },
+        });
         console.log(`Batch: ${counter} response: ${JSON.stringify(response)}`);
         batch = [];
         pageContent = "";

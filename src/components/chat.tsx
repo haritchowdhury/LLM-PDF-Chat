@@ -12,6 +12,8 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
+
+import QuizForm from "@/components/quizForm";
 type User = {
   email: string;
 };
@@ -47,14 +49,14 @@ const Chat = ({ email }: User) => {
 
   useEffect(() => {
     scrollToBottom();
-  }, [messages, setMessages, loading]);
+  }, [messages, setMessages]);
 
   return (
     <>
       <input
         type="file"
         id="fileInput"
-        className="hidden"
+        className="hidden "
         accept="application/pdf"
         onChange={() => {
           const fileInput = document.getElementById(
@@ -76,6 +78,7 @@ const Chat = ({ email }: User) => {
             duration: 10000,
             description: "Adding your PDF to AI's knowledge...",
           });
+          //setDisabled(true);
           fetch("/api/upsert", {
             method: "POST",
             body: formData,
@@ -86,7 +89,13 @@ const Chat = ({ email }: User) => {
                 duration: 2000,
                 description: "Added the PDF to AI's knowledge succesfully.",
               });
-              setMessages([]);
+              setTimeout(() => {
+                //window.location.reload();
+                router.refresh();
+              }, 10000);
+              //router.refresh();
+              //setDisabled(false);
+              //setMessages(res.messages);
             } else {
               toast({
                 duration: 2000,
@@ -97,21 +106,23 @@ const Chat = ({ email }: User) => {
           });
         }}
       />
-
-      <div className="flex flex-column items-start justify-between py-2">
-        <h6 className="font-bold text-white bg-gray-400 self-start px-2 rounded-lg text-justify">
+      {!messages.length ? (
+        <p className="text-white">
           {" "}
-          DocWhisperer
-        </h6>
-      </div>
+          Upload a document to start as conversation
+        </p>
+      ) : (
+        <></>
+      )}
+
       <div
         className="mx-auto flex w-full flex-col overflow-y-auto  "
         style={{
-          maxHeight: "calc(100vh - 400px)",
+          maxHeight: "clamp(300px, 100vh - 320px, 900px)",
           paddingBottom: "8px",
-          maxWidth: "calc(100vw - 100px)",
+          paddingTop: "8px",
+          maxWidth: "clamp(300px, 100vw - 420px, 900px)",
           margin: "0 auto",
-          padding: "0",
         }}
       >
         {email ? (
@@ -142,7 +153,7 @@ const Chat = ({ email }: User) => {
         )}
         <div ref={messagesEndRef} />
       </div>
-      <div className="fixed bottom-0  mb-20 flex w-full max-w-[82vw] flex-row items-center shadow sm:max-w-md">
+      <div className="fixed bottom-0  mb-20 flex w-full  flex-row items-center justify-center shadow left-0 right-0">
         <div className="cursor-pointer border px-2 py-1 pt-2 text-gray-400 hover:text-gray-800">
           <TooltipProvider>
             <Tooltip>
@@ -164,6 +175,7 @@ const Chat = ({ email }: User) => {
         </div>
         <Input
           value={input}
+          style={{ maxWidth: "clamp(300px, 100vw - 420px, 900px)" }}
           disabled={disabled}
           className="!rounded-none align-content: center"
           onChange={handleInputChange}
@@ -178,3 +190,13 @@ const Chat = ({ email }: User) => {
 };
 
 export { Chat };
+/*<>
+          <div className=" fixed top-40 flex  items-start">
+            <h6 className="font-bold text-white  px-2 rounded-lg ">
+              DocWhisperer
+            </h6>
+          </div>
+          <div style={{ maxWidth: "clamp(300px, 100vw - 100px, 900px)" }}>
+            <QuizForm />{" "}
+          </div>
+        </> */

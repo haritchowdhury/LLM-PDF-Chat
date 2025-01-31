@@ -29,7 +29,7 @@ HUGGINGFACEHUB_API_KEY= //allow read and write access
 ```
 4. run the command `yarn`
 5. run the command `"db:migrate"`
-6. run in localhost `yarn dev` ```
+6. run in localhost `yarn dev`
 ````
 
 ## Tech Stack

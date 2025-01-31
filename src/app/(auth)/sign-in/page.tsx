@@ -12,7 +12,7 @@ const Page = async () => {
   if (session) redirect("/");
   return (
     <div className="w-full max-w-sm mx-auto space-y-6">
-      <h6 className="font-semibold"> DocWhisperer</h6>
+      <h6 className="font-semibold text-white"> DocWhisperer</h6>
 
       <GithubSignIn />
       <div className="relative">
@@ -63,7 +63,9 @@ const Page = async () => {
 
       <div className="text-center">
         <Button asChild variant="link">
-          <Link href="/sign-up">Don&apos;t have an account? Sign up</Link>
+          <Link className="text-white" href="/sign-up">
+            Don&apos;t have an account? Sign up
+          </Link>
         </Button>
       </div>
     </div>

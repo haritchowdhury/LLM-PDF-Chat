@@ -33,11 +33,11 @@ export async function POST(request: NextRequest) {
     url: process.env.UPSTASH_VECTOR_REST_URL,
     token: process.env.UPSTASH_VECTOR_REST_TOKEN,
   });
-  try {
+  /* try {
     deleteUpstashRedis(index, namespace, sessionId);
   } catch (err) {
     console.log("error: ", err);
-  }
+  }*/
   try {
     await updateUpstash(index, namespace, docs);
   } catch (err) {

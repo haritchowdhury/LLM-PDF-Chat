@@ -12,7 +12,9 @@ const Page = async () => {
 
   return (
     <div className="w-full max-w-sm mx-auto space-y-6">
-      <h1 className="text-2xl font-bold text-center mb-6">Create Account</h1>
+      <h1 className="text-white text-2xl font-bold text-center mb-6">
+        Create Account
+      </h1>
 
       <GithubSignIn />
 
@@ -59,7 +61,9 @@ const Page = async () => {
 
       <div className="text-center">
         <Button asChild variant="link">
-          <Link href="/sign-in">Already have an account? Sign in</Link>
+          <Link className="text-white" href="/sign-in">
+            Already have an account? Sign in
+          </Link>
         </Button>
       </div>
     </div>
