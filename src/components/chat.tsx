@@ -107,10 +107,7 @@ const Chat = ({ email }: User) => {
         }}
       />
       {!messages.length ? (
-        <p className="text-white">
-          {" "}
-          Upload a document to start as conversation
-        </p>
+        <p className="text-white"> Upload a document to start a conversation</p>
       ) : (
         <></>
       )}
