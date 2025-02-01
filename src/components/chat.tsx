@@ -109,7 +109,12 @@ const Chat = ({ email }: User) => {
       {!messages.length ? (
         <p className="text-white"> Upload a document to start a conversation</p>
       ) : (
-        <></>
+        <>
+          <div className=" fixed top-40 flex  items-start py-6"></div>
+          {/*<div style={{ maxWidth: "clamp(300px, 100vw - 80px, 1000px)" }}>
+            <QuizForm />{" "}
+          </div> */}
+        </>
       )}
 
       <div
@@ -187,13 +192,4 @@ const Chat = ({ email }: User) => {
 };
 
 export { Chat };
-/*<>
-          <div className=" fixed top-40 flex  items-start">
-            <h6 className="font-bold text-white  px-2 rounded-lg ">
-              DocWhisperer
-            </h6>
-          </div>
-          <div style={{ maxWidth: "clamp(300px, 100vw - 100px, 900px)" }}>
-            <QuizForm />{" "}
-          </div>
-        </> */
+/**/

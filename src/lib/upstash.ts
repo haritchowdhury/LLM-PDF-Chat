@@ -94,7 +94,6 @@ export const queryUpstashAndLLM = async (
   );
   //console.log(queryResponse[0].metadata);
   if (queryResponse.length >= 1) {
-    //let promiseList = [];
     for (let idx = 0; idx < queryResponse.length; idx++) {
       try {
         const context = queryResponse[0].metadata.content;
@@ -117,6 +116,7 @@ export const queryUpstashAndLLM = async (
     historyLength: 5,
     topK: 5,
   });
+  //const formattedResponse = response.toString().replace(/\. /g, ".\n");
   return response;
 };
 
@@ -133,11 +133,11 @@ export const deleteUpstashRedis = async (
   if (taskId == 1) {
     const responseReset = await index.reset({ namespace: namespace });
     console.log(responseReset);
-  }
-  //const responseDelete = await index.delete({ namespace: "my-namespace" });
-  const history = await redis.keys(`${sessionId}*`);
-  for (const key of history) {
-    await redis.del(key);
+  } else {
+    const history = await redis.keys(`${sessionId}*`);
+    for (const key of history) {
+      await redis.del(key);
+    }
   }
   const context = await redis.keys(`${namespace}*`);
   for (const key of context) {
