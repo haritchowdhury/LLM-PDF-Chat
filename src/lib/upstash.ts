@@ -133,7 +133,6 @@ export const deleteUpstashRedis = async (
   if (taskId == 1) {
     const responseReset = await index.reset({ namespace: namespace });
     console.log(responseReset);
-  } else {
     const history = await redis.keys(`${sessionId}*`);
     for (const key of history) {
       await redis.del(key);
