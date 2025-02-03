@@ -96,7 +96,7 @@ export const queryUpstashAndLLM = async (
   if (queryResponse.length >= 1) {
     for (let idx = 0; idx < queryResponse.length; idx++) {
       try {
-        const context = queryResponse[0].metadata.content;
+        const context = queryResponse[idx]?.metadata?.content;
         await ragChat.context.add({
           type: "text",
           data: context,
@@ -107,17 +107,63 @@ export const queryUpstashAndLLM = async (
       }
     }
   }
-
+  //let textResponse = "";
   const response = await ragChat.chat(question, {
+    debug: true,
     streaming: true,
     namespace,
     sessionId,
     similarityThreshold: 0.7,
     historyLength: 5,
     topK: 5,
+    /*onChunk: async ({
+      content,
+      inputTokens,
+      chunkTokens,
+      totalTokens,
+      rawContent,
+    }: {
+      // Change or read your streamed chunks
+      // Examples:
+      //textResponse += content;
+      //console.log(rawContent);
+      // - Log the content: console.log(content);
+      // - Modify the content: content = content.toUpperCase();
+      // - Track token usage: console.log(`Tokens used: ${totalTokens}`);
+      // - Analyze raw content: processRawContent(rawContent);
+      // - Update UI in real-time: updateStreamingUI(content);
+    }) => {
+      textResponse += await content;
+    },*/
   });
   //const formattedResponse = response.toString().replace(/\. /g, ".\n");
   return response;
+};
+
+export const queryUpstash = async (
+  index: Index,
+  namespace: string,
+  sessionId: string,
+  topic: string
+) => {
+  const embeddingsArrays =
+    await new HuggingFaceInferenceEmbeddings().embedDocuments([topic]);
+  const queryResponse: any[] = await index.query(
+    {
+      topK: 10,
+      vector: embeddingsArrays[0],
+      includeVectors: false,
+      includeMetadata: true,
+    },
+    { namespace: namespace }
+  );
+  let quizcontent = "";
+  if (queryResponse.length >= 1) {
+    for (let idx = 0; idx < queryResponse.length; idx++) {
+      quizcontent += queryResponse[0].metadata;
+    }
+  }
+  return quizcontent;
 };
 
 export const deleteUpstashRedis = async (
