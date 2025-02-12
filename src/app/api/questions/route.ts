@@ -92,7 +92,7 @@ import { queryUpstash } from "@/lib/upstash";
 import { Index } from "@upstash/vector";
 
 export const runtime = "nodejs";
-export const maxDuration = 500;
+export const maxDuration = 60;
 
 export async function POST(request: NextRequest) {
   const body = await request.json();

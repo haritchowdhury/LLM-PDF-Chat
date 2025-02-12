@@ -9,7 +9,7 @@ import { auth } from "@/lib/auth";
 import db from "@/lib/db/db";
 
 export const runtime = "nodejs";
-export const maxDuration = 500;
+export const maxDuration = 60;
 interface Topics {
   topic1: string;
   topic2: string;
