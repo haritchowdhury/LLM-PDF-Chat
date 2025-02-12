@@ -27,32 +27,31 @@ export const updateUpstash = async (
   namespace: string,
   docs: Document[]
 ) => {
-  let counter = 0;
-  for (let i = 0; i < docs.length; i++) {
-    const text = docs[i]["pageContent"];
-    counter = counter + 1;
-
+  const promiseList = docs.map(async (doc, counter) => {
+    const text = doc["pageContent"];
     const textSplitter = new RecursiveCharacterTextSplitter({
       chunkSize: 500,
       chunkOverlap: 100,
     });
     const chunks = await textSplitter.createDocuments([text]);
+
     const embeddingsArrays =
       await new HuggingFaceInferenceEmbeddings().embedDocuments(
         chunks.map((chunk) => chunk.pageContent.replace(/\n/g, " "))
       );
+
     const batchSize = 100;
     let batch: Vector[] = [];
     let pageContent = "";
-    for (let idx = 0; idx < chunks.length; idx++) {
+    const batchPromises = chunks.map(async (chunk, idx) => {
       const vector = {
         id: `${counter}_${idx}`,
         values: embeddingsArrays[idx],
       };
 
-      pageContent += chunks[idx].pageContent + " ";
+      pageContent += chunk.pageContent + " ";
+      batch.push(vector);
 
-      batch = [...batch, vector];
       if (batch.length === batchSize || idx === chunks.length - 1) {
         const response = await index.upsert(
           {
@@ -62,19 +61,25 @@ export const updateUpstash = async (
           },
           { namespace: namespace }
         );
+
         await ragChat.context.add({
           type: "text",
           data: pageContent,
           options: { namespace: namespace },
         });
+
         console.log(`Batch: ${counter} response: ${JSON.stringify(response)}`);
         batch = [];
         pageContent = "";
       }
-    }
-  }
-};
+    });
 
+    await Promise.all(batchPromises);
+  });
+
+  await Promise.all(promiseList);
+};
+/*
 export const queryUpstashAndLLM = async (
   index: Index,
   namespace: string,
@@ -92,7 +97,7 @@ export const queryUpstashAndLLM = async (
     },
     { namespace: namespace }
   );
-  //console.log(queryResponse[0].metadata);
+  //console.log(queryResponse);
   if (queryResponse.length >= 1) {
     for (let idx = 0; idx < queryResponse.length; idx++) {
       try {
@@ -116,34 +121,63 @@ export const queryUpstashAndLLM = async (
     similarityThreshold: 0.7,
     historyLength: 5,
     topK: 5,
-    /*onChunk: async ({
-      content,
-      inputTokens,
-      chunkTokens,
-      totalTokens,
-      rawContent,
-    }: {
-      // Change or read your streamed chunks
-      // Examples:
-      //textResponse += content;
-      //console.log(rawContent);
-      // - Log the content: console.log(content);
-      // - Modify the content: content = content.toUpperCase();
-      // - Track token usage: console.log(`Tokens used: ${totalTokens}`);
-      // - Analyze raw content: processRawContent(rawContent);
-      // - Update UI in real-time: updateStreamingUI(content);
-    }) => {
-      textResponse += await content;
-    },*/
   });
-  //const formattedResponse = response.toString().replace(/\. /g, ".\n");
   return response;
-};
+}; */
 
-export const queryUpstash = async (
+export const queryUpstashAndLLM = async (
   index: Index,
   namespace: string,
   sessionId: string,
+  question: string
+) => {
+  const embeddingsArrays =
+    await new HuggingFaceInferenceEmbeddings().embedDocuments([question]);
+
+  const queryResponse: any[] = await index.query(
+    {
+      topK: 10,
+      vector: embeddingsArrays[0],
+      includeVectors: false,
+      includeMetadata: true,
+    },
+    { namespace }
+  );
+
+  if (queryResponse.length >= 1) {
+    const contextPromises = queryResponse.map(async (result) => {
+      try {
+        const context = result?.metadata?.content;
+        return ragChat.context.add({
+          type: "text",
+          data: context,
+          options: { namespace },
+        });
+      } catch (err) {
+        console.error(`There was an error: ${err}`);
+        return Promise.resolve(); // Prevents rejection of Promise.all
+      }
+    });
+
+    await Promise.all(contextPromises);
+  }
+
+  const response = await ragChat.chat(question, {
+    debug: true,
+    streaming: true,
+    namespace,
+    sessionId,
+    similarityThreshold: 0.7,
+    historyLength: 5,
+    topK: 5,
+  });
+
+  return response;
+};
+/*
+export const queryUpstash = async (
+  index: Index,
+  namespace: string,
   topic: string
 ) => {
   const embeddingsArrays =
@@ -158,12 +192,41 @@ export const queryUpstash = async (
     { namespace: namespace }
   );
   let quizcontent = "";
+  //console.log(queryResponse[0]);
   if (queryResponse.length >= 1) {
     for (let idx = 0; idx < queryResponse.length; idx++) {
-      quizcontent += queryResponse[0].metadata;
+      quizcontent += queryResponse[idx]?.metadata?.content;
     }
-  }
+  } 
+  //console.log(quizcontent);
   return quizcontent;
+}; */
+
+export const queryUpstash = async (
+  index: Index,
+  namespace: string,
+  topic: string
+) => {
+  const embeddingsArrays =
+    await new HuggingFaceInferenceEmbeddings().embedDocuments([topic]);
+
+  const queryResponse: any[] = await index.query(
+    {
+      topK: 10,
+      vector: embeddingsArrays[0],
+      includeVectors: false,
+      includeMetadata: true,
+    },
+    { namespace }
+  );
+
+  if (queryResponse.length === 0) return "";
+
+  const quizContentArray = await Promise.all(
+    queryResponse.map(async (result) => result?.metadata?.content || "")
+  );
+
+  return quizContentArray.join(""); // Combines all the content into a single string
 };
 
 export const deleteUpstashRedis = async (

@@ -6,12 +6,14 @@ import { Input } from "@/components/ui/input";
 import { executeAction } from "@/lib/executeAction";
 import Link from "next/link";
 import { redirect } from "next/navigation";
+import ErrorToast from "@/components/ErrorToast";
 
 const Page = async () => {
   const session = await auth();
   if (session) redirect("/");
   return (
     <div className="w-full max-w-sm mx-auto space-y-6">
+      <ErrorToast />
       <h6 className="font-semibold text-white"> DocWhisperer</h6>
 
       <GithubSignIn />
@@ -33,11 +35,11 @@ const Page = async () => {
           "use server";
           await executeAction({
             actionFn: async () => {
-              /* try {*/
-              await signIn("credentials", formData);
-              /* } catch {
-                redirect("/error");
-              }*/
+              try {
+                await signIn("credentials", formData);
+              } catch {
+                redirect("/sign-in?error=1");
+              }
             },
           });
         }}

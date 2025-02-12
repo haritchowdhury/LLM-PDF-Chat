@@ -1,6 +1,7 @@
 import { schema } from "@/lib/schema";
 import db from "@/lib/db/db";
 import { executeAction } from "@/lib/executeAction";
+import bcrypt from "bcryptjs"; // Import bcrypt
 
 const signUp = async (formData: FormData) => {
   return executeAction({
@@ -8,10 +9,12 @@ const signUp = async (formData: FormData) => {
       const email = formData.get("email");
       const password = formData.get("password");
       const validatedData = schema.parse({ email, password });
+      const hashedPassword = await bcrypt.hash(validatedData.password, 10);
+
       await db.user.create({
         data: {
           email: validatedData.email.toLocaleLowerCase(),
-          password: validatedData.password,
+          password: hashedPassword,
         },
       });
     },

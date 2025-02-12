@@ -5,7 +5,7 @@ import Link from "next/link";
 const Footer = () => {
   return (
     <footer
-      className="bg-black text-white"
+      className="bg-black text-white flex justify-center"
       style={{
         position: "fixed",
         bottom: 0,

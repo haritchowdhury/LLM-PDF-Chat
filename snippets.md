@@ -1,3 +1,4 @@
+cm706yo790000s7lmvpjl4yks
 // Define the function schema
 const extractionFunctionSchema = {
 name: "extractor",
@@ -43,19 +44,19 @@ required: [
 //const extractionFunctionSchemaList = extractionFunctionSchema[]
 const parser = new JsonOutputFunctionsParser<extractionFunctionSchema>();
 
-//console.log(system_prompt, user_prompt, output_format);
+//console.log(system*prompt, user_prompt, output_format);
 // if the user input is in a list, we also process the output as a list of json
 const list_input: boolean = Array.isArray(user_prompt);
 // if the output format contains dynamic elements of < or >, then add to the prompt to handle dynamic elements
-const dynamic_elements: boolean = /<._?>/.test(JSON.stringify(output_format));
+const dynamic_elements: boolean = /<.*?>/.test(JSON.stringify(output*format));
 // if the output format contains list elements of [ or ], then we add to the prompt to handle lists
-const list_output: boolean = /\[._?\]/.test(JSON.stringify(output_format));
+const list_output: boolean = /\[.*?\]/.test(JSON.stringify(output_format));
 
 // start off with no error message
-let error_msg: string = "";
-/_ const context_prompt: string =
+let error*msg: string = "";
+/* const context*prompt: string =
 "You are an assistant that only responds based on the provided document. If information is not in the document, say 'I don't know'. Here is the document:\n\n" +
-document_text; _/
+document_text; */
 
 for (let i = 0; i < num_tries; i++) {
 let output_format_prompt: string = `\nYou are to output the following in json format: ${JSON.stringify(

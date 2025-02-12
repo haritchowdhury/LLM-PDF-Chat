@@ -4,13 +4,12 @@ import { ChatPromptTemplate } from "@langchain/core/prompts";
 import { ChatGroq } from "@langchain/groq";
 import { JsonOutputParser } from "@langchain/core/output_parsers";
 
-interface Question {
-  question: string;
-  answer: string;
-  option1: string;
-  option2: string;
-  option3: string;
-  option4: string;
+interface Topic {
+  topic1: string;
+  topic2: string;
+  topic3: string;
+  topic4: string;
+  topic5: string;
 }
 
 export async function strict_output(
@@ -34,7 +33,7 @@ export async function strict_output(
       model: model,
       temperature: temperature,
     });
-    const parser = new JsonOutputParser<Question[]>();
+    const parser = new JsonOutputParser<Topic[]>();
 
     const context_prompt = `You are an assistant that strictly answers based on the provided document. 
     If the information is not in the document or the document is empty, respond with "I don't know." you can make up the wrong
@@ -56,13 +55,9 @@ export async function strict_output(
 
     const list_output: boolean = Array.isArray(res);
 
-    if (list_output) {
-      return res;
-    } else {
-      return "Not Found" as any;
-    }
+    return res;
     console.log("parsed output", res);
   } catch (error) {
-    return "Not Found" as any;
+    return error as any;
   }
 }

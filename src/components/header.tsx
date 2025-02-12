@@ -14,7 +14,7 @@ const Header = async () => {
         left: 0,
         width: "100%",
         zIndex: 1000, // Ensures it stays on top of other elements
-        borderBottom: "1px solid #ddd", // Optional: Adds a subtle border
+        //borderBottom: "1px solid #ddd", // Optional: Adds a subtle border
         padding: "1rem", // Optional: Adjust spacing
         boxShadow: "0 2px 5px rgba(0, 0, 0, 0.1)", // Optional: Adds a shadow
       }}

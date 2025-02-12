@@ -16,6 +16,8 @@ model User {
   image         String?
   accounts      Account[]
   sessions      Session[]
+  games         Game[]
+  uploads       Upload[]
   // Optional for WebAuthn support
   Authenticator Authenticator[]
 
@@ -78,4 +80,60 @@ model Authenticator {
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@id([userId, credentialID])
+}
+
+enum GameType {
+  mcq
+  open_ended
+}
+
+model Game {
+  id          String     @id @default(cuid())
+  userId      String
+  questions   Question[]
+  timeStarted DateTime
+  topic       String
+  timeEnded   DateTime?
+  gameType    GameType
+  user        User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+}
+
+model topic_count {
+  id    String @id @default(cuid())
+  topic String @unique
+  count Int
+}
+
+model Question {
+  id                String   @id @default(cuid())
+  question          String
+  answer            String
+  gameId            String
+  options           Json? // for mcq questions
+  percentageCorrect Float? // for open_ended questions
+  isCorrect         Boolean? // for mcq questions
+  questionType      GameType
+  userAnswer        String?
+
+  game Game @relation(fields: [gameId], references: [id])
+
+  @@index([gameId])
+}
+
+model Upload {
+  id                String   @id @default(cuid())
+  userId            String
+  options           Json? 
+  timeStarted       DateTime
+  isCompleted1      Boolean? 
+  isCompleted2      Boolean? 
+  isCompleted3      Boolean? 
+  isCompleted4      Boolean? 
+  isCompleted5      Boolean? 
+  timeEnded         DateTime?
+  user        User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  @@index([userId])
 }
