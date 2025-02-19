@@ -59,12 +59,10 @@ const TopicCreationButton = () => {
   return (
     <Card className="border-none bg-black text-white">
       {!created ? (
-        <CardContent>
-          <CardDescription> Wait a while! </CardDescription>
-        </CardContent>
+        <CardDescription className="mb-0"> Wait a while! </CardDescription>
       ) : (
         <form
-          className="flex w-full p-3 items-center justify-center"
+          className="flex w-full pt-1 items-center justify-center"
           //className="flex  grid-cols-3 flex-row w-full "
           onSubmit={form.handleSubmit(onSubmit)}
         >

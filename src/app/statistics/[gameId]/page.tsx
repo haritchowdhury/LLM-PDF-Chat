@@ -46,30 +46,34 @@ const Statistics = async ({ params }: { params: Params }) => {
   accuracy = Math.round(accuracy * 100) / 100;
 
   return (
-    <div className="flex flex-col h-screen  p-1 mb-4 px-2">
-      {/* Header */}
-      <div className="flex items-center justify-between mb-1">
-        <h6 className="text-lg font-bold tracking-tight text-white">Summary</h6>
-      </div>
-
-      {/* Content Container */}
-      <div className="flex flex-col flex-grow overflow-hidden">
-        {/* Statistics Grid */}
-        <div className="grid gap-3 md:grid-cols-7 flex-grow justify-center items-stretch overflow-auto">
-          <ResultsCard accuracy={accuracy} />
-          <AccuracyCard accuracy={accuracy} />
-          <TimeTakenCard
-            timeEnded={new Date(game.timeEnded ?? 0)}
-            timeStarted={new Date(game.timeStarted ?? 0)}
-          />
+    <main className="flex relative items-center overflow-y-auto justify-center max-h-[900px] bg-black">
+      <div className="flex flex-col h-screen  p-1 mb-4 px-2">
+        {/* Header */}
+        <div className="flex items-center justify-between mb-1">
+          <h6 className="text-lg font-bold tracking-tight text-white">
+            Summary
+          </h6>
         </div>
 
-        {/* Questions List */}
-        <div className="flex-grow">
-          <QuestionsList questions={game.questions} />
+        {/* Content Container */}
+        <div className="flex flex-col flex-grow overflow-hidden">
+          {/* Statistics Grid */}
+          <div className="grid gap-3 md:grid-cols-7 flex-grow justify-center items-stretch overflow-auto">
+            <ResultsCard accuracy={accuracy} />
+            <AccuracyCard accuracy={accuracy} />
+            <TimeTakenCard
+              timeEnded={new Date(game.timeEnded ?? 0)}
+              timeStarted={new Date(game.timeStarted ?? 0)}
+            />
+          </div>
+
+          {/* Questions List */}
+          <div className="flex-grow">
+            <QuestionsList questions={game.questions} />
+          </div>
         </div>
       </div>
-    </div>
+    </main>
   );
 };
 

@@ -46,5 +46,9 @@ export default async function MCQPage({ params }: { params: Params }) {
     return redirect("/quiz");
   }
   //console.log("current game:", game);
-  return <MCQ key={game.id} game={game} />;
+  return (
+    <main className="flex relative items-center justify-center min-h-screen bg-black">
+      <MCQ key={game.id} game={game} />{" "}
+    </main>
+  );
 }

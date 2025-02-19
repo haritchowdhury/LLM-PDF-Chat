@@ -114,7 +114,7 @@ USEEFEECT */
     <p className="bg-black text-white"> Creating Quiz...</p>
   ) : (
     <>
-      <Card className="border-none fixed top-20 left-1/2 -translate-x-1/2 w-[500px] bg-black">
+      <Card className="border-none fixed top-20 p-0 left-1/2 -translate-x-1/2 w-[675px] bg-black">
         <Form {...form}>
           <form
             className="flex  grid-cols-3 flex-row w-full "
@@ -126,7 +126,7 @@ USEEFEECT */
               render={({ field }) => (
                 <FormItem
                   className=" w-5/6"
-                  style={{ maxWidth: "calc(100vw - 80px)" }}
+                  //style={{ maxWidth: "calc(100vw - 80px)" }}
                 >
                   <FormControl className="bg-gray-200 text-black">
                     <Input placeholder="Quiz topic" {...field} />
@@ -141,7 +141,7 @@ USEEFEECT */
               render={({ field }) => (
                 <FormItem
                   className="w-1/6 px-1"
-                  style={{ maxWidth: "calc(100vw - 80px)" }}
+                  //style={{ maxWidth: "calc(100vw - 80px)" }}
                 >
                   <FormControl className="bg-gray-200 text-black">
                     <Input
@@ -169,13 +169,13 @@ USEEFEECT */
         {!topics?.length ? (
           <TopicCreationButton />
         ) : (
-          <div className="flex flex-wrap gap-3 py-2 justify-center bg-black rounded-md">
+          <div className="flex gap-3  py-1 justify-center bg-black rounded-md">
             {topics.map((topic, idx) => (
               <Button
                 key={idx}
                 variant="outline"
                 size="sm"
-                className="text-black bg-gray-200 border-gray-600 hover:bg-gray-700"
+                className="text-black bg-gray-200 m-0 border-none hover:bg-gray-700"
                 onClick={() => {
                   form.setValue("topic", topic);
                   form.setValue("amount", 5);

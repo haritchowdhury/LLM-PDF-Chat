@@ -4,6 +4,9 @@ import "@/app/globals.css";
 import { ReactNode } from "react";
 import { Toaster } from "@/components/ui/toaster";
 import Providers from "@/components/providers";
+//import { ConnectButton } from "@rainbow-me/rainbowkit";
+import { Header } from "@/components/header";
+import { Footer } from "@/components/footer";
 const geistSans = Geist({
   variable: "--font-geist-sans",
   subsets: ["latin"],
@@ -26,19 +29,20 @@ type LayoutProps = {
 
 const Layout = ({ children }: LayoutProps) => {
   return (
-    <html lang="en">
-      <Providers>
-        <body
-          className={`${geistSans.variable} ${geistMono.variable} antialiased`}
-        >
-          <div className="flex items-center justify-center min-h-screen bg-black">
-            {/*<div className="bg-white p-8 rounded-lg shadow-md w-full max-w-md"> */}
-            {children}
-            <Toaster />
-            {/*</div> */}
-          </div>
-        </body>
-      </Providers>
+    <html
+      lang="en"
+      className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+    >
+      <body className="min-h-screen flex flex-col bg-black">
+        <Providers>
+          <Header />
+          {/*<main className="flex-1 pt-16 relative items-center justify-center min-h-screen">*/}
+          {children}
+          {/*</main>*/}
+          <Toaster />
+          <Footer />
+        </Providers>
+      </body>
     </html>
   );
 };

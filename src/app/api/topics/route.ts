@@ -137,6 +137,9 @@ export async function POST(request: NextRequest) {
 
 export async function GET(request: NextRequest) {
   const user = await getUserSession();
+  if (!user) {
+    throw new Error("User not found");
+  }
   const [sessionId, namespace] = user;
 
   const id: string = namespace.split("_")[0];

@@ -1,26 +1,26 @@
 import { SignOut } from "@/components/sign-out";
 import { auth } from "@/lib/auth";
 import { redirect } from "next/navigation";
+import { ConnectWallet } from "@/components/wallet/connect";
+
 const Header = async () => {
   const session = await auth();
-  if (!session) redirect("/sign-in");
+  //if (!session) redirect("/sign-in");
 
   return (
-    <header
-      className="bg-black text-white"
-      style={{
-        position: "fixed",
-        top: 0,
-        left: 0,
-        width: "100%",
-        zIndex: 1000, // Ensures it stays on top of other elements
-        //borderBottom: "1px solid #ddd", // Optional: Adds a subtle border
-        padding: "1rem", // Optional: Adjust spacing
-        boxShadow: "0 2px 5px rgba(0, 0, 0, 0.1)", // Optional: Adds a shadow
-      }}
-    >
-      <SignOut />
+    <header className="fixed top-0 left-0 w-full bg-black text-white z-50 h-16 border-b border-gray-800">
+      <nav className="flex justify-end h-full max-w-7xl mx-auto px-4  gap-2 py-2 ">
+        {session ? (
+          <>
+            <ConnectWallet />
+            <SignOut />
+          </>
+        ) : (
+          <></>
+        )}
+      </nav>
     </header>
   );
 };
+
 export { Header };

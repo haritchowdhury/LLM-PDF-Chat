@@ -14,6 +14,7 @@ import {
 } from "@/components/ui/tooltip";
 import { Card, CardHeader, CardContent, CardTitle } from "@/components/ui/card";
 import QuizForm from "@/components/quizForm";
+import { useAccount } from "wagmi";
 type User = {
   email: string;
 };
@@ -27,6 +28,9 @@ const Chat = ({ email }: User) => {
   if (!email) {
     router.push("/sign-in");
   }
+
+  const { address, isConnected } = useAccount();
+
   const { toast } = useToast();
   const [disabled, setDisabled] = useState(true);
   const [loading, setLoading] = useState(true);
@@ -57,7 +61,7 @@ const Chat = ({ email }: User) => {
       {disabled ? (
         <p className="text-white">loading...</p>
       ) : (
-        <Card className="max-w-2xl mx-auto shadow-lg bg-black border-none">
+        <Card className="max-w-full md:max-w-2xl mx-auto shadow-lg bg-black border-none">
           <input
             type="file"
             id="fileInput"
@@ -110,36 +114,45 @@ const Chat = ({ email }: User) => {
               });
             }}
           />
-          <CardHeader className="w-full flex justify-center items-center p-0 ">
-            <QuizForm topic={""} />
-          </CardHeader>
-          <CardContent className="overflow-y-auto max-h-[525px] custom-scrollbar pb-2">
-            {!messages?.length ? (
-              <p className="text-white"> Upload a document and ask something</p>
+          <CardContent className="text-white flex justify-center items-center p-0 ">
+            {isConnected ? (
+              <QuizForm topic={""} />
             ) : (
-              <></>
+              <div>Connect wallet to access quiz</div>
             )}
-            {disabled ? (
-              <p className="text-gray-500 text-center">loading... </p>
-            ) : (
-              messages.map(({ content }, idx) => (
-                <div
-                  key={idx}
-                  className={clsx(
-                    "font-sans-semibold text-sm p-2 rounded-lg text-justify mt-1",
-                    idx % 2 == 0
-                      ? "text-white bg-black self-end"
-                      : "text-white bg-gray-900 self-start"
-                  )}
-                >
-                  {content}
-                </div>
-              ))
-            )}
-            <div ref={messagesEndRef} />
           </CardContent>
-          <CardContent className="overflow-y-auto max-h-[100px] p-0">
-            <div className="fixed bottom-10  mb-20 flex w-full  flex-row items-center justify-center shadow left-0 right-0">
+          <CardContent className=" bg-gray-900 rounded p-4">
+            <div className="overflow-y-auto max-h-[600px] custom-scrollbar">
+              {!messages?.length ? (
+                <p className="text-white">
+                  {" "}
+                  Upload a document and ask something
+                </p>
+              ) : (
+                <></>
+              )}
+              {disabled ? (
+                <p className="text-gray-500 text-center">loading... </p>
+              ) : (
+                messages.map(({ content }, idx) => (
+                  <div
+                    key={idx}
+                    className={clsx(
+                      "font-sans-semibold text-sm p-2 rounded-lg text-justify mt-1",
+                      idx % 2 == 0
+                        ? "text-white bg-black self-end"
+                        : "text-white bg-gray-600 self-start"
+                    )}
+                  >
+                    {content}
+                  </div>
+                ))
+              )}
+              <div ref={messagesEndRef} className="h-0" />
+            </div>
+          </CardContent>
+          <CardContent className="overflow-y-auto  p-0">
+            <div className="fixed bottom-12  mb-10 flex w-full  flex-row items-center justify-center shadow left-0 right-0">
               <div className="cursor-pointer border px-2 py-1 pt-2 text-gray-400 hover:text-gray-800">
                 <TooltipProvider>
                   <Tooltip>

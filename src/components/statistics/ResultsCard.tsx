@@ -48,7 +48,7 @@ const ResultsCard = ({ accuracy }: Props) => {
       <CardContent>
         <Link href="/" className={buttonVariants()}>
           <LucideLayoutDashboard className="mr-2" />
-          Back to Chat
+          Home
         </Link>
       </CardContent>
     </Card>
