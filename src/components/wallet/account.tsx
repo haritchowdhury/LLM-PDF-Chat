@@ -20,8 +20,8 @@ export function Account() {
   const { data: ensAvatar } = useEnsAvatar({ name: ensName! });
   //console.log(address, ensName, ensAvatar);
   //const chainId = getChainId(config);
-  const [chainId, setChainId] = useState<any | null>(null);
-  const [balance, setBalance] = useState<any | null>(null);
+  const [chainId, setChainId] = useState<any | null>("");
+  const [balance, setBalance] = useState<any | null>("");
   //const { connectors, switchAccount } = useSwitchAccount();
 
   useEffect(() => {
