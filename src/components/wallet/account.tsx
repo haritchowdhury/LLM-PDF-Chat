@@ -57,11 +57,11 @@ export function Account() {
           </div>
           {ensName ? (
             `${ensName} (${
-              address.slice(1, 7) + "..." + address.slice(-5, -1)
+              address?.slice(1, 7) + "..." + address?.slice(-5, -1)
             })`
           ) : (
             <div className="flex flex-col p-1 justify-end bg-gray-900 rounded">
-              <div>{address.slice(0, 4) + "..." + address.slice(-5, -1)}</div>{" "}
+              <div>{address?.slice(0, 4) + "..." + address?.slice(-5, -1)}</div>{" "}
               <small className="bg-gray-400 rounded  text-black ">
                 Balance:{balance?.toString().split(".")[0]}.{""}
                 {balance?.toString().split(".")[1].slice(0, 2)}
