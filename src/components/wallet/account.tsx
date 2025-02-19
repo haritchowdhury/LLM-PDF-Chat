@@ -51,7 +51,7 @@ export function Account() {
       {ensAvatar && <img alt="ENS Avatar" src={ensAvatar} />}
       {address ? (
         <>
-          <div className="flex justify-center gap-2 w-full">
+          {/*<div className="flex justify-center gap-2 w-full">
             <div className="flex flex-col bg-gray-900 rounded p-1">
               <small>Chain Id</small>
               <small className="bg-black rounded">{chainId}</small>
@@ -75,7 +75,7 @@ export function Account() {
                 </small>
               </div>
             )}
-          </div>
+          </div> */}
           <Button onClick={() => disconnect()}>Disconnect</Button>
         </>
       ) : (

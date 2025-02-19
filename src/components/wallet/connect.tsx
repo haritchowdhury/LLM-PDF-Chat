@@ -13,5 +13,5 @@ export function ConnectWallet() {
   }, []);
 
   if (!mounted) return null; // Prevents mismatch by delaying render until client is ready
-  return isConnected ? <></> : <WalletOptions />;
+  return isConnected ? <Account /> : <WalletOptions />;
 }
