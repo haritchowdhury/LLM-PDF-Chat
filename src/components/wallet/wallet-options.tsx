@@ -32,7 +32,7 @@ function WalletOption({
   }, [connector]);
 
   return (
-    <div className="flex justify-center">
+    <div className="flex justify-center text-center">
       <Button disabled={!ready} onClick={onClick}>
         {connector.name}
       </Button>

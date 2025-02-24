@@ -4,7 +4,6 @@ import "@/app/globals.css";
 import { ReactNode } from "react";
 import { Toaster } from "@/components/ui/toaster";
 import Providers from "@/components/providers";
-//import { ConnectButton } from "@rainbow-me/rainbowkit";
 import { Header } from "@/components/header";
 import { Footer } from "@/components/footer";
 const geistSans = Geist({
@@ -25,7 +24,6 @@ const metadata: Metadata = {
 type LayoutProps = {
   children: ReactNode;
 };
-//const queryClient = new QueryClient();
 
 const Layout = ({ children }: LayoutProps) => {
   return (
@@ -36,9 +34,7 @@ const Layout = ({ children }: LayoutProps) => {
       <body className="min-h-screen flex flex-col bg-black">
         <Providers>
           <Header />
-          {/*<main className="flex-1 pt-16 relative items-center justify-center min-h-screen">*/}
           {children}
-          {/*</main>*/}
           <Toaster />
           <Footer />
         </Providers>

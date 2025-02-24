@@ -27,7 +27,6 @@ const Page = async () => {
           </div>
         </div>
 
-        {/* Email/Password Sign In */}
         <form
           className="space-y-4"
           action={async (formData) => {

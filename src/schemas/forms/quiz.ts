@@ -11,4 +11,5 @@ export const quizCreationSchema = z.object({
     }),
   //type: z.enum(["mcq", "open_ended"]),
   amount: z.number().min(1).max(10),
+  id: z.string().min(1),
 });

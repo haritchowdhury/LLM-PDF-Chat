@@ -1,11 +1,13 @@
 "use client";
+import { Button } from "@/components/ui/button";
+import { FaXTwitter } from "react-icons/fa6";
 
 import Link from "next/link";
 
 const Footer = () => {
   return (
     <footer
-      className="bg-black text-white flex justify-center border-t border-gray-800"
+      className="bg-black gap-4  text-white flex justify-center border-t border-gray-800"
       style={{
         position: "fixed",
         bottom: 0,
@@ -15,9 +17,14 @@ const Footer = () => {
         //boxShadow: "0 2px 5px rgba(0, 0, 0, 0.1)", // Optional: Adds a shadow
       }}
     >
-      <small className="inline-block bg-gray-300 hover:bg-gray-800 text-black font-semibold py-2 px-2 rounded transition duration-300">
-        DocWhisperer@2025
+      <small className="inline-block bg-gray-300 hover:bg-gray-800 text-black font-semibold px-1 py-1 rounded transition duration-300">
+        <Link href="https://docs.google.com/forms/d/e/1FAIpQLSem8OlduXTZCeUqi_tY2gnBIMlFgq-KMIozShzCH9WGDLDLHA/viewform?usp=sharing">
+          aiversity-beta | Feedback
+        </Link>
       </small>
+      <Link href="https://x.com/Ainiversity">
+        <FaXTwitter className="text-xl" />
+      </Link>
     </footer>
   );
 };

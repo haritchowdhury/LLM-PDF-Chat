@@ -1,3 +1,4 @@
+import { WalletOptions } from "@/components/wallet/wallet-options";
 import { strict_output } from "@/lib/groqTopicSetter";
 import getUserSession from "@/lib/user.server";
 import { getTopicsSchema } from "@/schemas/topics";
@@ -71,9 +72,9 @@ export async function POST(request: NextRequest) {
       "What are the Key Topics of this document?"
     );
     const topics: any = await strict_output(
-      `You are an Expert AI Instructor who can identify the theme of the summary and figure out the most important topics
-        from a summary that may be most important for a coming examination,  you are to return the top 5 most important topics that most 
-        thoroughly capture the import aspects of the summary. Chosse these topics like they are the main chapters of a book. The length of each topic must
+      `You are an Expert AI Instructor who can identify the theme of the summary and figure out the most important chapers
+        from the summary that will be useful for preparing the paper for exam,  you are to return the top 5 important chapters that most 
+        thoroughly capture the import aspects of the summary. The length of each topic must
         not exceed 4 words. Store all options in a JSON array of the following structure:
         {
          "topic1": "string",
@@ -114,8 +115,6 @@ export async function POST(request: NextRequest) {
         }
       );
     }
-
-    /* ---------- */
     return NextResponse.json(
       {
         topcs: topics,
@@ -140,55 +139,102 @@ export async function GET(request: NextRequest) {
   if (!user) {
     throw new Error("User not found");
   }
-  const [sessionId, namespace] = user;
-
-  const id: string = namespace.split("_")[0];
-  const userExists = await db.user.findUnique({
-    where: { id },
-  });
-
-  if (!userExists) {
-    throw new Error("User not found");
-  } /* else {
-    //console.log(userExists);
-  }*/
-
-  const lastUpload = await db.upload.findFirst({
-    where: {
-      userId: id,
-    },
-    orderBy: {
-      timeStarted: "desc",
-    },
-  });
-  if (!lastUpload) {
-    return NextResponse.json(
-      {
-        topics: [],
-      },
-      {
-        status: 200,
-      }
-    );
-  }
   try {
+    const [sessionId, namespace] = user;
+
+    const id: string = namespace.split("_")[0];
+    const userExists = await db.user.findUnique({
+      where: { id },
+    });
+
+    if (!userExists) {
+      throw new Error("User not found");
+    }
+
+    const lastUpload = await db.upload.findFirst({
+      where: {
+        userId: id,
+      },
+      orderBy: {
+        timeStarted: "desc",
+      },
+    });
     console.log("topics found");
     return NextResponse.json(
       {
         topics: lastUpload.options,
+        completed: lastUpload.isCompleted,
       },
       {
         status: 200,
       }
     );
   } catch (err) {
-    console.log("no topics", err);
+    console.log("no topics");
     return NextResponse.json(
       {
         topics: [],
+        completed: [],
       },
       {
         status: 200,
+      }
+    );
+  }
+}
+
+export async function PUT(request: NextRequest) {
+  const user = await getUserSession();
+  const body = await request.json();
+  const { ix } = body;
+  if (!user) {
+    throw new Error("User not found");
+  }
+  try {
+    const [sessionId, namespace] = user;
+
+    const id: string = namespace.split("_")[0];
+    const userExists = await db.user.findUnique({
+      where: { id },
+    });
+
+    if (!userExists) {
+      throw new Error("User not found");
+    }
+
+    const lastUpload = await db.upload.findFirst({
+      where: {
+        userId: id,
+      },
+      orderBy: {
+        timeStarted: "desc",
+      },
+    });
+    let options: boolean[] = JSON.parse(lastUpload.isCompleted as string);
+    console.log(body, ix);
+    options[ix] = true;
+    const updatedUpload = await db.upload.update({
+      where: {
+        id: lastUpload.id,
+      },
+      data: {
+        isCompleted: JSON.stringify(options),
+      },
+    });
+    return NextResponse.json(
+      {
+        topics: "milestone updated succesfully!",
+      },
+      {
+        status: 200,
+      }
+    );
+  } catch (err) {
+    console.log(err);
+    return NextResponse.json(
+      { error: "An unexpected error occurred." },
+      {
+        status: 500,
       }
     );
   }

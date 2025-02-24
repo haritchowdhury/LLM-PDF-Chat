@@ -79,51 +79,6 @@ export const updateUpstash = async (
 
   await Promise.all(promiseList);
 };
-/*
-export const queryUpstashAndLLM = async (
-  index: Index,
-  namespace: string,
-  sessionId: string,
-  question: string
-) => {
-  const embeddingsArrays =
-    await new HuggingFaceInferenceEmbeddings().embedDocuments([question]);
-  const queryResponse: any[] = await index.query(
-    {
-      topK: 10,
-      vector: embeddingsArrays[0],
-      includeVectors: false,
-      includeMetadata: true,
-    },
-    { namespace: namespace }
-  );
-  //console.log(queryResponse);
-  if (queryResponse.length >= 1) {
-    for (let idx = 0; idx < queryResponse.length; idx++) {
-      try {
-        const context = queryResponse[idx]?.metadata?.content;
-        await ragChat.context.add({
-          type: "text",
-          data: context,
-          options: { namespace: namespace },
-        });
-      } catch (err) {
-        console.log(`There was an error ${err}`);
-      }
-    }
-  }
-  //let textResponse = "";
-  const response = await ragChat.chat(question, {
-    debug: true,
-    streaming: true,
-    namespace,
-    sessionId,
-    similarityThreshold: 0.7,
-    historyLength: 5,
-    topK: 5,
-  });
-  return response;
-}; */
 
 export const queryUpstashAndLLM = async (
   index: Index,
@@ -155,7 +110,7 @@ export const queryUpstashAndLLM = async (
         });
       } catch (err) {
         console.error(`There was an error: ${err}`);
-        return Promise.resolve(); // Prevents rejection of Promise.all
+        return Promise.resolve();
       }
     });
 
@@ -174,33 +129,6 @@ export const queryUpstashAndLLM = async (
 
   return response;
 };
-/*
-export const queryUpstash = async (
-  index: Index,
-  namespace: string,
-  topic: string
-) => {
-  const embeddingsArrays =
-    await new HuggingFaceInferenceEmbeddings().embedDocuments([topic]);
-  const queryResponse: any[] = await index.query(
-    {
-      topK: 10,
-      vector: embeddingsArrays[0],
-      includeVectors: false,
-      includeMetadata: true,
-    },
-    { namespace: namespace }
-  );
-  let quizcontent = "";
-  //console.log(queryResponse[0]);
-  if (queryResponse.length >= 1) {
-    for (let idx = 0; idx < queryResponse.length; idx++) {
-      quizcontent += queryResponse[idx]?.metadata?.content;
-    }
-  } 
-  //console.log(quizcontent);
-  return quizcontent;
-}; */
 
 export const queryUpstash = async (
   index: Index,
@@ -226,7 +154,7 @@ export const queryUpstash = async (
     queryResponse.map(async (result) => result?.metadata?.content || "")
   );
 
-  return quizContentArray.join(""); // Combines all the content into a single string
+  return quizContentArray.join("");
 };
 
 export const deleteUpstashRedis = async (

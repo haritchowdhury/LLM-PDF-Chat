@@ -14,6 +14,8 @@ import {
 import axios, { AxiosError } from "axios";
 import { Input } from "@/components/ui/input";
 import { z } from "zod";
+import { motion } from "framer-motion";
+
 const schema = z.object({});
 type Input = z.infer<typeof schema>;
 
@@ -59,7 +61,10 @@ const TopicCreationButton = () => {
   return (
     <Card className="border-none bg-black text-white">
       {!created ? (
-        <CardDescription className="mb-0"> Wait a while! </CardDescription>
+        <CardDescription className="mb-0">
+          {" "}
+          <motion.div className="w-5 h-5 border-4 border-gray-300 border-t-blue-500 rounded-full animate-spin" />
+        </CardDescription>
       ) : (
         <form
           className="flex w-full pt-1 items-center justify-center"

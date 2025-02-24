@@ -14,5 +14,4 @@ const hardhatChain = {
   },
 };
 
-// Export properly
 export { hardhatChain };

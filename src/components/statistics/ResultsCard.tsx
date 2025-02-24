@@ -45,12 +45,7 @@ const ResultsCard = ({ accuracy }: Props) => {
           </>
         )}
       </CardContent>
-      <CardContent>
-        <Link href="/" className={buttonVariants()}>
-          <LucideLayoutDashboard className="mr-2" />
-          Home
-        </Link>
-      </CardContent>
+      <CardContent></CardContent>
     </Card>
   );
 };

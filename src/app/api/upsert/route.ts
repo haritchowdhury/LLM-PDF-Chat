@@ -6,7 +6,6 @@ export const dynamic = "force-dynamic";
 
 export const fetchCache = "force-no-store";
 
-//import ragChat from "@/lib/rag.server";
 import { NextRequest, NextResponse } from "next/server";
 import getUserSession from "@/lib/user.server";
 import { PDFLoader } from "@langchain/community/document_loaders/fs/pdf";
@@ -31,7 +30,6 @@ export async function POST(request: NextRequest) {
   });
 
   const id: string = namespace.split("_")[0];
-
   const docs = await loader.load();
   const index = new Index({
     url: process.env.UPSTASH_VECTOR_REST_URL,
@@ -52,33 +50,20 @@ export async function POST(request: NextRequest) {
   const userExists = await db.user.findUnique({
     where: { id },
   });
-
   if (!userExists) {
     throw new Error("User not found");
-  } else {
-    console.log(userExists);
   }
   try {
-    console.log(id, sessionId, new Date());
     const Upload = await db.upload.create({
       data: {
         id: uuid(),
         timeStarted: new Date(),
         userId: id as string,
-        isCompleted1: false,
-        isCompleted2: false,
-        isCompleted3: false,
-        isCompleted4: false,
-        isCompleted5: false,
+        isCompleted: JSON.stringify([false, false, false, false, false]),
       },
     });
-    console.log(Upload);
+    return NextResponse.redirect(new URL("/", request.url));
   } catch (err) {
     throw new Error("Upload Could not be created");
-    console.log(err);
   }
-
-  return NextResponse.json(null, {
-    status: 200,
-  });
 }

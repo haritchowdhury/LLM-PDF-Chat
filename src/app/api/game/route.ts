@@ -21,24 +21,20 @@ export async function POST(request: NextRequest) {
 
   const user = await getUserSession();
   const [sessionId, namespace] = user;
-  console.log(user);
-
   const body = await request.json();
-  const { topic, amount } = quizCreationSchema.parse(body);
+  const { topic, amount, id } = quizCreationSchema.parse(body);
   const type = "mcq";
-  console.log(topic, type, amount);
   const headersList = await headers();
   const host = await headersList.get("host");
-  //console.log(host);
   const game = await db.game.create({
     data: {
       gameType: type,
       timeStarted: new Date(),
       userId: session.user.id,
-      topic,
+      uploadId: id,
+      topic: topic,
     },
   });
-  console.log(game);
 
   await db.topic_count.upsert({
     where: {
@@ -54,7 +50,6 @@ export async function POST(request: NextRequest) {
       },
     },
   });
-  //const url = new URL(`/api/questions`, `http://${host as string}`) as string;
 
   const { data } = await axios.post(`http://${host as string}/api/questions`, {
     amount,
@@ -62,8 +57,6 @@ export async function POST(request: NextRequest) {
     type,
     namespace,
   });
-  console.log(amount, topic, type, namespace);
-  console.log(data);
   let parsedData;
   try {
     parsedData = data.questions;
@@ -102,12 +95,10 @@ export async function POST(request: NextRequest) {
         questionType: "mcq",
       };
     });
-    //console.log(manyData);
     await db.question.createMany({
       data: manyData,
     });
   }
-  //console.log(game.id);
 
   return NextResponse.json({ gameId: game.id }, { status: 200 });
 }

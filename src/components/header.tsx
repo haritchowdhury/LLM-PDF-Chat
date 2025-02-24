@@ -5,7 +5,7 @@ import { ConnectWallet } from "@/components/wallet/connect";
 
 const Header = async () => {
   const session = await auth();
-  //if (!session) redirect("/sign-in");
+  //if (!session) redirect("/sign-in"); - what a laugh!
 
   return (
     <header className="fixed top-0 left-0 w-full bg-black text-white z-50 h-16 border-b border-gray-800">

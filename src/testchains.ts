@@ -1,5 +1,5 @@
 export const eduTestnetChain = {
-  id: 656476, // Replace with the actual chain ID for the EDU testnet
+  id: 656476,
   name: "EDU Testnet",
   network: "edu-testnet",
   nativeCurrency: {
@@ -9,14 +9,14 @@ export const eduTestnetChain = {
   },
   rpcUrls: {
     default: {
-      http: ["https://open-campus-codex-sepolia.drpc.org"], // Replace with the actual RPC URL
+      http: ["https://open-campus-codex-sepolia.drpc.org"],
     },
   },
   blockExplorers: {
     default: {
       name: "EDU Explorer",
-      url: "https://educhain.blockscout.com/", // Replace with the actual block explorer URL
+      url: "https://educhain.blockscout.com/",
     },
   },
-  testnet: true, // Indicates this is a testnet
+  testnet: true,
 };

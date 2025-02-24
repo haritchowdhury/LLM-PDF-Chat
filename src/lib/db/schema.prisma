@@ -90,14 +90,16 @@ enum GameType {
 model Game {
   id          String     @id @default(cuid())
   userId      String
+  uploadId    String
   questions   Question[]
   timeStarted DateTime
   topic       String
   timeEnded   DateTime?
   gameType    GameType
   user        User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  upload Upload @relation(fields:[uploadId], references:[id])
 
-  @@index([userId])
+  @@index([userId, uploadId])
 }
 
 model topic_count {
@@ -121,7 +123,7 @@ model Question {
 
   @@index([gameId])
 }
-
+/*
 model Upload {
   id                String   @id @default(cuid())
   userId            String
@@ -132,6 +134,19 @@ model Upload {
   isCompleted3      Boolean? 
   isCompleted4      Boolean? 
   isCompleted5      Boolean? 
+  timeEnded         DateTime?
+  user        User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  @@index([userId])
+} */
+
+model Upload {
+  id                String   @id @default(cuid())
+  userId            String
+  games             Game[]
+  options           Json? 
+  timeStarted       DateTime
+  isCompleted       Json?
   timeEnded         DateTime?
   user        User       @relation(fields: [userId], references: [id], onDelete: Cascade)
   
