@@ -1,4 +1,4 @@
-import { Chat } from "@/components/Chat";
+import Chat from "@/components/Chat";
 import { auth } from "@/lib/auth";
 import { redirect } from "next/navigation";
 import db from "@/lib/db/db";
