@@ -1,7 +1,7 @@
 import { schema } from "@/schemas/schema";
 import db from "@/lib/db/db";
 import { executeAction } from "@/lib/executeAction";
-import bcrypt from "bcryptjs"; // Import bcrypt
+import bcrypt from "bcryptjs";
 
 const signUp = async (formData: FormData) => {
   return executeAction({
