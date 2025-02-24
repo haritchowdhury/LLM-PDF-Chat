@@ -25,7 +25,7 @@ const Page = async () => {
           </div>
           <div className="relative flex justify-center text-sm">
             <span className="bg-background px-2 text-muted-foreground">
-              Or continue with email
+              Sing up with email
             </span>
           </div>
         </div>
