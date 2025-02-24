@@ -17,7 +17,7 @@ const Page = async () => {
           Create Account
         </h1>
 
-        <GithubSignIn />
+        {/*   <GithubSignIn /> */}
 
         <div className="relative">
           <div className="absolute inset-0 flex items-center">
