@@ -307,4 +307,4 @@ const Chat = ({ email, upload }: User) => {
     </>
   );
 };
-export { Chat };
+export default Chat;
