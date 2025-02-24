@@ -123,22 +123,6 @@ model Question {
 
   @@index([gameId])
 }
-/*
-model Upload {
-  id                String   @id @default(cuid())
-  userId            String
-  options           Json? 
-  timeStarted       DateTime
-  isCompleted1      Boolean? 
-  isCompleted2      Boolean? 
-  isCompleted3      Boolean? 
-  isCompleted4      Boolean? 
-  isCompleted5      Boolean? 
-  timeEnded         DateTime?
-  user        User       @relation(fields: [userId], references: [id], onDelete: Cascade)
-  
-  @@index([userId])
-} */
 
 model Upload {
   id                String   @id @default(cuid())
