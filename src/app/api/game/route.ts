@@ -6,6 +6,7 @@ import { z } from "zod";
 import axios from "axios";
 import { headers } from "next/headers";
 import getUserSession from "@/lib/user.server";
+export const maxDuration = 60;
 
 export async function POST(request: NextRequest) {
   const session: any = await auth();
