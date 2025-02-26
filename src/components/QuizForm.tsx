@@ -142,10 +142,10 @@ const QuizForm = ({
     </div>
   ) : (
     <Card className="border-none w-full bg-black mb-0 pb-0 overflow-hidden">
-      <div className="bg-black pb-0 mb-0">
+      <div className="bg-black pb-0 mb-0 text-xs px-2 py-1">
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)}>
-            <div className="flex flex-col sm:flex-row w-full gap-2 p-2">
+            <div className="flex flex-col sm:flex-row w-full gap-2">
               <FormField
                 control={form.control}
                 name="topic"
@@ -213,7 +213,7 @@ const QuizForm = ({
                   key={topic}
                   variant="outline"
                   size="sm"
-                  className={`m-0 border-none hover:bg-gray-700 ${
+                  className={`m-0 border-none  text-xs px-2 py-1 hover:bg-gray-700 ${
                     !isCompleted
                       ? "bg-gray-300 text-gray-800"
                       : "bg-gray-600 text-gray-100"
