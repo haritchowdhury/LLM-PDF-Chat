@@ -107,11 +107,8 @@ const ClaimMilestones = ({ id, ix }: Upload) => {
   return (
     isConnected &&
     !lockedIn && (
-      <Card className="border-none">
-        <form
-          className="flex w-full  items-center justify-center "
-          onSubmit={form.handleSubmit(onSubmit)}
-        >
+      <div className="border-none">
+        <form className="flex flex-grow" onSubmit={form.handleSubmit(onSubmit)}>
           <Button
             disabled={status === "pending"}
             type="submit"
@@ -123,7 +120,7 @@ const ClaimMilestones = ({ id, ix }: Upload) => {
             Claim Milestones
           </Button>
         </form>
-      </Card>
+      </div>
     )
   );
 };

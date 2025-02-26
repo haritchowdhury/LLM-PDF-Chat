@@ -134,9 +134,9 @@ const Chat = ({ email, upload }: User) => {
   return (
     <>
       {disabled ? (
-        <CardContent className="top-20 flex gap-4 flex-row fixed bg-gray-900 rounded p-4 left-1/2 -translate-x-1/2">
+        <div className="top-20 flex gap-4 flex-row fixed bg-gray-900 rounded p-4 left-1/2 transform -translate-x-1/2">
           <motion.div className="w-5 h-5 border-4 border-gray-300 border-t-blue-500 rounded-full animate-spin" />
-        </CardContent>
+        </div>
       ) : (
         <Card className="max-w-full md:max-w-2xl mx-auto shadow-lg bg-black border-none">
           <input
@@ -195,21 +195,23 @@ const Chat = ({ email, upload }: User) => {
               });
             }}
           />
-          <CardContent className="text-white h-full flex justify-center items-center p-0 ">
+          <CardContent className="text-white bg-black h-full flex justify-center items-center p-0 pb-0 mb-0">
             {isConnected && (
               <>
                 {lockedIn && isConnected && !loadingMilestones && (
-                  <QuizForm
-                    topic={""}
-                    id={upload}
-                    showLoader={showLoader}
-                    setShowLoader={setShowLoader}
-                  />
+                  <div className="w-full px-2 py-4 bg-black">
+                    <QuizForm
+                      topic={""}
+                      id={upload}
+                      showLoader={showLoader}
+                      setShowLoader={setShowLoader}
+                    />
+                  </div>
                 )}
                 {isConnected && loadingMilestones && !lockedIn && (
-                  <CardContent className="top-20 flex gap-4 flex-row fixed bg-gray-900 rounded p-4 left-1/2 -translate-x-1/2">
+                  <div className="p-4 flex justify-center">
                     <motion.div className="w-5 h-5 border-4 border-gray-300 border-t-blue-500 rounded-full animate-spin" />
-                  </CardContent>
+                  </div>
                 )}
                 {isConnected && !loadingMilestones && !lockedIn && (
                   <CreateMilestones id={upload} />
@@ -217,30 +219,30 @@ const Chat = ({ email, upload }: User) => {
               </>
             )}
             {!isConnected && !loadingMilestones && (
-              <div className="bg-black gap-3 text-white border-none fixed top-20 p-0 left-1/2 -translate-x-1/2 w-[275px]">
+              <div className="bg-black gap-3 text-white border-none w-full p-4 flex flex-col items-center">
                 <div>
-                  <ConnectWallet />{" "}
+                  <ConnectWallet />
                 </div>
-                <small className="flex justify-center">
-                  Connect Wallet to Access Quiz!
-                </small>
+                <small>Connect Wallet to Access Quiz!</small>
               </div>
             )}
           </CardContent>
-          <CardContent className=" bg-gray-1000 rounded p-4">
-            <div className="overflow-y-auto max-h-[600px] custom-scrollbar">
+
+          <hr className="m-0 border-gray-800" />
+
+          <CardContent className="bg-gray-1000 rounded p-4">
+            <div className="overflow-y-auto rounded flex-grow custom-scrollbar max-h-[400px]">
               {!messages?.length ? (
-                <p className="p-4 rounded  bg-gray-500 text-gray-100">
-                  {" "}
+                <p className="p-4 rounded bg-gray-400 text-gray-100">
                   Upload a document and ask something
                 </p>
               ) : (
                 <></>
               )}
               {disabled ? (
-                <CardContent className="text-gray-1000 flex gap-4 flex-row fixed bg-gray-900 rounded p-4 left-1/2 -translate-x-1/2">
+                <div className="text-gray-1000 flex gap-4 flex-row justify-center p-4">
                   <motion.div className="w-5 h-5 border-4 border-gray-300 border-t-blue-500 rounded-full animate-spin" />
-                </CardContent>
+                </div>
               ) : (
                 messages.map(({ content }, idx) => (
                   <div
@@ -259,48 +261,44 @@ const Chat = ({ email, upload }: User) => {
               <div ref={messagesEndRef} className="h-0" />
             </div>
           </CardContent>
-          {!showLoader ? (
-            <>
-              {" "}
-              <CardContent className="overflow-y-auto  p-0">
-                <div className="fixed bottom-12  mb-10 flex w-full  flex-row items-center justify-center shadow left-0 right-0">
-                  <div className="cursor-pointer border px-2 py-1 pt-2 text-gray-400 hover:text-gray-800">
-                    <TooltipProvider>
-                      <Tooltip>
-                        <TooltipTrigger
-                          onClick={() => {
-                            const tmp = document.querySelector(
-                              `[id="fileInput"]`
-                            ) as HTMLInputElement;
-                            tmp?.click();
-                          }}
-                        >
-                          <Upload className="size-[20px]" />
-                        </TooltipTrigger>
-                        <TooltipContent>
-                          <span>Upload Document</span>
-                        </TooltipContent>
-                      </Tooltip>
-                    </TooltipProvider>
-                  </div>
-                  <Input
-                    value={input}
-                    style={{ maxWidth: "clamp(300px, 100vw - 420px, 600px)" }}
-                    disabled={disabled}
-                    className="bg-gray-200 text-black border-none !rounded-none align-content: center "
-                    onChange={handleInputChange}
-                    placeholder="Ask something..."
-                    onKeyDown={(e) => {
-                      if (e.key.toLowerCase() == "enter") {
-                        handleSubmit();
-                      }
-                    }}
-                  />
+
+          {!showLoader && (
+            <CardContent className="p-2 bg-black">
+              <div className="flex w-full flex-row items-center justify-center bg-black">
+                <div className="cursor-pointer border px-2 py-1 pt-2 text-gray-400 hover:text-gray-800">
+                  <TooltipProvider>
+                    <Tooltip>
+                      <TooltipTrigger
+                        onClick={() => {
+                          const tmp = document.querySelector(
+                            `[id="fileInput"]`
+                          ) as HTMLInputElement;
+                          tmp?.click();
+                        }}
+                      >
+                        <Upload className="size-[20px]" />
+                      </TooltipTrigger>
+                      <TooltipContent>
+                        <span>Upload Document</span>
+                      </TooltipContent>
+                    </Tooltip>
+                  </TooltipProvider>
                 </div>
-              </CardContent>
-            </>
-          ) : (
-            <></>
+                <Input
+                  value={input}
+                  style={{ maxWidth: "100%" }}
+                  disabled={disabled}
+                  className="bg-gray-200 text-black border-none flex-grow"
+                  onChange={handleInputChange}
+                  placeholder="Ask something..."
+                  onKeyDown={(e) => {
+                    if (e.key.toLowerCase() == "enter") {
+                      handleSubmit();
+                    }
+                  }}
+                />
+              </div>
+            </CardContent>
           )}
         </Card>
       )}

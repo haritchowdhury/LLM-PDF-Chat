@@ -24,7 +24,7 @@ const QuestionsList = ({ questions }: Props) => {
           <TableHead>Your Answer</TableHead>
         </TableRow>
       </TableHeader>
-      <TableBody className="overflow-y-auto">
+      <TableBody>
         <>
           {questions.map(
             (
@@ -44,7 +44,7 @@ const QuestionsList = ({ questions }: Props) => {
 
                   <TableCell
                     className={`${
-                      isCorrect ? "text-green-600" : "text-red-600"
+                      isCorrect ? "text-green-200" : "text-red-200"
                     } font-semibold`}
                   >
                     {userAnswer}

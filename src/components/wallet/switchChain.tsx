@@ -26,7 +26,7 @@ export default function SwitchNetwork() {
           onChange={handleChange}
           className="bg-black rounded p-2 text-gray-200 "
         >
-          {/*<option value={31337}>{"31337"}</option>*/}
+          <option value={31337}>{"31337"}</option>
           <option value={11155111}>{"11155111"}</option>
           {/*<option value={656476}>656476</option>*/}
         </select>

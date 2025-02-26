@@ -56,27 +56,9 @@ const Statistics = async ({ params }: { params: Params }) => {
   }
 
   return (
-    <main className="flex relative items-center overflow-y-auto justify-center max-h-[900px] bg-black">
-      <div className="flex flex-col h-screen  p-1 mb-4 px-2">
-        <div className="flex items-center justify-between mb-1">
-          <h6 className="text-lg font-bold tracking-tight text-white">
-            Summary
-          </h6>
-        </div>
-
-        <div className="flex flex-col flex-grow overflow-hidden">
-          <div className="grid gap-3  md:grid-cols-7 flex-grow justify-center items-stretch overflow-auto">
-            <ResultsCard accuracy={accuracy} />
-            <AccuracyCard accuracy={accuracy} />
-            <TimeTakenCard
-              timeEnded={new Date(game.timeEnded ?? 0)}
-              timeStarted={new Date(game.timeStarted ?? 0)}
-            />
-          </div>
-
-          <div className="flex-grow">
-            <QuestionsList questions={game.questions} />
-          </div>
+    <main className="flex flex-grow items-center p-20 justify-center  bg-black">
+      <div className="flex flex-col  p-1 px-2 overflow-y-auto">
+        <div className="flex flex-col flex-grow item-center justify-between">
           <div className="flex flex-row justify-between">
             <Link href="/" className={buttonVariants()}>
               <LucideLayoutDashboard className="mr-2" />
@@ -85,6 +67,17 @@ const Statistics = async ({ params }: { params: Params }) => {
             <div>
               {isClaimable && <ClaimMilestones id={upload.id} ix={j} />}
             </div>
+          </div>
+          <ResultsCard accuracy={accuracy} />
+          <div className="flex flex-row justify-between">
+            <AccuracyCard accuracy={accuracy} />
+            <TimeTakenCard
+              timeEnded={new Date(game.timeEnded ?? 0)}
+              timeStarted={new Date(game.timeStarted ?? 0)}
+            />
+          </div>
+          <div className="flex-grow">
+            <QuestionsList questions={game.questions} />
           </div>
         </div>
       </div>

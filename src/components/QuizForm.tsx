@@ -47,7 +47,6 @@ const QuizForm = ({
   id: uploadId,
 }: Props) => {
   const router = useRouter();
-  //const [showLoader, setShowLoader] = useState(false);
   const [finishedLoading, setFinishedLoading] = useState(false);
   const [topicsCreated, setTopicsCreated] = useState(false);
   const { toast } = useToast();
@@ -56,7 +55,7 @@ const QuizForm = ({
       console.log("atclient", amount, topic, id);
       const response = await axios.post("/api/game", {
         amount,
-        topic /*, type */,
+        topic,
         id,
       });
       return response.data;
@@ -68,7 +67,6 @@ const QuizForm = ({
     resolver: zodResolver(quizCreationSchema),
     defaultValues: {
       topic: topicParam || "",
-      //type: "mcq",
       amount: 3,
       id: uploadId || "",
     },
@@ -92,6 +90,7 @@ const QuizForm = ({
 
     return () => clearInterval(interval);
   }, []);
+
   useEffect(() => {
     console.log("Updated topics:", topics);
     console.log("Updated completed:", completed);
@@ -137,63 +136,74 @@ const QuizForm = ({
   form.watch();
 
   return showLoader ? (
-    <CardContent className="top-20 flex gap-4 flex-row fixed bg-gray-900 rounded p-4 left-1/2 -translate-x-1/2">
+    <div className="flex gap-4 items-center justify-center bg-gray-900 rounded p-4">
       <small>Creating Quiz</small>
       <motion.div className="w-5 h-5 border-4 border-gray-300 border-t-blue-500 rounded-full animate-spin" />
-    </CardContent>
+    </div>
   ) : (
-    <>
-      <Card className="border-none fixed top-20 p-0 left-1/2 -translate-x-1/2 w-[675px] bg-black">
+    <Card className="border-none w-full bg-black mb-0 pb-0 overflow-hidden">
+      <div className="bg-black pb-0 mb-0">
         <Form {...form}>
-          <form
-            className="flex  grid-cols-3 flex-row w-full "
-            onSubmit={form.handleSubmit(onSubmit)}
-          >
-            <FormField
-              control={form.control}
-              name="topic"
-              render={({ field }) => (
-                <FormItem className=" w-5/6">
-                  <FormControl className="bg-gray-200 text-black">
-                    <Input placeholder="Quiz topic" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="amount"
-              render={({ field }) => (
-                <FormItem className="w-1/6 px-1">
-                  <FormControl className="bg-gray-200 text-black">
-                    <Input
-                      placeholder="How many questions?"
-                      type="number"
-                      {...field}
-                      onChange={(e) => {
-                        form.setValue("amount", parseInt(e.target.value) || 3);
-                      }}
-                      min={3}
-                      max={5}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+          <form onSubmit={form.handleSubmit(onSubmit)}>
+            <div className="flex flex-col sm:flex-row w-full gap-2 p-2">
+              <FormField
+                control={form.control}
+                name="topic"
+                render={({ field }) => (
+                  <FormItem className="flex-grow mb-0">
+                    <FormControl className="bg-gray-200 text-black">
+                      <Input placeholder="Quiz topic" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="amount"
+                render={({ field }) => (
+                  <FormItem className="w-full sm:w-24 mb-0">
+                    <FormControl className="bg-gray-200 text-black">
+                      <Input
+                        placeholder="# Q's"
+                        type="number"
+                        {...field}
+                        onChange={(e) => {
+                          form.setValue(
+                            "amount",
+                            parseInt(e.target.value) || 3
+                          );
+                        }}
+                        min={3}
+                        max={5}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
 
-            <Button disabled={status === "pending"} type="submit">
-              Quiz
-            </Button>
+              <Button disabled={status === "pending"} type="submit">
+                Quiz
+              </Button>
+            </div>
           </form>
         </Form>
+
         {!topicsCreated && (
-          <motion.div className="w-5 h-5 border-4 border-gray-300 border-t-blue-500 rounded-full animate-spin" />
+          <div className="flex justify-center p-2">
+            <motion.div className="w-5 h-5 border-4 border-gray-300 border-t-blue-500 rounded-full animate-spin" />
+          </div>
         )}
-        {!(topics?.length > 0) && topicsCreated && <TopicCreationButton />}
+
+        {!(topics?.length > 0) && topicsCreated && (
+          <div className="p-2">
+            <TopicCreationButton />
+          </div>
+        )}
+
         {topics?.length > 0 && (
-          <div className="flex gap-3  py-1 justify-center bg-black rounded-md">
+          <div className="flex flex-wrap gap-2 p-2 justify-center rounded-md">
             {topics.map((topic, idx) => {
               const milestones: boolean[] = JSON.parse(completed as any) as any;
               const isCompleted = milestones[idx];
@@ -219,8 +229,8 @@ const QuizForm = ({
             })}
           </div>
         )}
-      </Card>
-    </>
+      </div>
+    </Card>
   );
 };
 
