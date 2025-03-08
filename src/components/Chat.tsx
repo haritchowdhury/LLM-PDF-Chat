@@ -255,8 +255,8 @@ const Chat = ({ email, upload }: User) => {
                       className={clsx(
                         "font-sans-semibold text-sm p-2 rounded-lg text-justify mt-1",
                         idx % 2 == 0
-                          ? "text-white bg-black self-end"
-                          : "text-gray-100 bg-gray-500 self-start"
+                          ? "text-white bg-gray-900 self-end"
+                          : "text-gray-100 bg-gray-600 self-start"
                       )}
                     >
                       <MarkdownRenderer text={content} />
