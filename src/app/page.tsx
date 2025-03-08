@@ -1,28 +1,20 @@
-import Chat from "@/components/Chat";
-import { auth } from "@/lib/auth";
 import { redirect } from "next/navigation";
-import db from "@/lib/db/db";
+import Link from "next/link";
+import { buttonVariants } from "@/components/ui/button";
+import { MessageSquareText } from "lucide-react";
+import { auth } from "@/lib/auth";
 
-const Page = async () => {
+const Home = async () => {
   const session = await auth();
   if (!session) redirect("/sign-in");
-  const email = String(session.user?.email);
-  const id = String(session.user.id);
-  const lastUpload = await db.upload.findFirst({
-    where: {
-      userId: id,
-    },
-    orderBy: {
-      timeStarted: "desc",
-    },
-  });
   return (
-    <>
-      <main className="flex relative items-center justify-center min-h-screen bg-black">
-        <Chat email={email} upload={lastUpload?.id} />
-      </main>
-    </>
+    <main className="flex relative items-center justify-center min-h-screen bg-black">
+            <Link href="/chat" className={buttonVariants()}>
+              Chat with PDF
+              <MessageSquareText />
+            </Link>
+    </main>
   );
-};
+}
 
-export default Page;
+export default Home;

@@ -179,7 +179,7 @@ const Chat = ({ email, upload }: User) => {
                     });
                     setTimeout(() => {
                       router.refresh();
-                      router.replace("/");
+                      router.replace("/chat");
                     }, 100);
                     setMessages([]);
                     setDisabled(false);
@@ -215,7 +215,9 @@ const Chat = ({ email, upload }: User) => {
                     </div>
                   )}
                   {isConnected && !loadingMilestones && !lockedIn && (
-                    <CreateMilestones id={upload} />
+                  <div className="w-full px-2 py-8 bg-black">
+                     <CreateMilestones id={upload} />
+                  </div>
                   )}
                 </>
               )}

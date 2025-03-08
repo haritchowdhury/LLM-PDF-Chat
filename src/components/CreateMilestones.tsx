@@ -99,7 +99,7 @@ const CreateMilestones = ({ id }: Upload) => {
               "Milestones Unlocked succesfully! Now you can generate topics.",
             variant: "default",
           });
-          router.push(`/`);
+          router.push(`/chat`);
         }, 2000);
       },
     });

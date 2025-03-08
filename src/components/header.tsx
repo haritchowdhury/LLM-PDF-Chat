@@ -1,8 +1,10 @@
 import { SignOut } from "@/components/sign-out";
 import { auth } from "@/lib/auth";
-import { redirect } from "next/navigation";
+//import { redirect } from "next/navigation";
 import { ConnectWallet } from "@/components/wallet/connect";
-
+import Link from "next/link";
+import { buttonVariants } from "@/components/ui/button";
+import { LucideLayoutDashboard } from "lucide-react";
 const Header = async () => {
   const session = await auth();
   //if (!session) redirect("/sign-in"); - what a laugh!
@@ -14,6 +16,10 @@ const Header = async () => {
           <>
             <ConnectWallet />
             <SignOut />
+            <Link href="/" className={buttonVariants()}>
+               <LucideLayoutDashboard  /> 
+              Home
+            </Link>
           </>
         ) : (
           <></>

@@ -60,9 +60,9 @@ const Statistics = async ({ params }: { params: Params }) => {
       <div className="flex flex-col  p-1 px-2 overflow-y-auto">
         <div className="flex flex-col flex-grow item-center justify-between">
           <div className="flex flex-row justify-between">
-            <Link href="/" className={buttonVariants()}>
+            <Link href="/chat" className={buttonVariants()}>
               <LucideLayoutDashboard className="mr-2" />
-              Home
+              Chat
             </Link>
             <div>
               {isClaimable && <ClaimMilestones id={upload.id} ix={j} />}
