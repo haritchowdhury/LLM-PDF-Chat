@@ -125,6 +125,25 @@ export const queryUpstashAndLLM = async (
     similarityThreshold: 0.7,
     historyLength: 5,
     topK: 5,
+    /*onChunk: ({
+      content,
+      inputTokens,
+      chunkTokens,
+      totalTokens,
+      rawContent,
+    }: {
+      inputTokens: number;
+      chunkTokens: number;
+      totalTokens: number;
+      content: string;
+      rawContent: string;
+    }) => {
+      console.log("token content", content);
+      if (content.includes(".")) {
+        content = content + "\n";
+      }
+      console.log(content);
+    }, */
   });
 
   return response;

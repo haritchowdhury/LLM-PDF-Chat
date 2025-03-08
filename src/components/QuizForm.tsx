@@ -220,7 +220,7 @@ const QuizForm = ({
                   }`}
                   onClick={() => {
                     form.setValue("topic", topic);
-                    form.setValue("amount", 5);
+                    form.setValue("amount", 3);
                   }}
                 >
                   {topic}

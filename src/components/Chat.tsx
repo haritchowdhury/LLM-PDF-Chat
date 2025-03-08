@@ -19,9 +19,9 @@ import { readContract } from "@wagmi/core";
 import { useAccount, useChainId, useDisconnect, useReadContract } from "wagmi";
 import { config } from "@/wagmi";
 import CreateMilestones from "@/components/CreateMilestones";
-import { Button } from "@/components/ui/button";
 import { ConnectWallet } from "@/components/wallet/connect";
 import { motion } from "framer-motion";
+import { MarkdownRenderer } from "@/components/MarkDown";
 
 type User = {
   email: string;
@@ -39,7 +39,7 @@ interface MileStone {
 }
 
 const Chat = ({ email, upload }: User) => {
-  console.log("clent side:", upload);
+  // console.log("clent side:", upload);
   const { disconnect } = useDisconnect();
   const messagesEndRef = useRef<HTMLDivElement | null>(null);
   const scrollToBottom = () => {
@@ -84,7 +84,7 @@ const Chat = ({ email, upload }: User) => {
       setId(upload);
 
       async function getUserDetails() {
-        console.log(mileStonesAddress);
+        // console.log(mileStonesAddress);
         if (!mileStonesAddress) {
           toast({
             duration: 2000,
@@ -98,7 +98,7 @@ const Chat = ({ email, upload }: User) => {
           functionName: "getUserMilestoneDetails",
           args: [upload],
         })) as MileStone;
-        console.log("user deets", result.creator, address, result, id, upload);
+        //console.log("user deets", result.creator, address, result, id, upload);
         if ((result?.creator as any) == address && isConnected) {
           setLockedIn(true);
         } else {
@@ -175,7 +175,8 @@ const Chat = ({ email, upload }: User) => {
                   if (res.ok) {
                     toast({
                       duration: 2000,
-                      description: "Added the PDF to AI's knowledge succesfully.",
+                      description:
+                        "Added the PDF to AI's knowledge succesfully.",
                     });
                     setTimeout(() => {
                       router.refresh();
@@ -194,7 +195,7 @@ const Chat = ({ email, upload }: User) => {
                 });
               }}
             />
-            
+
             {/* Wallet/Quiz Section - Dynamically sized */}
             <CardContent className="text-white bg-black flex-shrink-0 flex justify-center items-center p-0 pb-0 mb-0">
               {isConnected && (
@@ -215,9 +216,9 @@ const Chat = ({ email, upload }: User) => {
                     </div>
                   )}
                   {isConnected && !loadingMilestones && !lockedIn && (
-                  <div className="w-full px-2 py-8 bg-black">
-                     <CreateMilestones id={upload} />
-                  </div>
+                    <div className="w-full px-2 py-8 bg-black">
+                      <CreateMilestones id={upload} />
+                    </div>
                   )}
                 </>
               )}
@@ -258,7 +259,7 @@ const Chat = ({ email, upload }: User) => {
                           : "text-gray-100 bg-gray-500 self-start"
                       )}
                     >
-                      {content}
+                      <MarkdownRenderer text={content} />
                     </div>
                   ))
                 )}

@@ -49,7 +49,7 @@ const CreateMilestones = ({ id }: Upload) => {
     });
     disconnect();
   }
-  console.log("claim Milestone", mileStonesAddress, chainId);
+  //console.log("claim Milestone", mileStonesAddress, chainId);
   const { mutate: setMileStones, status } = useMutation({
     mutationFn: async ({ id }: Input) => {
       console.log("id:", id, fee);

@@ -9,12 +9,12 @@ const Home = async () => {
   if (!session) redirect("/sign-in");
   return (
     <main className="flex relative items-center justify-center min-h-screen bg-black">
-            <Link href="/chat" className={buttonVariants()}>
-              Chat with PDF
-              <MessageSquareText />
-            </Link>
+      <Link href="/chat" className={buttonVariants()}>
+        Chat with PDF
+        <MessageSquareText />
+      </Link>
     </main>
   );
-}
+};
 
 export default Home;
