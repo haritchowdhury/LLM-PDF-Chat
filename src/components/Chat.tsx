@@ -58,7 +58,6 @@ const Chat = ({ email, upload }: User) => {
   const { toast } = useToast();
   const [disabled, setDisabled] = useState(true);
   const [loading, setLoading] = useState(true);
-  // const [uploaded, setUploaded] = useState(false);
   const [suggestions, setSuggestions] = useState();
   const [showLoader, setShowLoader] = useState(false);
   const [lockedIn, setLockedIn] = useState(false);
@@ -134,173 +133,177 @@ const Chat = ({ email, upload }: User) => {
   return (
     <>
       {disabled ? (
-        <div className="top-20 flex gap-4 flex-row fixed bg-gray-900 rounded p-4 left-1/2 transform -translate-x-1/2">
+        <div className="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 flex gap-4 flex-row bg-gray-900 rounded p-4">
           <motion.div className="w-5 h-5 border-4 border-gray-300 border-t-blue-500 rounded-full animate-spin" />
         </div>
       ) : (
-        <Card className="max-w-full md:max-w-2xl mx-auto shadow-lg bg-black border-none">
-          <input
-            type="file"
-            id="fileInput"
-            className="hidden w-full"
-            accept="application/pdf"
-            onChange={() => {
-              setDisabled(true);
-              const fileInput = document.getElementById(
-                "fileInput"
-              ) as HTMLInputElement;
-              if (
-                !fileInput ||
-                !fileInput.files ||
-                fileInput.files.length === 0
-              ) {
-                toast({
-                  duration: 2000,
-                  variant: "destructive",
-                  description: "No file attached.",
-                });
-                return;
-              }
-              const fileData = fileInput.files[0];
-              const formData = new FormData();
-              formData.append("file", fileData);
-              toast({
-                duration: 10000,
-                description: "Adding your PDF to AI's knowledge...",
-              });
-              fetch("/api/upsert", {
-                method: "POST",
-                body: formData,
-              }).then((res) => {
-                if (res.ok) {
-                  toast({
-                    duration: 2000,
-                    description: "Added the PDF to AI's knowledge succesfully.",
-                  });
-                  setTimeout(() => {
-                    router.refresh();
-
-                    router.replace("/");
-                  }, 100);
-                  setMessages([]);
-                  setDisabled(false);
-                } else {
+        <div className="w-full h-full flex items-center justify-center p-4">
+          <Card className="w-full max-w-2xl mx-auto shadow-lg bg-black border-none flex flex-col h-[calc(100vh-8rem)] max-h-[800px]">
+            <input
+              type="file"
+              id="fileInput"
+              className="hidden w-full"
+              accept="application/pdf"
+              onChange={() => {
+                setDisabled(true);
+                const fileInput = document.getElementById(
+                  "fileInput"
+                ) as HTMLInputElement;
+                if (
+                  !fileInput ||
+                  !fileInput.files ||
+                  fileInput.files.length === 0
+                ) {
                   toast({
                     duration: 2000,
                     variant: "destructive",
-                    description: "Failed to add the PDF to AI's knowledge.",
+                    description: "No file attached.",
                   });
-                  setDisabled(false);
+                  return;
                 }
-              });
-            }}
-          />
-          <CardContent className="text-white bg-black h-full flex justify-center items-center p-0 pb-0 mb-0">
-            {isConnected && (
-              <>
-                {lockedIn && isConnected && !loadingMilestones && (
-                  <div className="w-full px-2 py-4 bg-black">
-                    <QuizForm
-                      topic={""}
-                      id={upload}
-                      showLoader={showLoader}
-                      setShowLoader={setShowLoader}
-                    />
+                const fileData = fileInput.files[0];
+                const formData = new FormData();
+                formData.append("file", fileData);
+                toast({
+                  duration: 10000,
+                  description: "Adding your PDF to AI's knowledge...",
+                });
+                fetch("/api/upsert", {
+                  method: "POST",
+                  body: formData,
+                }).then((res) => {
+                  if (res.ok) {
+                    toast({
+                      duration: 2000,
+                      description: "Added the PDF to AI's knowledge succesfully.",
+                    });
+                    setTimeout(() => {
+                      router.refresh();
+                      router.replace("/");
+                    }, 100);
+                    setMessages([]);
+                    setDisabled(false);
+                  } else {
+                    toast({
+                      duration: 2000,
+                      variant: "destructive",
+                      description: "Failed to add the PDF to AI's knowledge.",
+                    });
+                    setDisabled(false);
+                  }
+                });
+              }}
+            />
+            
+            {/* Wallet/Quiz Section - Dynamically sized */}
+            <CardContent className="text-white bg-black flex-shrink-0 flex justify-center items-center p-0 pb-0 mb-0">
+              {isConnected && (
+                <>
+                  {lockedIn && isConnected && !loadingMilestones && (
+                    <div className="w-full px-2 py-4 bg-black">
+                      <QuizForm
+                        topic={""}
+                        id={upload}
+                        showLoader={showLoader}
+                        setShowLoader={setShowLoader}
+                      />
+                    </div>
+                  )}
+                  {isConnected && loadingMilestones && !lockedIn && (
+                    <div className="p-4 flex justify-center">
+                      <motion.div className="w-5 h-5 border-4 border-gray-300 border-t-blue-500 rounded-full animate-spin" />
+                    </div>
+                  )}
+                  {isConnected && !loadingMilestones && !lockedIn && (
+                    <CreateMilestones id={upload} />
+                  )}
+                </>
+              )}
+              {!isConnected && !loadingMilestones && (
+                <div className="bg-black gap-3 text-white border-none w-full p-4 flex flex-col items-center">
+                  <div>
+                    <ConnectWallet />
                   </div>
+                  <small>Connect Wallet to Access Quiz!</small>
+                </div>
+              )}
+            </CardContent>
+
+            <hr className="m-0 border-gray-800" />
+
+            {/* Messages Section - Takes available space */}
+            <CardContent className="bg-gray-1000 rounded p-4 flex-grow overflow-hidden">
+              <div className="h-full overflow-y-auto rounded flex-grow custom-scrollbar">
+                {!messages?.length ? (
+                  <p className="p-4 rounded bg-gray-400 text-gray-100">
+                    Upload a document and ask something
+                  </p>
+                ) : (
+                  <></>
                 )}
-                {isConnected && loadingMilestones && !lockedIn && (
-                  <div className="p-4 flex justify-center">
+                {disabled ? (
+                  <div className="text-gray-1000 flex gap-4 flex-row justify-center p-4">
                     <motion.div className="w-5 h-5 border-4 border-gray-300 border-t-blue-500 rounded-full animate-spin" />
                   </div>
+                ) : (
+                  messages.map(({ content }, idx) => (
+                    <div
+                      key={idx}
+                      className={clsx(
+                        "font-sans-semibold text-sm p-2 rounded-lg text-justify mt-1",
+                        idx % 2 == 0
+                          ? "text-white bg-black self-end"
+                          : "text-gray-100 bg-gray-500 self-start"
+                      )}
+                    >
+                      {content}
+                    </div>
+                  ))
                 )}
-                {isConnected && !loadingMilestones && !lockedIn && (
-                  <CreateMilestones id={upload} />
-                )}
-              </>
-            )}
-            {!isConnected && !loadingMilestones && (
-              <div className="bg-black gap-3 text-white border-none w-full p-4 flex flex-col items-center">
-                <div>
-                  <ConnectWallet />
-                </div>
-                <small>Connect Wallet to Access Quiz!</small>
-              </div>
-            )}
-          </CardContent>
-
-          <hr className="m-0 border-gray-800" />
-
-          <CardContent className="bg-gray-1000 rounded p-4">
-            <div className="overflow-y-auto rounded flex-grow custom-scrollbar max-h-[400px]">
-              {!messages?.length ? (
-                <p className="p-4 rounded bg-gray-400 text-gray-100">
-                  Upload a document and ask something
-                </p>
-              ) : (
-                <></>
-              )}
-              {disabled ? (
-                <div className="text-gray-1000 flex gap-4 flex-row justify-center p-4">
-                  <motion.div className="w-5 h-5 border-4 border-gray-300 border-t-blue-500 rounded-full animate-spin" />
-                </div>
-              ) : (
-                messages.map(({ content }, idx) => (
-                  <div
-                    key={idx}
-                    className={clsx(
-                      "font-sans-semibold text-sm p-2 rounded-lg text-justify mt-1",
-                      idx % 2 == 0
-                        ? "text-white bg-black self-end"
-                        : "text-gray-100 bg-gray-500 self-start"
-                    )}
-                  >
-                    {content}
-                  </div>
-                ))
-              )}
-              <div ref={messagesEndRef} className="h-0" />
-            </div>
-          </CardContent>
-
-          {!showLoader && (
-            <CardContent className="p-2 bg-black">
-              <div className="flex w-full flex-row items-center justify-center bg-black">
-                <div className="cursor-pointer border px-2 py-1 pt-2 text-gray-400 hover:text-gray-800">
-                  <TooltipProvider>
-                    <Tooltip>
-                      <TooltipTrigger
-                        onClick={() => {
-                          const tmp = document.querySelector(
-                            `[id="fileInput"]`
-                          ) as HTMLInputElement;
-                          tmp?.click();
-                        }}
-                      >
-                        <Upload className="size-[20px]" />
-                      </TooltipTrigger>
-                      <TooltipContent>
-                        <span>Upload Document</span>
-                      </TooltipContent>
-                    </Tooltip>
-                  </TooltipProvider>
-                </div>
-                <Input
-                  value={input}
-                  style={{ maxWidth: "100%" }}
-                  disabled={disabled}
-                  className="bg-gray-200 text-black border-none flex-grow"
-                  onChange={handleInputChange}
-                  placeholder="Ask something..."
-                  onKeyDown={(e) => {
-                    if (e.key.toLowerCase() == "enter") {
-                      handleSubmit();
-                    }
-                  }}
-                />
+                <div ref={messagesEndRef} className="h-0" />
               </div>
             </CardContent>
-          )}
-        </Card>
+
+            {/* Input Section - Fixed height at bottom */}
+            {!showLoader && (
+              <CardContent className="p-2 bg-black flex-shrink-0">
+                <div className="flex w-full flex-row items-center justify-center bg-black">
+                  <div className="cursor-pointer border px-2 py-1 pt-2 text-gray-400 hover:text-gray-800">
+                    <TooltipProvider>
+                      <Tooltip>
+                        <TooltipTrigger
+                          onClick={() => {
+                            const tmp = document.querySelector(
+                              `[id="fileInput"]`
+                            ) as HTMLInputElement;
+                            tmp?.click();
+                          }}
+                        >
+                          <Upload className="size-[20px]" />
+                        </TooltipTrigger>
+                        <TooltipContent>
+                          <span>Upload Document</span>
+                        </TooltipContent>
+                      </Tooltip>
+                    </TooltipProvider>
+                  </div>
+                  <Input
+                    value={input}
+                    disabled={disabled}
+                    className="bg-gray-200 text-black border-none flex-grow"
+                    onChange={handleInputChange}
+                    placeholder="Ask something..."
+                    onKeyDown={(e) => {
+                      if (e.key.toLowerCase() == "enter") {
+                        handleSubmit();
+                      }
+                    }}
+                  />
+                </div>
+              </CardContent>
+            )}
+          </Card>
+        </div>
       )}
     </>
   );
