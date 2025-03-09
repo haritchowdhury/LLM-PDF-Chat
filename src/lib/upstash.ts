@@ -4,6 +4,7 @@ import ragChat from "@/lib/rag.server";
 import { Redis } from "@upstash/redis";
 import { Index } from "@upstash/vector";
 import { Document } from "langchain/document";
+import { summarizer } from "@/lib/groqSummarizer";
 
 interface Vector {
   id: string;
@@ -61,10 +62,16 @@ export const updateUpstash = async (
           },
           { namespace: namespace }
         );
+        const summary: any = await summarizer(
+          `You are an expert summarizer who is able to capture the main talking points from a text.`,
 
+          `Summarize the text in less than 150 words.`,
+          pageContent
+        );
+        //console.log("summary before adding context", summary.content);
         await ragChat.context.add({
           type: "text",
-          data: pageContent,
+          data: summary.content,
           options: { namespace: namespace },
         });
 

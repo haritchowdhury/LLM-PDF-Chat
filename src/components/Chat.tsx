@@ -255,7 +255,7 @@ const Chat = ({ email, upload }: User) => {
                       className={clsx(
                         "font-sans-semibold text-sm p-2 rounded-lg text-justify mt-1",
                         idx % 2 == 0
-                          ? "text-white bg-gray-900 self-end"
+                          ? "text-white bg-gray-1000 self-end"
                           : "text-gray-100 bg-gray-600 self-start"
                       )}
                     >

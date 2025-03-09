@@ -12,7 +12,7 @@ import type { Message } from "ai";
 import { Index } from "@upstash/vector";
 import { aiUseChatAdapter } from "@upstash/rag-chat/nextjs";
 import getUserSession from "@/lib/user.server";
-import { queryUpstashAndLLM, deleteUpstashRedis } from "@/lib/upstash";
+import { queryUpstashAndLLM /*, deleteUpstashRedis*/ } from "@/lib/upstash";
 
 export async function POST(request: Request) {
   const user = await getUserSession();
@@ -31,13 +31,13 @@ export async function POST(request: Request) {
     token: process.env.UPSTASH_VECTOR_REST_TOKEN,
   });
 
-  if (messages?.messages?.length == 3) {
+  /* if (messages?.messages?.length == 3) {
     try {
       deleteUpstashRedis(index, namespace, sessionId, 0);
     } catch (err) {
       console.log("error: ", err);
     }
-  }
+  } */
   if (!namespaceList.includes(namespace)) {
     return new Response(null, { status: 404 });
   }

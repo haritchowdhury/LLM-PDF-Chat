@@ -25,9 +25,9 @@ const MarkdownRenderer = ({ text }: { text: string }) => {
 
   useEffect(() => {
     const parseMarkdown = async () => {
-      let cleanText = text.trim().replace(/;+\s*$/, "");
+      let cleanText = text.trim(); //.replace(/;+\s*$/, "");
       let parsed = await marked.parse(cleanText);
-      setHtml(parsed.trim().replace(/;+\s*$/, ""));
+      setHtml(parsed.trim() /*.replace(/;+\s*$/, "")*/);
     };
     parseMarkdown();
   }, [text]);
