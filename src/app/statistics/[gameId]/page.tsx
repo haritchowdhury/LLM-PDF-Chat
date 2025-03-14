@@ -19,6 +19,9 @@ const Statistics = async ({ params }: { params: Params }) => {
 
   if (!session?.user) return redirect("/");
 
+  const sessionId = `${session.user.id}_session`;
+  const namespace = `${session.user.id}_documents`;
+
   const game = await db.game.findUnique({
     where: { id: gameId },
     include: { questions: true },
@@ -60,12 +63,22 @@ const Statistics = async ({ params }: { params: Params }) => {
       <div className="flex flex-col  p-1 px-2 overflow-y-auto">
         <div className="flex flex-col flex-grow item-center justify-between">
           <div className="flex flex-row justify-between">
-            <Link href="/chat" className={buttonVariants()}>
+            <Link
+              href={`/chat/${upload.id}/${sessionId}/${namespace}`}
+              className={buttonVariants()}
+            >
               <LucideLayoutDashboard className="mr-2" />
               Chat
             </Link>
             <div>
-              {isClaimable && <ClaimMilestones id={upload.id} ix={j} />}
+              {isClaimable && (
+                <ClaimMilestones
+                  id={upload.id}
+                  ix={j}
+                  sessionId={sessionId}
+                  namespace={namespace}
+                />
+              )}
             </div>
           </div>
           <ResultsCard accuracy={accuracy} />

@@ -11,18 +11,6 @@ interface Vector {
   values: number[];
 }
 
-interface Conntent {
-  content: string;
-}
-
-interface QueryResponse {
-  id: string;
-  score: string;
-  metadata: {
-    content: Conntent;
-  };
-}
-
 export const updateUpstash = async (
   index: Index,
   namespace: string,
@@ -31,8 +19,8 @@ export const updateUpstash = async (
   const promiseList = docs.map(async (doc, counter) => {
     const text = doc["pageContent"];
     const textSplitter = new RecursiveCharacterTextSplitter({
-      chunkSize: 500,
-      chunkOverlap: 100,
+      chunkSize: 2000,
+      chunkOverlap: 200,
     });
     const chunks = await textSplitter.createDocuments([text]);
 
@@ -41,7 +29,7 @@ export const updateUpstash = async (
         chunks.map((chunk) => chunk.pageContent.replace(/\n/g, " "))
       );
 
-    const batchSize = 100;
+    const batchSize = 500;
     let batch: Vector[] = [];
     let pageContent = "";
     const batchPromises = chunks.map(async (chunk, idx) => {
@@ -132,25 +120,6 @@ export const queryUpstashAndLLM = async (
     similarityThreshold: 0.7,
     historyLength: 5,
     topK: 5,
-    /*onChunk: ({
-      content,
-      inputTokens,
-      chunkTokens,
-      totalTokens,
-      rawContent,
-    }: {
-      inputTokens: number;
-      chunkTokens: number;
-      totalTokens: number;
-      content: string;
-      rawContent: string;
-    }) => {
-      console.log("token content", content);
-      if (content.includes(".")) {
-        content = content + "\n";
-      }
-      console.log(content);
-    }, */
   });
 
   return response;
@@ -183,7 +152,7 @@ export const queryUpstash = async (
   return quizContentArray.join("");
 };
 
-export const deleteUpstashRedis = async (
+export const deleteUpstash = async (
   index: Index,
   namespace: string,
   sessionId: string,

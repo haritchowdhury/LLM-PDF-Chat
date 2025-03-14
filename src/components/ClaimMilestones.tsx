@@ -31,6 +31,8 @@ import { useRouter } from "next/navigation";
 type Upload = {
   id: string;
   ix: number;
+  sessionId: string;
+  namespace: string;
 };
 const milestoneSchema = z.object({
   id: z.string().min(1),
@@ -38,7 +40,7 @@ const milestoneSchema = z.object({
 });
 type Input = z.infer<typeof milestoneSchema>;
 
-const ClaimMilestones = ({ id, ix }: Upload) => {
+const ClaimMilestones = ({ id, ix, sessionId, namespace }: Upload) => {
   const router = useRouter();
   const { disconnect } = useDisconnect();
   const { toast } = useToast();
@@ -98,7 +100,7 @@ const ClaimMilestones = ({ id, ix }: Upload) => {
             description: "Milestone claimed succesfully!",
             variant: "default",
           });
-          router.push(`/`);
+          router.push(`/chat/${id}/${sessionId}/${namespace}`);
         }, 2000);
       },
     });

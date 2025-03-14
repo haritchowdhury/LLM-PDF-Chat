@@ -37,7 +37,8 @@ export async function POST(request: NextRequest) {
          "option4": "string"
          }`,
         new Array(amount).fill(
-          `You are to generate a random hard mcq question about ${topic}. The question should be strictly relevant to the topic and the answer should be clear, there should not be any ambiguity among the options for the question.`
+          `You are to generate a random hard mcq question about ${topic}. 
+          The question should be strictly relevant to the topic and the answer should be clear, there should not be any ambiguity among the options for the question.`
         ),
         questionData
       );

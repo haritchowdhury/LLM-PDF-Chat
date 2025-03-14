@@ -5,6 +5,8 @@ import { ConnectWallet } from "@/components/wallet/connect";
 import Link from "next/link";
 import { buttonVariants } from "@/components/ui/button";
 import { LucideLayoutDashboard } from "lucide-react";
+import Image from "next/image";
+
 const Header = async () => {
   const session = await auth();
   //if (!session) redirect("/sign-in"); - what a laugh!
@@ -16,14 +18,19 @@ const Header = async () => {
           <>
             <ConnectWallet />
             <SignOut />
-            <Link href="/" className={buttonVariants()}>
-               <LucideLayoutDashboard  /> 
-              Home
-            </Link>
           </>
         ) : (
           <></>
         )}
+        <Link href="/">
+          <Image
+            src="/aiversity.jpg"
+            alt="Example Image"
+            width={50}
+            height={50}
+            className="rounded-lg shadow-md"
+          />
+        </Link>
       </nav>
     </header>
   );

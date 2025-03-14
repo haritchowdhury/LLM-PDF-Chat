@@ -3,7 +3,6 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { redirect } from "next/navigation";
 import Link from "next/link";
-import { GithubSignIn } from "@/components/github-sign-in";
 import { auth } from "@/lib/auth";
 
 const Page = async () => {
@@ -16,9 +15,6 @@ const Page = async () => {
         <h1 className="text-white text-2xl font-bold text-center mb-6">
           Create Account
         </h1>
-
-        {/*   <GithubSignIn /> */}
-
         <div className="relative">
           <div className="absolute inset-0 flex items-center">
             <span className="w-full border-t" />
@@ -29,7 +25,6 @@ const Page = async () => {
             </span>
           </div>
         </div>
-
         <form
           className="space-y-4"
           action={async (formData) => {
@@ -58,7 +53,6 @@ const Page = async () => {
             Sign Up
           </Button>
         </form>
-
         <div className="text-center">
           <Button asChild variant="link">
             <Link className="text-white" href="/sign-in">

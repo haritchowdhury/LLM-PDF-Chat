@@ -24,13 +24,15 @@ import { parseUnits } from "viem";
 
 type Upload = {
   id: string;
+  sessionId: string;
+  namespace: string;
 };
 const milestoneSchema = z.object({
   id: z.string().min(1),
 });
 type Input = z.infer<typeof milestoneSchema>;
 
-const CreateMilestones = ({ id }: Upload) => {
+const CreateMilestones = ({ id, sessionId, namespace }: Upload) => {
   const router = useRouter();
   const { disconnect } = useDisconnect();
   const { toast } = useToast();
@@ -99,7 +101,7 @@ const CreateMilestones = ({ id }: Upload) => {
               "Milestones Unlocked succesfully! Now you can generate topics.",
             variant: "default",
           });
-          router.push(`/chat`);
+          router.push(`/chat/${id}/${sessionId}/${namespace}`);
         }, 2000);
       },
     });

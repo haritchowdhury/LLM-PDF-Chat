@@ -7,6 +7,7 @@ import { executeAction } from "@/lib/executeAction";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import ErrorToast from "@/components/ErrorToast";
+import Image from "next/image";
 
 const Page = async () => {
   const session = await auth();
@@ -14,6 +15,20 @@ const Page = async () => {
   return (
     <main className="flex relative items-center justify-center min-h-screen bg-black">
       <div className="w-full max-w-sm mx-auto space-y-6">
+        <div className="flex items-center justify-between">
+          <Link href="/">
+            <Image
+              src="/aiversity.jpg"
+              alt="Aiversity Logo"
+              width={75}
+              height={25}
+              className="rounded-lg shadow-md"
+            />
+          </Link>
+          <small className="text-gray-300">
+            Skim fast, automate retention!
+          </small>
+        </div>
         <ErrorToast />
         <GithubSignIn />
         <div className="relative">

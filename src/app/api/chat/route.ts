@@ -1,5 +1,3 @@
-// File: app/api/chat/route.ts
-
 export const runtime = "nodejs";
 
 export const dynamic = "force-dynamic";
@@ -12,32 +10,31 @@ import type { Message } from "ai";
 import { Index } from "@upstash/vector";
 import { aiUseChatAdapter } from "@upstash/rag-chat/nextjs";
 import getUserSession from "@/lib/user.server";
-import { queryUpstashAndLLM /*, deleteUpstashRedis*/ } from "@/lib/upstash";
+import { queryUpstashAndLLM } from "@/lib/upstash";
 
+interface ChatRequest {
+  upload: string;
+  sessionId: string;
+  namespace: string;
+  messages: Message[];
+}
 export async function POST(request: Request) {
+  const { upload, sessionId, namespace, messages } =
+    (await request.json()) as ChatRequest;
+  console.log("payload", upload, sessionId, namespace);
+
   const user = await getUserSession();
-  const messages = (await request.json()) as { messages: Message[] };
   const namespaceList = await new Index().listNamespaces();
 
   if (!user) return new Response(null, { status: 403 });
-  const question: string | undefined = (messages["messages"] as Message[]).at(
-    -1
-  )?.content;
+  const question: string | undefined = messages.at(-1)?.content;
   if (!question) return new Response("No question in the request.");
-  const [sessionId, namespace] = user;
 
   const index = new Index({
     url: process.env.UPSTASH_VECTOR_REST_URL,
     token: process.env.UPSTASH_VECTOR_REST_TOKEN,
   });
 
-  /* if (messages?.messages?.length == 3) {
-    try {
-      deleteUpstashRedis(index, namespace, sessionId, 0);
-    } catch (err) {
-      console.log("error: ", err);
-    }
-  } */
   if (!namespaceList.includes(namespace)) {
     return new Response(null, { status: 404 });
   }

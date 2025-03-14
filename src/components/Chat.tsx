@@ -22,10 +22,14 @@ import CreateMilestones from "@/components/CreateMilestones";
 import { ConnectWallet } from "@/components/wallet/connect";
 import { motion } from "framer-motion";
 import { MarkdownRenderer } from "@/components/MarkDown";
+//import { chatSession } from "@/schemas/chat/chatsession";
+//import { z } from "zod";
 
 type User = {
   email: string;
   upload: string;
+  sessionId: string;
+  namespace: string;
 };
 
 interface MileStone {
@@ -38,7 +42,15 @@ interface MileStone {
   totalMilestones: bigint;
 }
 
-const Chat = ({ email, upload }: User) => {
+const articleDict = {
+  AttentionIsAllYouNeed:
+    "Ask from the groundbreaking article on transformers 'Attention is All You Need' " +
+    "by Ashish Vaswani, Noam Shazeer, Niki Parmar, Jakob Uszkoreit, " +
+    "Llion Jones, Aidan N. Gomez, Łukasz Kaiser, Illia Polosukhin",
+  bitcoinWhitepaper: "Ask from the Bitcoin Whitepaper",
+};
+
+const Chat = ({ email, upload, sessionId, namespace }: User) => {
   // console.log("clent side:", upload);
   const { disconnect } = useDisconnect();
   const messagesEndRef = useRef<HTMLDivElement | null>(null);
@@ -49,8 +61,16 @@ const Chat = ({ email, upload }: User) => {
   if (!email) {
     router.push("/sign-in");
   }
+
   const { messages, input, handleInputChange, handleSubmit, setMessages } =
-    useChat();
+    useChat({
+      body: {
+        upload: upload,
+        sessionId: sessionId,
+        namespace: namespace,
+      },
+    });
+
   const { address, isConnected } = useAccount();
   const chainId = useChainId();
 
@@ -114,7 +134,9 @@ const Chat = ({ email, upload }: User) => {
 
   useEffect(() => {
     if (email) {
-      fetch("/api/chat/history")
+      fetch(
+        `/api/chat/history?upload=${upload}&&sessionId=${sessionId}&&namespace=${namespace}`
+      )
         .then((res) => res.json())
         .then((res) => {
           if (res?.messages?.length > 0) {
@@ -164,6 +186,8 @@ const Chat = ({ email, upload }: User) => {
                 const fileData = fileInput.files[0];
                 const formData = new FormData();
                 formData.append("file", fileData);
+                formData.append("sessionId", sessionId);
+                formData.append("namespace", namespace);
                 toast({
                   duration: 10000,
                   description: "Adding your PDF to AI's knowledge...",
@@ -180,7 +204,9 @@ const Chat = ({ email, upload }: User) => {
                     });
                     setTimeout(() => {
                       router.refresh();
-                      router.replace("/chat");
+                      router.replace(
+                        `/chat/${upload}/${sessionId}/${namespace}`
+                      );
                     }, 100);
                     setMessages([]);
                     setDisabled(false);
@@ -197,40 +223,46 @@ const Chat = ({ email, upload }: User) => {
             />
 
             {/* Wallet/Quiz Section - Dynamically sized */}
-            <CardContent className="text-white bg-black flex-shrink-0 flex justify-center items-center p-0 pb-0 mb-0">
-              {isConnected && (
-                <>
-                  {lockedIn && isConnected && !loadingMilestones && (
-                    <div className="w-full px-2 py-4 bg-black">
-                      <QuizForm
-                        topic={""}
-                        id={upload}
-                        showLoader={showLoader}
-                        setShowLoader={setShowLoader}
-                      />
-                    </div>
-                  )}
-                  {isConnected && loadingMilestones && !lockedIn && (
-                    <div className="p-4 flex justify-center">
-                      <motion.div className="w-5 h-5 border-4 border-gray-300 border-t-blue-500 rounded-full animate-spin" />
-                    </div>
-                  )}
-                  {isConnected && !loadingMilestones && !lockedIn && (
-                    <div className="w-full px-2 py-8 bg-black">
-                      <CreateMilestones id={upload} />
-                    </div>
-                  )}
-                </>
-              )}
-              {!isConnected && !loadingMilestones && (
-                <div className="bg-black gap-3 text-white border-none w-full p-4 flex flex-col items-center">
-                  <div>
-                    <ConnectWallet />
-                  </div>
-                  <small>Connect Wallet to Access Quiz!</small>
-                </div>
-              )}
-            </CardContent>
+            {isConnected && (
+              <>
+                {!Object.keys(articleDict).includes(upload) && (
+                  <CardContent className="text-white bg-black flex-shrink-0 flex justify-center items-center p-0 pb-0 mb-0">
+                    {lockedIn && isConnected && !loadingMilestones && (
+                      <div className="w-full px-2 py-4 bg-black">
+                        <QuizForm
+                          topic={""}
+                          id={upload}
+                          showLoader={showLoader}
+                          setShowLoader={setShowLoader}
+                        />
+                      </div>
+                    )}
+                    {isConnected && loadingMilestones && !lockedIn && (
+                      <div className="p-4 flex justify-center">
+                        <motion.div className="w-5 h-5 border-4 border-gray-300 border-t-blue-500 rounded-full animate-spin" />
+                      </div>
+                    )}
+                    {isConnected && !loadingMilestones && !lockedIn && (
+                      <div className="w-full px-2 py-8 bg-black">
+                        <CreateMilestones
+                          id={upload}
+                          sessionId={sessionId}
+                          namespace={namespace}
+                        />
+                      </div>
+                    )}
+                    {!isConnected && !loadingMilestones && (
+                      <div className="bg-black gap-3 text-white border-none w-full p-4 flex flex-col items-center">
+                        <div>
+                          <ConnectWallet />
+                        </div>
+                        <small>Connect Wallet to Access Quiz!</small>
+                      </div>
+                    )}
+                  </CardContent>
+                )}
+              </>
+            )}
 
             <hr className="m-0 border-gray-800" />
 
@@ -238,9 +270,15 @@ const Chat = ({ email, upload }: User) => {
             <CardContent className="bg-gray-1000 rounded p-4 flex-grow overflow-hidden">
               <div className="h-full overflow-y-auto rounded flex-grow custom-scrollbar">
                 {!messages?.length ? (
-                  <p className="p-4 rounded bg-gray-400 text-gray-100">
-                    Upload a document and ask something
-                  </p>
+                  Object.keys(articleDict).includes(upload) ? (
+                    <p className="p-4 rounded bg-gray-400 text-gray-100">
+                      {articleDict[upload]}
+                    </p>
+                  ) : (
+                    <p className="p-4 rounded bg-gray-400 text-gray-100">
+                      Upload a document and ask something
+                    </p>
+                  )
                 ) : (
                   <></>
                 )}
@@ -271,25 +309,28 @@ const Chat = ({ email, upload }: User) => {
             {!showLoader && (
               <CardContent className="p-2 bg-black flex-shrink-0">
                 <div className="flex w-full flex-row items-center justify-center bg-black">
-                  <div className="cursor-pointer border px-2 py-1 pt-2 text-gray-400 hover:text-gray-800">
-                    <TooltipProvider>
-                      <Tooltip>
-                        <TooltipTrigger
-                          onClick={() => {
-                            const tmp = document.querySelector(
-                              `[id="fileInput"]`
-                            ) as HTMLInputElement;
-                            tmp?.click();
-                          }}
-                        >
-                          <Upload className="size-[20px]" />
-                        </TooltipTrigger>
-                        <TooltipContent>
-                          <span>Upload Document</span>
-                        </TooltipContent>
-                      </Tooltip>
-                    </TooltipProvider>
-                  </div>
+                  {!Object.keys(articleDict).includes(upload) && (
+                    <div className="cursor-pointer border px-2 py-1 pt-2 text-gray-400 hover:text-gray-800">
+                      <TooltipProvider>
+                        <Tooltip>
+                          <TooltipTrigger
+                            onClick={() => {
+                              const tmp = document.querySelector(
+                                `[id="fileInput"]`
+                              ) as HTMLInputElement;
+                              tmp?.click();
+                            }}
+                          >
+                            <Upload className="size-[20px]" />
+                          </TooltipTrigger>
+                          <TooltipContent>
+                            <span>Upload Document</span>
+                          </TooltipContent>
+                        </Tooltip>
+                      </TooltipProvider>
+                    </div>
+                  )}
+
                   <Input
                     value={input}
                     disabled={disabled}

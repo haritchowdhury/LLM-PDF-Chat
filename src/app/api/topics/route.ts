@@ -1,9 +1,7 @@
-import { WalletOptions } from "@/components/wallet/wallet-options";
 import { strict_output } from "@/lib/groqTopicSetter";
 import getUserSession from "@/lib/user.server";
 import { getTopicsSchema } from "@/schemas/topics";
 import { NextResponse, NextRequest } from "next/server";
-import { ZodError } from "zod";
 import { queryUpstash } from "@/lib/upstash";
 import { Index } from "@upstash/vector";
 import { auth } from "@/lib/auth";
@@ -11,13 +9,7 @@ import db from "@/lib/db/db";
 
 export const runtime = "nodejs";
 export const maxDuration = 60;
-interface Topics {
-  topic1: string;
-  topic2: string;
-  topic3: string;
-  topic4: string;
-  topic5: string;
-}
+
 export async function POST(request: NextRequest) {
   const user = await getUserSession();
   const [sessionId, namespace] = user;

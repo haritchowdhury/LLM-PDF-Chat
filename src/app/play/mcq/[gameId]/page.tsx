@@ -30,9 +30,7 @@ export default async function MCQPage({ params }: { params: Params }) {
       },
     },
   });
-  if (
-    !game /*                                                                                                    || game.gameType === "open_ended"*/
-  ) {
+  if (!game) {
     return redirect("/quiz");
   }
   return (
