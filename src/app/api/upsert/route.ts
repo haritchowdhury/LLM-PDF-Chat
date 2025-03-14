@@ -11,7 +11,7 @@ import { Index } from "@upstash/vector";
 import { updateUpstash, deleteUpstash } from "@/lib/upstash";
 import db from "@/lib/db/db";
 import { v4 as uuid } from "uuid";
-export const maxDuration = 500;
+export const maxDuration = 60;
 
 export async function POST(request: NextRequest) {
   const user = await getUserSession();
