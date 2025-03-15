@@ -58,13 +58,13 @@ const CreateMilestones = ({ id, sessionId, namespace }: Upload) => {
       const result = await readContract(config, {
         abi,
         address: mileStonesAddress,
-        functionName: "getMainNetBalance",
+        functionName: "getPrice",
         args: [],
         chainId: chainId,
         account: address,
       } as any);
-      const price = String((1 / (Number(result) / 10 ** 18)).toFixed(18));
-      console.log("price:", Number(result) / 10 ** 18);
+      const price = String(Number(result));
+      console.log("price:", typeof result, result);
       await writeContract(config, {
         abi,
         address: mileStonesAddress,

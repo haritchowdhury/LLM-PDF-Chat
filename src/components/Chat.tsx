@@ -195,30 +195,40 @@ const Chat = ({ email, upload, sessionId, namespace }: User) => {
                 fetch("/api/upsert", {
                   method: "POST",
                   body: formData,
-                }).then((res) => {
-                  if (res.ok) {
-                    toast({
-                      duration: 2000,
-                      description:
-                        "Added the PDF to AI's knowledge succesfully.",
-                    });
-                    setTimeout(() => {
-                      router.refresh();
-                      router.replace(
-                        `/chat/${upload}/${sessionId}/${namespace}`
-                      );
-                    }, 100);
-                    setMessages([]);
-                    setDisabled(false);
-                  } else {
+                })
+                  .then((res) => res.json())
+                  .then((data) => {
+                    console.log("response after upload:", data);
+
+                    if (data.message) {
+                      toast({
+                        duration: 2000,
+                        description:
+                          "Added the PDF to AI's knowledge successfully.",
+                      });
+
+                      setTimeout(() => {
+                        router.refresh();
+                        router.replace(
+                          `/chat/${data.message}/${sessionId}/${namespace}`
+                        );
+                      }, 100);
+
+                      setMessages([]);
+                      setDisabled(false);
+                    } else {
+                      throw new Error("Upload ID missing in response");
+                    }
+                  })
+                  .catch((error) => {
+                    console.error("Upload error:", error);
                     toast({
                       duration: 2000,
                       variant: "destructive",
                       description: "Failed to add the PDF to AI's knowledge.",
                     });
                     setDisabled(false);
-                  }
-                });
+                  });
               }}
             />
 

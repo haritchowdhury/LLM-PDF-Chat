@@ -64,8 +64,9 @@ export async function POST(request: NextRequest) {
         isCompleted: JSON.stringify([false, false, false, false, false]),
       },
     });
-    return NextResponse.redirect(new URL("/", request.url));
+    return NextResponse.json({ message: Upload.id }, { status: 200 });
   } catch (err) {
     throw new Error("Upload Could not be created");
   }
 }
+//new URL(`/chat/${Upload.id}/${sessionId}/${namespace}`, request.url)

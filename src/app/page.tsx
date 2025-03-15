@@ -34,7 +34,7 @@ const Home = async () => {
               src="/aiversity.jpg"
               alt="Aiversity Logo"
               width={75}
-              height={25}
+              height={75}
               className="rounded-lg shadow-md"
             />
           </Link>
