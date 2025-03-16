@@ -260,15 +260,18 @@ const Chat = ({ email, upload, sessionId, namespace }: User) => {
                         <motion.div className="w-5 h-5 border-4 border-gray-300 border-t-blue-500 rounded-full animate-spin" />
                       </div>
                     )}
-                    {isConnected && !loadingMilestones && !lockedIn && (
-                      <div className="w-full px-2 py-8 bg-black">
-                        <CreateMilestones
-                          id={upload}
-                          sessionId={sessionId}
-                          namespace={namespace}
-                        />
-                      </div>
-                    )}
+                    {isConnected &&
+                      !loadingMilestones &&
+                      !lockedIn &&
+                      upload != "undefined" && (
+                        <div className="w-full px-2 py-8 bg-black">
+                          <CreateMilestones
+                            id={upload}
+                            sessionId={sessionId}
+                            namespace={namespace}
+                          />
+                        </div>
+                      )}
                   </CardContent>
                 )}
               </>
