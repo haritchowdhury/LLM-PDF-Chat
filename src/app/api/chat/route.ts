@@ -38,13 +38,12 @@ export async function POST(request: Request) {
   if (!namespaceList.includes(namespace)) {
     return new Response(null, { status: 404 });
   }
-
-  const response = await queryUpstashAndLLM(
-    index,
-    namespace,
-    sessionId,
-    question
-  );
+  let response;
+  try {
+    response = await queryUpstashAndLLM(index, namespace, sessionId, question);
+  } catch {
+    throw new Error("Chat could not be compiled");
+  }
 
   return aiUseChatAdapter(response);
 }

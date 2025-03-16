@@ -62,14 +62,30 @@ const Chat = ({ email, upload, sessionId, namespace }: User) => {
     router.push("/sign-in");
   }
 
-  const { messages, input, handleInputChange, handleSubmit, setMessages } =
-    useChat({
-      body: {
-        upload: upload,
-        sessionId: sessionId,
-        namespace: namespace,
-      },
-    });
+  const {
+    messages,
+    input,
+    error,
+    handleInputChange,
+    handleSubmit,
+    setMessages,
+  } = useChat({
+    body: {
+      upload: upload,
+      sessionId: sessionId,
+      namespace: namespace,
+    },
+  });
+
+  useEffect(() => {
+    if (error) {
+      toast({
+        duration: 2000,
+        variant: "destructive",
+        description: "API limit exceeded. Please gib funds!",
+      });
+    }
+  }, [error]);
 
   const { address, isConnected } = useAccount();
   const chainId = useChainId();
