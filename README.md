@@ -1,3 +1,13 @@
+--- EDU ---
+wo upkeep: 0xaB78b4D8d452efDC81A10b0EAF8Fd7373B6a0526
+w upkeep: 0x5e831A94139712C7C480d9B9fD3290f3c234875c
+
+---
+
+SEPOLIA ----
+w upkeep:
+0x419275ca1C99026A5e463a7880134c116B91c079
+
 # LLM PDF CHAT
 
 1. Simple implementation of Auth.js with Prisma in Next.js 15

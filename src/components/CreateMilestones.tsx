@@ -1,7 +1,13 @@
 "use client";
 import { abi, contractAddresses } from "@/constants";
 import { readContract, writeContract } from "@wagmi/core";
-import { useAccount, useChainId, useReadContract, useDisconnect } from "wagmi";
+import {
+  useAccount,
+  useChainId,
+  useReadContract,
+  useDisconnect,
+  useWriteContract,
+} from "wagmi";
 import { config } from "@/wagmi";
 import { useEffect, useState } from "react";
 import {
@@ -42,6 +48,8 @@ const CreateMilestones = ({ id, sessionId, namespace }: Upload) => {
   const chainId = useChainId();
   const mileStonesAddress =
     chainId in contractAddresses ? contractAddresses[chainId][0] : null;
+  //const { data: hash, writeContract, error, isPending } = useWriteContract();
+
   if (!mileStonesAddress) {
     router.push("/");
     toast({
@@ -54,7 +62,7 @@ const CreateMilestones = ({ id, sessionId, namespace }: Upload) => {
   //console.log("claim Milestone", mileStonesAddress, chainId);
   const { mutate: setMileStones, status } = useMutation({
     mutationFn: async ({ id }: Input) => {
-      console.log("id:", id, fee);
+      //console.log("id:", id, fee);
       const result = await readContract(config, {
         abi,
         address: mileStonesAddress,
@@ -65,14 +73,33 @@ const CreateMilestones = ({ id, sessionId, namespace }: Upload) => {
       } as any);
       const price = String(Number(result));
       console.log("price:", typeof result, result);
-      await writeContract(config, {
+      /*  await writeContract(config, {
         abi,
         address: mileStonesAddress,
         functionName: "lockFunds",
         args: [id],
         value: ethers.parseEther(price),
-      } as any);
-      console.log("mutation:", result);
+        overrides: {
+          gasLimit: ethers.toBigInt(500000),
+          gasPrice: ethers.parseUnits("50", "gwei"),
+        },
+      } as any); */
+      const priceInEth = String(ethers.formatEther(price));
+      console.log("price in ETH:", priceInEth, typeof priceInEth, price);
+      const provider = new ethers.BrowserProvider(window.ethereum);
+      const signer = await provider.getSigner(); // Get the connected wallet signer
+
+      const contract = new ethers.Contract(mileStonesAddress, abi, signer);
+      try {
+        const tx = await contract.lockFunds(id, {
+          value: ethers.parseEther(priceInEth),
+        });
+        await tx.wait();
+        console.log("Transaction successful:", tx);
+      } catch (error) {
+        console.log("error", error);
+        throw new Error("Transaction failed");
+      }
     },
   });
 

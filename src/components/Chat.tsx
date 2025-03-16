@@ -233,6 +233,14 @@ const Chat = ({ email, upload, sessionId, namespace }: User) => {
             />
 
             {/* Wallet/Quiz Section - Dynamically sized */}
+            {!isConnected && (
+              <div className="bg-black gap-3 text-white border-none w-full p-4 flex flex-col items-center">
+                <div>
+                  <ConnectWallet />
+                </div>
+                <small>Connect Wallet to Access Quiz!</small>
+              </div>
+            )}
             {isConnected && (
               <>
                 {!Object.keys(articleDict).includes(upload) && (
@@ -259,14 +267,6 @@ const Chat = ({ email, upload, sessionId, namespace }: User) => {
                           sessionId={sessionId}
                           namespace={namespace}
                         />
-                      </div>
-                    )}
-                    {!isConnected && !loadingMilestones && (
-                      <div className="bg-black gap-3 text-white border-none w-full p-4 flex flex-col items-center">
-                        <div>
-                          <ConnectWallet />
-                        </div>
-                        <small>Connect Wallet to Access Quiz!</small>
                       </div>
                     )}
                   </CardContent>

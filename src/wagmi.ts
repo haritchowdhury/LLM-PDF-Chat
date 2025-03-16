@@ -19,7 +19,7 @@ export const config = createConfig({
   connectors: [metaMask()],
   transports: {
     [eduTestnetChain.id]: http(
-      "https://open-campus-codex-sepolia.drpc.org" /*"https://rpc.open-campus-codex.gelato.digital"*/
+      "https://rpc.open-campus-codex.gelato.digital" /*"https://rpc.open-campus-codex.gelato.digital"*/
     ),
     [hardhatChain.id]: http("http://127.0.0.1:8545/"),
     [sepolia.id]: http(
