@@ -1,7 +1,5 @@
 export const runtime = "nodejs";
-
 export const dynamic = "force-dynamic";
-
 export const fetchCache = "force-no-store";
 
 import ragChat from "@/lib/rag.server";
@@ -17,7 +15,7 @@ export async function GET(request: NextRequest) {
   const sessionId = searchParams.get("sessionId");
   const namespace = searchParams.get("namespace");
 
-  console.log("upload at history", sessionId, upload);
+  //console.log("upload at history", sessionId, upload);
 
   const messages = await ragChat.history.getMessages({
     amount: 100,

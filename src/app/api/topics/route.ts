@@ -1,10 +1,10 @@
 import { strict_output } from "@/lib/groqTopicSetter";
 import getUserSession from "@/lib/user.server";
-import { getTopicsSchema } from "@/schemas/topics";
+//import { getTopicsSchema } from "@/schemas/topics";
 import { NextResponse, NextRequest } from "next/server";
 import { queryUpstash } from "@/lib/upstash";
 import { Index } from "@upstash/vector";
-import { auth } from "@/lib/auth";
+//import { auth } from "@/lib/auth";
 import db from "@/lib/db/db";
 
 export const runtime = "nodejs";
@@ -12,7 +12,7 @@ export const maxDuration = 60;
 
 export async function POST(request: NextRequest) {
   const user = await getUserSession();
-  const [sessionId, namespace] = user;
+  const [_, namespace] = user;
   const index = new Index({
     url: process.env.UPSTASH_VECTOR_REST_URL,
     token: process.env.UPSTASH_VECTOR_REST_TOKEN,
@@ -24,10 +24,7 @@ export async function POST(request: NextRequest) {
 
   if (!userExists) {
     throw new Error("User not found");
-  } else {
-    console.log(userExists);
   }
-
   const lastUpload = await db.upload.findFirst({
     where: {
       userId: id,
@@ -40,7 +37,7 @@ export async function POST(request: NextRequest) {
   if (lastUpload) {
     const isOptionsEmpty =
       !lastUpload.options || Object.keys(lastUpload.options).length === 0;
-    console.log("Is options field empty:", isOptionsEmpty);
+    //console.log("Is options field empty:", isOptionsEmpty);
     if (!isOptionsEmpty) {
       return NextResponse.json(
         { error: "Topics already created." },
@@ -80,7 +77,7 @@ export async function POST(request: NextRequest) {
     );
 
     /* --------- */
-    console.log(lastUpload.id, topics, typeof topics);
+    //console.log(lastUpload.id, topics, typeof topics);
     try {
       const topicsArray = [
         topics.topic1,
@@ -97,7 +94,7 @@ export async function POST(request: NextRequest) {
           options: topicsArray,
         },
       });
-      console.log(updatedUpload);
+      //console.log(updatedUpload);
     } catch (err) {
       console.log(err);
       return NextResponse.json(
@@ -203,7 +200,7 @@ export async function PUT(request: NextRequest) {
       },
     });
     let options: boolean[] = JSON.parse(lastUpload.isCompleted as string);
-    console.log(body, ix);
+    //console.log(body, ix);
     options[ix] = true;
     const updatedUpload = await db.upload.update({
       where: {

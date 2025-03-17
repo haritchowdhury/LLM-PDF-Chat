@@ -7,9 +7,9 @@ import * as React from "react";
 type Params = Promise<{ gameId: any }>;
 
 export default async function MCQPage({ params }: { params: Params }) {
-  console.log(typeof params, params, params instanceof Promise);
+  //console.log(typeof params, params, params instanceof Promise);
   const { gameId } = await params;
-  console.log("awaited params", gameId);
+  //console.log("awaited params", gameId);
 
   const session: any = await auth();
 

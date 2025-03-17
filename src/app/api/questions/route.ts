@@ -17,9 +17,9 @@ export async function POST(request: NextRequest) {
   });
   try {
     const { amount, topic, type, namespace } = getQuestionsSchema.parse(body);
-    console.log("quesionAPI", amount, topic, type, namespace);
+    //console.log("quesionAPI", amount, topic, type, namespace);
     const questionData = await queryUpstash(index, namespace, topic);
-    console.log(questionData);
+    //console.log(questionData);
     //console.log(amount, topic, type);
     let questions: any;
     if (type === "mcq") {
@@ -43,7 +43,7 @@ export async function POST(request: NextRequest) {
         questionData
       );
     }
-    console.log(JSON.stringify(questions));
+    //console.log(JSON.stringify(questions));
     return NextResponse.json(
       {
         questions: questions,

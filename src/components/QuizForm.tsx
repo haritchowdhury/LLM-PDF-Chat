@@ -92,24 +92,31 @@ const QuizForm = ({
   }, []);
 
   useEffect(() => {
-    console.log("Updated topics:", topics);
-    console.log("Updated completed:", completed);
+    //console.log("Updated topics:", topics);
+    //console.log("Updated completed:", completed);
   }, [topics, completed]);
 
   useEffect(() => {
     if (uploadId) {
-      console.log("Setting uploadId in form:", uploadId);
+      //console.log("Setting uploadId in form:", uploadId);
       form.setValue("id", uploadId);
     }
   }, [uploadId]);
 
   const onSubmit = async (data: Input) => {
-    console.log("submitted data", data);
+    //console.log("submitted data", data);
     setShowLoader(true);
     getQuestions(data, {
       onError: (error) => {
         setShowLoader(false);
-        if (error instanceof AxiosError) {
+        if (error.message === "Request failed with status code 429") {
+          toast({
+            title: "Error",
+            description:
+              "Could not create a quiz, you exceeded the number of quizzes you can take in a day.",
+            variant: "destructive",
+          });
+        } else if (error instanceof AxiosError) {
           if (error.response?.status === 500) {
             toast({
               title: "Error",
@@ -121,9 +128,9 @@ const QuizForm = ({
         }
       },
       onSuccess: ({ gameId }: { gameId: string }) => {
-        console.log("gameid", gameId);
+        //console.log("gameid", gameId);
         if (!gameId) {
-          console.error("gameId is missing!");
+          //console.error("gameId is missing!");
           return;
         }
         setFinishedLoading(true);

@@ -79,10 +79,12 @@ const Chat = ({ email, upload, sessionId, namespace }: User) => {
 
   useEffect(() => {
     if (error) {
+      //console.log("error at chat");
       toast({
         duration: 2000,
         variant: "destructive",
-        description: "API limit exceeded. Please gib funds!",
+        description:
+          "You have exceeded 20 questions for the day. Come back tomorrow.",
       });
     }
   }, [error]);
@@ -208,6 +210,7 @@ const Chat = ({ email, upload, sessionId, namespace }: User) => {
                   duration: 10000,
                   description: "Adding your PDF to AI's knowledge...",
                 });
+
                 fetch("/api/upsert", {
                   method: "POST",
                   body: formData,
@@ -215,21 +218,25 @@ const Chat = ({ email, upload, sessionId, namespace }: User) => {
                   .then((res) => res.json())
                   .then((data) => {
                     console.log("response after upload:", data);
-
-                    if (data.message) {
+                    if (data.error) {
+                      toast({
+                        duration: 2000,
+                        variant: "destructive",
+                        description: data.error,
+                      });
+                      setDisabled(false);
+                    } else if (data.message) {
                       toast({
                         duration: 2000,
                         description:
                           "Added the PDF to AI's knowledge successfully.",
                       });
-
                       setTimeout(() => {
                         router.refresh();
                         router.replace(
                           `/chat/${data.message}/${sessionId}/${namespace}`
                         );
                       }, 100);
-
                       setMessages([]);
                       setDisabled(false);
                     } else {
@@ -241,7 +248,7 @@ const Chat = ({ email, upload, sessionId, namespace }: User) => {
                     toast({
                       duration: 2000,
                       variant: "destructive",
-                      description: "Failed to add the PDF to AI's knowledge.",
+                      description: "Something went wrong!",
                     });
                     setDisabled(false);
                   });
