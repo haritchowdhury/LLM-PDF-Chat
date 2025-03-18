@@ -48,6 +48,7 @@ export async function POST(request: NextRequest) {
   });
   const id: string = sessionId.split("_")[0];
   const docs = await loader.load();
+  //console.log(docs[0].pageContent);
   const index = new Index({
     url: process.env.UPSTASH_VECTOR_REST_URL,
     token: process.env.UPSTASH_VECTOR_REST_TOKEN,

@@ -1,5 +1,5 @@
-import Groq from "groq-sdk";
-import { JsonOutputFunctionsParser } from "langchain/output_parsers";
+//import Groq from "groq-sdk";
+//import { JsonOutputFunctionsParser } from "langchain/output_parsers";
 import { ChatPromptTemplate } from "@langchain/core/prompts";
 import { ChatGroq } from "@langchain/groq";
 import { JsonOutputParser } from "@langchain/core/output_parsers";
@@ -17,18 +17,18 @@ export async function strict_output(
   system_prompt: string,
   user_prompt: string | string[],
   document_text: string,
-  default_category: string = "",
-  output_value_only: boolean = false,
+  //default_category: string = "",
+  //output_value_only: boolean = false,
   model: string = "llama-3.3-70b-versatile",
-  temperature: number = 1,
-  num_tries: number = 1,
-  verbose: boolean = false
-): Promise<
+  temperature: number = 1
+  // num_tries: number = 1,
+  //verbose: boolean = false
+) /* : Promise<
   {
     question: string;
     answer: string;
   }[]
-> {
+> */ {
   try {
     const groq = new ChatGroq({
       model: model,
@@ -53,15 +53,16 @@ export async function strict_output(
 
     const chain = partialedPrompt.pipe(groq).pipe(parser);
     const res: any = await chain.invoke({ query: user_prompt });
+    return res;
 
-    const list_output: boolean = Array.isArray(res);
+    /* const list_output: boolean = Array.isArray(res);
 
     if (list_output) {
       return res;
     } else {
       return "Not Found" as any;
     }
-    console.log("parsed output", res);
+    console.log("parsed output", res); */
   } catch (error) {
     return "Not Found" as any;
   }
