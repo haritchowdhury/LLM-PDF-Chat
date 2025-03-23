@@ -98,9 +98,10 @@ export const queryUpstashAndLLM = async (
   sessionId: string,
   question: string
 ) => {
+  //console.log(namespace, question);
   const embeddingsArrays =
     await new HuggingFaceInferenceEmbeddings().embedDocuments([question]);
-
+  //console.log(embeddingsArrays);
   const queryResponse: any[] = await index.query(
     {
       topK: 10,
@@ -110,7 +111,7 @@ export const queryUpstashAndLLM = async (
     },
     { namespace }
   );
-
+  console.log(queryResponse);
   if (queryResponse.length >= 1) {
     const contextPromises = queryResponse.map(async (result) => {
       try {

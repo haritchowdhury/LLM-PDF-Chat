@@ -21,10 +21,18 @@ const MAX_REQUESTS_PER_DAY = 2;
 const EXPIRATION_TIME = 24 * 60 * 60;
 
 export async function POST(request: NextRequest) {
+  const data = await request.formData();
+  const file = data.get("file") as File;
+  let upload = data.get("upload") as string;
+  let sessionId = data.get("sessionId") as string;
+  let namespace = data.get("namespace") as string;
   const session = await auth();
   const userId = String(session.user.id);
   const requestCount =
     (await redis.get<number>(`upsert_rate_limit:${userId}`)) || 0;
+  /* if(sessionId.split("_")[1] !== session?.user.id){
+    throw new Error("Upload Could not be created");
+  }*/
   /* if (requestCount >= MAX_REQUESTS_PER_DAY) {
     return NextResponse.json(
       {
@@ -33,15 +41,8 @@ export async function POST(request: NextRequest) {
       { status: 429 }
     );
   } */
-  //const user = await getUserSession();
-  const data = await request.formData();
-  const file = data.get("file") as File;
-  const upload = data.get("upload") as string;
-  const sessionId = data.get("sessionId") as string;
-  const namespace = data.get("namespace") as string;
-  //console.log(sessionId, namespace);
+
   if (!file) return new Response(null, { status: 400 });
-  //if (!user) return new Response(null, { status: 403 });
   const arrayBuffer = await file.arrayBuffer();
   const fileSource = new Blob([arrayBuffer], { type: file.type });
   const loader = new PDFLoader(fileSource, {
@@ -50,10 +51,32 @@ export async function POST(request: NextRequest) {
   //const userId: string = sessionId.split("_")[0];
   const docs = await loader.load();
   //console.log(docs[0].pageContent);
+
   const index = new Index({
     url: process.env.UPSTASH_VECTOR_REST_URL,
     token: process.env.UPSTASH_VECTOR_REST_TOKEN,
   });
+  let uploadId: string = upload;
+
+  try {
+    if (upload === "undefined") {
+      const Upload = await db.upload.create({
+        data: {
+          id: uuid(),
+          timeStarted: new Date(),
+          userId: userId as string,
+          isCompleted: JSON.stringify([false, false, false, false, false]),
+        },
+      });
+      uploadId = Upload.id;
+      upload = uploadId;
+      namespace = uploadId;
+      sessionId = (uploadId + "_" + session?.user.id) as string;
+    }
+  } catch (err) {
+    throw new Error("Upload Could not be created");
+  }
+
   try {
     deleteUpstash(index, namespace, sessionId, 1);
   } catch (err) {
@@ -66,31 +89,18 @@ export async function POST(request: NextRequest) {
     console.log("error: ", err);
     throw new Error("Upstash Could be Updated");
   }
-  const userExists = await db.user.findUnique({
+  /* const userExists = await db.user.findUnique({
     where: { id: userId },
   });
   if (!userExists) {
     throw new Error("User not found");
-  }
-  let uploadId: string = upload;
+  } */
   try {
-    if (upload === "undefined") {
-      const Upload = await db.upload.create({
-        data: {
-          id: uuid(),
-          timeStarted: new Date(),
-          userId: userId as string,
-          isCompleted: JSON.stringify([false, false, false, false, false]),
-        },
-      });
-      uploadId = Upload.id;
-    }
-
     await redis.set(`upsert_rate_limit:${userId}`, requestCount + 1, {
       ex: EXPIRATION_TIME,
     });
     return NextResponse.json({ message: uploadId }, { status: 200 });
   } catch (err) {
-    throw new Error("Upload Could not be created");
+    throw new Error("Could not commit to redis");
   }
 }

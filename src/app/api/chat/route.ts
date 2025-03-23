@@ -33,20 +33,19 @@ export async function POST(request: NextRequest) {
   const requestCount =
     (await redis.get<number>(`chat_rate_limit:${userId}`)) || 0;
 
-  if (requestCount >= MAX_REQUESTS_PER_DAY) {
+  /* if (requestCount >= MAX_REQUESTS_PER_DAY) {
     return NextResponse.json(
       {
         error: `You have exceeded the nuber of questions you can ask in a day. Daily limit ${MAX_REQUESTS_PER_DAY}`,
       },
       { status: 429 }
     );
-  }
+  } */
   const { upload, sessionId, namespace, messages } =
     (await request.json()) as ChatRequest;
 
   const user = await getUserSession();
   const namespaceList = await new Index().listNamespaces();
-  console.log("payload", upload, sessionId, namespace);
 
   if (!user) return new Response(null, { status: 403 });
   const question: string | undefined = messages.at(-1)?.content;
@@ -56,16 +55,18 @@ export async function POST(request: NextRequest) {
     url: process.env.UPSTASH_VECTOR_REST_URL,
     token: process.env.UPSTASH_VECTOR_REST_TOKEN,
   });
-
+  //console.log("before namespace", namespaceList);
   if (!namespaceList.includes(namespace)) {
     return new Response(null, { status: 404 });
   }
+  console.log("payload at chat", upload, sessionId, namespace);
+
   let response: any;
 
   try {
-    /*  await redis.set(`chat_rate_limit:${userId}`, requestCount + 1, {
+    await redis.set(`chat_rate_limit:${userId}`, requestCount + 1, {
       ex: EXPIRATION_TIME,
-    }); */
+    });
     response = await queryUpstashAndLLM(index, namespace, sessionId, question);
   } catch {
     throw new Error("Chat could not be compiled");
