@@ -43,7 +43,7 @@ const Home = async () => {
           </small>
         </div>
 
-        {/* Demo Articles */}
+        {/* Demo Articles *
         <Card className="p-3 bg-black border-gray-900 text-gray-200">
           <CardTitle className="text-center text-sm">Demo articles!</CardTitle>
           <div className="flex flex-col sm:flex-row gap-3 mt-2">
@@ -59,7 +59,7 @@ const Home = async () => {
               <MessageSquareText />
             </Link>
           </div>
-        </Card>
+        </Card> */}
 
         {/* Chat with PDF Button */}
         {lastUpload.map((upload) => (
