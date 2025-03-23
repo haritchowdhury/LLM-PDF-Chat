@@ -88,7 +88,7 @@ const QuizForm = ({
 
     fetchTopics();
 
-    const interval = setInterval(fetchTopics, 500000);
+    const interval = setInterval(fetchTopics, 5000);
 
     return () => clearInterval(interval);
   }, []);

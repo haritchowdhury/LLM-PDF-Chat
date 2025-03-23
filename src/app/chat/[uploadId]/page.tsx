@@ -23,8 +23,10 @@ const ChatPage = async ({ params }: { params: Params }) => {
         userId: session?.user.id,
       },
     });
-
     if (!lastUpload) {
+      redirect("/sign-in");
+    }
+    if (lastUpload.private == true && lastUpload.userId !== id) {
       redirect("/sign-in");
     }
   }

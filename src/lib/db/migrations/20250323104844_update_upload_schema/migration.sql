@@ -1,0 +1,3 @@
+-- AlterTable
+ALTER TABLE "Upload" ALTER COLUMN "wallet" DROP NOT NULL,
+ALTER COLUMN "isDeleted" DROP NOT NULL;

@@ -68,7 +68,7 @@ const Home = async () => {
             href={`/chat/${upload.id}`}
             className={buttonVariants()}
           >
-            {upload.id}
+            {upload.name.slice(0, 25)}
             <MessageSquareText />
           </Link>
         ))}

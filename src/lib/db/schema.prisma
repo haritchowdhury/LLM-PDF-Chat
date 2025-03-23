@@ -126,12 +126,17 @@ model Question {
 
 model Upload {
   id                String   @id @default(cuid())
+  name              String
+  wallet            String?
   userId            String
   games             Game[]
+  uploadCount       Int?
   options           Json? 
   timeStarted       DateTime
   isCompleted       Json?
   timeEnded         DateTime?
+  isDeleted         Boolean?
+  private           Boolean
   user        User       @relation(fields: [userId], references: [id], onDelete: Cascade)
   
   @@index([userId])

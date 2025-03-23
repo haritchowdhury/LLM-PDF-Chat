@@ -207,9 +207,10 @@ const Chat = ({ email, upload, sessionId, namespace }: User) => {
                 const fileData = fileInput.files[0];
                 const formData = new FormData();
                 formData.append("file", fileData);
-                formData.append("upload", upload);
-                formData.append("sessionId", sessionId);
+                //formData.append("upload", upload);
+                //formData.append("sessionId", sessionId);
                 formData.append("namespace", namespace);
+                formData.append("private", "true");
                 toast({
                   duration: 10000,
                   description: "Adding your PDF to AI's knowledge...",

@@ -33,14 +33,14 @@ export async function POST(request: NextRequest) {
   const requestCount =
     (await redis.get<number>(`chat_rate_limit:${userId}`)) || 0;
 
-  /* if (requestCount >= MAX_REQUESTS_PER_DAY) {
+  if (requestCount >= MAX_REQUESTS_PER_DAY) {
     return NextResponse.json(
       {
         error: `You have exceeded the nuber of questions you can ask in a day. Daily limit ${MAX_REQUESTS_PER_DAY}`,
       },
       { status: 429 }
     );
-  } */
+  }
   const { upload, sessionId, namespace, messages } =
     (await request.json()) as ChatRequest;
 
