@@ -271,16 +271,19 @@ const Chat = ({ email, upload, sessionId, namespace }: User) => {
                 {isConnected && (
                   <>
                     <CardContent className="text-white bg-black flex-shrink-0 flex justify-center items-center p-0 pb-0 mb-0">
-                      {lockedIn && isConnected && !loadingMilestones && (
-                        <div className="w-full px-2 py-4 bg-black">
-                          <QuizForm
-                            topic={""}
-                            id={upload}
-                            showLoader={showLoader}
-                            setShowLoader={setShowLoader}
-                          />
-                        </div>
-                      )}
+                      {lockedIn &&
+                        isConnected &&
+                        !loadingMilestones &&
+                        upload !== "undefined" && (
+                          <div className="w-full px-2 py-4 bg-black">
+                            <QuizForm
+                              topic={""}
+                              id={upload}
+                              showLoader={showLoader}
+                              setShowLoader={setShowLoader}
+                            />
+                          </div>
+                        )}
                       {isConnected && loadingMilestones && !lockedIn && (
                         <div className="p-4 flex justify-center">
                           <motion.div className="w-5 h-5 border-4 border-gray-300 border-t-blue-500 rounded-full animate-spin" />
