@@ -6,6 +6,7 @@ import { queryUpstash } from "@/lib/upstash";
 import { Index } from "@upstash/vector";
 //import { auth } from "@/lib/auth";
 import db from "@/lib/db/db";
+import { auth } from "@/lib/auth";
 
 export const runtime = "nodejs";
 export const maxDuration = 60;
@@ -21,7 +22,8 @@ export async function POST(request: NextRequest) {
     url: process.env.UPSTASH_VECTOR_REST_URL,
     token: process.env.UPSTASH_VECTOR_REST_TOKEN,
   });
-  const id: string = namespace.split("_")[0];
+  const session = await auth();
+  const id: string = session?.user.id;
   const userExists = await db.user.findUnique({
     where: { id },
   });
