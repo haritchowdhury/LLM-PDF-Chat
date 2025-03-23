@@ -11,8 +11,12 @@ export const runtime = "nodejs";
 export const maxDuration = 60;
 
 export async function POST(request: NextRequest) {
+  const body = await request.json();
+  const { upload } = body;
+  console.log(upload);
   const user = await getUserSession();
-  const [_, namespace] = user;
+  //const [_, namespace] = user;
+  const namespace = upload;
   const index = new Index({
     url: process.env.UPSTASH_VECTOR_REST_URL,
     token: process.env.UPSTASH_VECTOR_REST_TOKEN,
@@ -27,11 +31,12 @@ export async function POST(request: NextRequest) {
   }
   const lastUpload = await db.upload.findFirst({
     where: {
+      id: upload,
       userId: id,
     },
-    orderBy: {
+    /* orderBy: {
       timeStarted: "desc",
-    },
+    }, */
   });
 
   if (lastUpload) {
@@ -106,7 +111,7 @@ export async function POST(request: NextRequest) {
     }
     return NextResponse.json(
       {
-        topcs: topics,
+        topics: topics,
       },
       {
         status: 200,
@@ -125,6 +130,8 @@ export async function POST(request: NextRequest) {
 
 export async function GET(request: NextRequest) {
   const user = await getUserSession();
+  const { searchParams } = request.nextUrl;
+  const upload = searchParams.get("upload");
   if (!user) {
     throw new Error("User not found");
   }
@@ -142,13 +149,15 @@ export async function GET(request: NextRequest) {
 
     const lastUpload = await db.upload.findFirst({
       where: {
+        id: upload,
         userId: id,
       },
-      orderBy: {
+      /*  orderBy: {
         timeStarted: "desc",
-      },
+      }, */
     });
     console.log("topics found");
+    //console.log(lastUpload);
     return NextResponse.json(
       {
         topics: lastUpload.options,
@@ -175,7 +184,7 @@ export async function GET(request: NextRequest) {
 export async function PUT(request: NextRequest) {
   const user = await getUserSession();
   const body = await request.json();
-  const { ix } = body;
+  const { ix, upload } = body;
   if (!user) {
     throw new Error("User not found");
   }
@@ -193,11 +202,12 @@ export async function PUT(request: NextRequest) {
 
     const lastUpload = await db.upload.findFirst({
       where: {
+        id: upload,
         userId: id,
       },
-      orderBy: {
+      /*  orderBy: {
         timeStarted: "desc",
-      },
+      },*/
     });
     let options: boolean[] = JSON.parse(lastUpload.isCompleted as string);
     //console.log(body, ix);

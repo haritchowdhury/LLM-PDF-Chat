@@ -1,21 +1,21 @@
 "use client";
 import { abi, contractAddresses } from "@/constants";
-import { readContract, writeContract } from "@wagmi/core";
+import { readContract /*, writeContract */ } from "@wagmi/core";
 import {
   useAccount,
   useChainId,
-  useReadContract,
   useDisconnect,
-  useWriteContract,
+  /* useReadContract,
+  useWriteContract, */
 } from "wagmi";
 import { config } from "@/wagmi";
 import { useEffect, useState } from "react";
 import {
   Card,
-  CardContent,
+  /*  CardContent,
   CardDescription,
   CardHeader,
-  CardTitle,
+  CardTitle, */
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { useMutation } from "@tanstack/react-query";
@@ -26,7 +26,7 @@ import { Input } from "@/components/ui/input";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useRouter } from "next/navigation";
 import { ethers } from "ethers";
-import { parseUnits } from "viem";
+//import { parseUnits } from "viem";
 
 type Upload = {
   id: string;
@@ -128,7 +128,7 @@ const CreateMilestones = ({ id, sessionId, namespace }: Upload) => {
               "Milestones Unlocked succesfully! Now you can generate topics.",
             variant: "default",
           });
-          router.push(`/chat/${id}/${sessionId}/${namespace}`);
+          router.push(`/chat/${id}`);
         }, 2000);
       },
     });

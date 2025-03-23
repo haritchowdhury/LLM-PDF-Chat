@@ -7,25 +7,25 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import {
   Form,
   FormControl,
-  FormDescription,
   FormField,
   FormItem,
-  FormLabel,
   FormMessage,
+  /* FormDescription,
+  FormLabel, */
 } from "@/components/ui/form";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { BookOpen, CopyCheck } from "lucide-react";
-import { Separator } from "@/components/ui/separator";
+//import { BookOpen, CopyCheck } from "lucide-react";
+//import { Separator } from "@/components/ui/separator";
 import { useMutation } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 import { useToast } from "@/hooks/use-toast";
 import {
-  Card,
-  CardContent,
+  Card /*,
+   CardContent,
   CardDescription,
   CardHeader,
-  CardTitle,
+  CardTitle, */,
 } from "@/components/ui/card";
 import { TopicCreationButton } from "@/components/TopicCreation";
 import axios, { AxiosError } from "axios";
@@ -75,7 +75,9 @@ const QuizForm = ({
   useEffect(() => {
     const fetchTopics = async () => {
       try {
-        const res = await fetch("/api/topics").then((res) => res.json());
+        const res = await fetch(`/api/topics?upload=${uploadId}`).then((res) =>
+          res.json()
+        );
         setTopics(res.topics);
         setCompleted(res.completed);
       } catch (error) {
@@ -86,7 +88,7 @@ const QuizForm = ({
 
     fetchTopics();
 
-    const interval = setInterval(fetchTopics, 5000);
+    const interval = setInterval(fetchTopics, 500000);
 
     return () => clearInterval(interval);
   }, []);
@@ -205,7 +207,7 @@ const QuizForm = ({
 
         {!(topics?.length > 0) && topicsCreated && (
           <div className="p-2">
-            <TopicCreationButton />
+            <TopicCreationButton upload={uploadId} />
           </div>
         )}
 

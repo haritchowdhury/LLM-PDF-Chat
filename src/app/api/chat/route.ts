@@ -43,10 +43,10 @@ export async function POST(request: NextRequest) {
   }
   const { upload, sessionId, namespace, messages } =
     (await request.json()) as ChatRequest;
-  //console.log("payload", upload, sessionId, namespace);
 
   const user = await getUserSession();
   const namespaceList = await new Index().listNamespaces();
+  console.log("payload", upload, sessionId, namespace);
 
   if (!user) return new Response(null, { status: 403 });
   const question: string | undefined = messages.at(-1)?.content;
@@ -61,10 +61,11 @@ export async function POST(request: NextRequest) {
     return new Response(null, { status: 404 });
   }
   let response: any;
+
   try {
-    await redis.set(`chat_rate_limit:${userId}`, requestCount + 1, {
+    /*  await redis.set(`chat_rate_limit:${userId}`, requestCount + 1, {
       ex: EXPIRATION_TIME,
-    });
+    }); */
     response = await queryUpstashAndLLM(index, namespace, sessionId, question);
   } catch {
     throw new Error("Chat could not be compiled");

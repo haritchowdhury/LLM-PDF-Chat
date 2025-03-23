@@ -4,19 +4,19 @@ import { readContract, writeContract } from "@wagmi/core";
 import {
   useAccount,
   useChainId,
-  useReadContract,
-  useWriteContract,
   useDisconnect,
+  /* useReadContract,
+  useWriteContract, */
 } from "wagmi";
 import { config } from "@/wagmi";
 import { useState } from "react";
-import {
+/*import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
-} from "@/components/ui/card";
+} from "@/components/ui/card"; */
 import { Button } from "@/components/ui/button";
 import { useMutation } from "@tanstack/react-query";
 import { useForm } from "react-hook-form";
@@ -33,6 +33,7 @@ type Upload = {
   ix: number;
   sessionId: string;
   namespace: string;
+  upload: string;
 };
 const milestoneSchema = z.object({
   id: z.string().min(1),
@@ -40,7 +41,7 @@ const milestoneSchema = z.object({
 });
 type Input = z.infer<typeof milestoneSchema>;
 
-const ClaimMilestones = ({ id, ix, sessionId, namespace }: Upload) => {
+const ClaimMilestones = ({ id, ix, sessionId, namespace, upload }: Upload) => {
   const router = useRouter();
   const { disconnect } = useDisconnect();
   const { toast } = useToast();
@@ -70,6 +71,7 @@ const ClaimMilestones = ({ id, ix, sessionId, namespace }: Upload) => {
       } as any);
       const response = await axios.put("/api/topics", {
         ix,
+        upload,
       });
     },
   });
@@ -100,7 +102,7 @@ const ClaimMilestones = ({ id, ix, sessionId, namespace }: Upload) => {
             description: "Milestone claimed succesfully!",
             variant: "default",
           });
-          router.push(`/chat/${id}/${sessionId}/${namespace}`);
+          router.push(`/chat/${id}`);
         }, 2000);
       },
     });

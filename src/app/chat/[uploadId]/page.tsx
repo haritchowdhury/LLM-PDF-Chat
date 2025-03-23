@@ -3,7 +3,7 @@ import { auth } from "@/lib/auth";
 import { redirect } from "next/navigation";
 import db from "@/lib/db/db";
 
-type Params = Promise<{ uploadId: any; chatSession: any; space: any }>;
+type Params = Promise<{ uploadId: any /* chatSession: any; space: any*/ }>;
 
 const ChatPage = async ({ params }: { params: Params }) => {
   const session = await auth();
@@ -11,7 +11,23 @@ const ChatPage = async ({ params }: { params: Params }) => {
   const email = String(session.user?.email);
   const id = String(session.user.id);
 
-  let { uploadId, chatSession, space } = await params;
+  let { uploadId /*, chatSession, space */ } = await params;
+
+  const chatSession = (uploadId + "_" + session?.user.id) as string;
+  const space = uploadId;
+
+  if (uploadId !== "undefined") {
+    const lastUpload = await db.upload.findFirst({
+      where: {
+        id: uploadId,
+        userId: session?.user.id,
+      },
+    });
+
+    if (!lastUpload) {
+      redirect("/sign-in");
+    }
+  }
 
   /* if (!uploadId) {
     const lastUpload = await db.upload.findFirst({

@@ -6,10 +6,10 @@ import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
 import {
   Card,
-  CardContent,
   CardDescription,
+  /* CardContent,
   CardHeader,
-  CardTitle,
+  CardTitle, */
 } from "@/components/ui/card";
 import axios, { AxiosError } from "axios";
 import { Input } from "@/components/ui/input";
@@ -18,12 +18,17 @@ import { motion } from "framer-motion";
 
 const schema = z.object({});
 type Input = z.infer<typeof schema>;
-
-const TopicCreationButton = () => {
+type Upload = {
+  upload: string;
+};
+const TopicCreationButton = ({ upload }: Upload) => {
   const [created, setCreated] = useState(true);
   const { mutate: getTopics, status } = useMutation({
     mutationFn: async (/*{ amount, topic, type }: Input*/) => {
-      const response = await axios.post("/api/topics");
+      //const response = await axios.post("/api/topics");
+      const response = await axios.post("/api/topics", {
+        upload,
+      });
       return response.data;
     },
   });

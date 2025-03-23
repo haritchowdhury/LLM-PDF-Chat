@@ -31,18 +31,19 @@ export async function POST(request: NextRequest) {
       }
     );
   }
-  if (requestCount >= MAX_REQUESTS_PER_DAY) {
+  /* if (requestCount >= MAX_REQUESTS_PER_DAY) {
     return NextResponse.json(
       {
         error: `You have exceeded the nuber of documents you can upload in a day. Daily limit ${MAX_REQUESTS_PER_DAY}`,
       },
       { status: 429 }
     );
-  }
+  } */
   const user = await getUserSession();
-  const [_, namespace] = user;
+  // const [_, namespace] = user;
   const body = await request.json();
   const { topic, amount, id } = quizCreationSchema.parse(body);
+  const namespace = id;
   const type = "mcq";
   const headersList = await headers();
   const host = await headersList.get("host");
@@ -88,6 +89,7 @@ export async function POST(request: NextRequest) {
       }
     );
   }
+  console.log("from questions api:", data);
   await redis.set(`game_rate_limit:${userId}`, requestCount + 1, {
     ex: EXPIRATION_TIME,
   });

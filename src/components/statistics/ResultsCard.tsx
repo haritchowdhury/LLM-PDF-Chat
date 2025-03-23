@@ -1,8 +1,8 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Award, Trophy } from "lucide-react";
-import Link from "next/link";
-import { buttonVariants } from "@/components/ui/button";
-import { LucideLayoutDashboard } from "lucide-react";
+//import Link from "next/link";
+//import { buttonVariants } from "@/components/ui/button";
+//import { LucideLayoutDashboard } from "lucide-react";
 
 type Props = { accuracy: number };
 

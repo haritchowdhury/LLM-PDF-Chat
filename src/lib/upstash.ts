@@ -5,10 +5,17 @@ import { Redis } from "@upstash/redis";
 import { Index } from "@upstash/vector";
 import { Document } from "langchain/document";
 import { summarizer } from "@/lib/groqSummarizer";
+import { v4 as uuid } from "uuid";
+import { SparseVector } from "@upstash/vector";
 
+interface Metadata {
+  content: string;
+}
 interface Vector {
   id: string;
-  values: number[];
+  vector: number[];
+  // sparseVector: SparseVector; // Ensures compatibility
+  metadata: Metadata;
 }
 
 export const updateUpstash = async (
@@ -30,12 +37,21 @@ export const updateUpstash = async (
       );
 
     const batchSize = 500;
-    let batch: Vector[] = [];
+    //let batch: Array<Vector> = [];
+    let batch /*: Array<{
+      id: string;
+      vector: number[];
+      metadata: Metadata;
+    }> */ = [];
     let pageContent = "";
     const batchPromises = chunks.map(async (chunk, idx) => {
-      const vector = {
-        id: `${counter}_${idx}`,
-        values: embeddingsArrays[idx],
+      const vector /*: Vector*/ = {
+        id: uuid(),
+        vector: embeddingsArrays[idx],
+        //sparseVector: undefined, // Ensures compatibility
+        metadata: {
+          content: chunk.pageContent,
+        },
       };
 
       pageContent += chunk.pageContent + " ";
@@ -43,11 +59,12 @@ export const updateUpstash = async (
 
       if (batch.length === batchSize || idx === chunks.length - 1) {
         const response = await index.upsert(
-          {
-            id: batch[0].id,
-            vector: batch[0].values,
+          /* {
+            id: batch[idx].id,
+            vector: batch[idx].values,
             metadata: { content: pageContent },
-          },
+          },*/
+          batch,
           { namespace: namespace }
         );
         const summary: any = await summarizer(

@@ -3,8 +3,8 @@ import { auth } from "@/lib/auth";
 //import { redirect } from "next/navigation";
 import { ConnectWallet } from "@/components/wallet/connect";
 import Link from "next/link";
-import { buttonVariants } from "@/components/ui/button";
-import { LucideLayoutDashboard } from "lucide-react";
+//import { buttonVariants } from "@/components/ui/button";
+//import { LucideLayoutDashboard } from "lucide-react";
 import Image from "next/image";
 
 const Header = async () => {

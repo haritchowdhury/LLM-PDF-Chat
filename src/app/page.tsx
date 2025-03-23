@@ -12,14 +12,14 @@ const Home = async () => {
   if (!session) redirect("/sign-in");
   const id = String(session.user.id);
 
-  const lastUpload = await db.upload.findFirst({
+  const lastUpload = await db.upload.findMany({
     where: { userId: id },
     orderBy: { timeStarted: "desc" },
   });
 
-  const uploadId = lastUpload?.id;
-  const chatSession = `${id}_session`;
-  const space = `${id}_documents`;
+  //const uploadId = lastUpload?.id;
+  //const chatSession = `${id}_session`;
+  //const space = `${id}_documents`;
 
   return (
     <main className="flex flex-col items-center min-h-screen bg-black p-2">
@@ -48,16 +48,13 @@ const Home = async () => {
           <CardTitle className="text-center text-sm">Demo articles!</CardTitle>
           <div className="flex flex-col sm:flex-row gap-3 mt-2">
             <Link
-              href={`/chat/AttentionIsAllYouNeed/${session.user.id}_attentionSession/AttentionIsAllYouNeed`}
+              href={`/chat/AttentionIsAllYouNeed`}
               className={buttonVariants()}
             >
               Attention is all you need
               <MessageSquareText />
             </Link>
-            <Link
-              href={`/chat/bitcoinWhitepaper/${session.user.id}_turingSession/bitcoinWhitepaper`}
-              className={buttonVariants()}
-            >
+            <Link href={`/chat/bitcoinWhitepaper`} className={buttonVariants()}>
               Bitcoin Whitepaper
               <MessageSquareText />
             </Link>
@@ -65,11 +62,19 @@ const Home = async () => {
         </Card>
 
         {/* Chat with PDF Button */}
-        <Link
-          href={`/chat/${uploadId}/${chatSession}/${space}`}
-          className={buttonVariants()}
-        >
-          Chat with PDF
+        {lastUpload.map((upload) => (
+          <Link
+            key={upload.id}
+            href={`/chat/${upload.id}`}
+            className={buttonVariants()}
+          >
+            {upload.id}
+            <MessageSquareText />
+          </Link>
+        ))}
+
+        <Link href={`/chat/undefined`} className={buttonVariants()}>
+          Start a New Chat
           <MessageSquareText />
         </Link>
 

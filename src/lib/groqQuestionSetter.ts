@@ -23,12 +23,12 @@ export async function strict_output(
   temperature: number = 1
   // num_tries: number = 1,
   //verbose: boolean = false
-) /* : Promise<
+) /*: Promise<
   {
     question: string;
     answer: string;
   }[]
-> */ {
+>*/ {
   try {
     const groq = new ChatGroq({
       model: model,

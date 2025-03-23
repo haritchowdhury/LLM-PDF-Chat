@@ -77,6 +77,7 @@ const Statistics = async ({ params }: { params: Params }) => {
                   ix={j}
                   sessionId={sessionId}
                   namespace={namespace}
+                  upload={upload.id}
                 />
               )}
             </div>

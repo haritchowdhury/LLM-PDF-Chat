@@ -12,17 +12,14 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-import {
-  Card,
-  /*CardHeader, CardTitle,*/ CardContent,
-} from "@/components/ui/card";
-import QuizForm from "@/components/QuizForm";
-import { abi, contractAddresses } from "@/constants";
-import { readContract } from "@wagmi/core";
+import { Card, CardHeader, CardContent, CardTitle } from "@/components/ui/card";
+//import QuizForm from "@/components/QuizForm";
+//import { abi, contractAddresses } from "@/constants";
+//import { readContract } from "@wagmi/core";
 import { useAccount, useChainId, useDisconnect, useReadContract } from "wagmi";
-import { config } from "@/wagmi";
-import CreateMilestones from "@/components/CreateMilestones";
-import { ConnectWallet } from "@/components/wallet/connect";
+//import { config } from "@/wagmi";
+//import CreateMilestones from "@/components/CreateMilestones";
+//import { ConnectWallet } from "@/components/wallet/connect";
 import { motion } from "framer-motion";
 import { MarkdownRenderer } from "@/components/MarkDown";
 //import { chatSession } from "@/schemas/chat/chatsession";
@@ -35,7 +32,7 @@ type User = {
   namespace: string;
 };
 
-interface MileStone {
+/*interface MileStone {
   createdAt: bigint;
   creator: string;
   endsAt: bigint;
@@ -43,7 +40,7 @@ interface MileStone {
   milestoneCompleted: bigint;
   totalAmount: bigint;
   totalMilestones: bigint;
-}
+}*/
 
 const articleDict = {
   AttentionIsAllYouNeed:
@@ -53,9 +50,9 @@ const articleDict = {
   bitcoinWhitepaper: "Ask from the Bitcoin Whitepaper",
 };
 
-const Chat = ({ email, upload, sessionId, namespace }: User) => {
+const Stream = ({ email, upload, sessionId, namespace }: User) => {
   // console.log("clent side:", upload);
-  const { disconnect } = useDisconnect();
+  //const { disconnect } = useDisconnect();
   const messagesEndRef = useRef<HTMLDivElement | null>(null);
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -92,22 +89,22 @@ const Chat = ({ email, upload, sessionId, namespace }: User) => {
     }
   }, [error]);
 
-  const { address, isConnected } = useAccount();
-  const chainId = useChainId();
+  //const { address, isConnected } = useAccount();
+  //const chainId = useChainId();
 
-  const [id, setId] = useState<string | undefined>();
+  //const [id, setId] = useState<string | undefined>();
   const { toast } = useToast();
   const [disabled, setDisabled] = useState(true);
   const [loading, setLoading] = useState(true);
-  const [suggestions, setSuggestions] = useState();
+  //const [suggestions, setSuggestions] = useState();
   const [showLoader, setShowLoader] = useState(false);
-  const [lockedIn, setLockedIn] = useState(false);
+  /*const [lockedIn, setLockedIn] = useState(false);
   const [loadingMilestones, setLoadingMilestones] = useState(true);
   const [mileStonesAddress, setMileStoneAddress] = useState(
     chainId in contractAddresses ? contractAddresses[chainId][0] : null
-  );
+  );*/
 
-  useEffect(() => {
+  /*  useEffect(() => {
     if (chainId in contractAddresses) {
       setMileStoneAddress(contractAddresses[chainId][0]);
     } else {
@@ -125,7 +122,6 @@ const Chat = ({ email, upload, sessionId, namespace }: User) => {
       setId(upload);
 
       async function getUserDetails() {
-        // console.log(mileStonesAddress);
         if (!mileStonesAddress) {
           toast({
             duration: 2000,
@@ -139,7 +135,6 @@ const Chat = ({ email, upload, sessionId, namespace }: User) => {
           functionName: "getUserMilestoneDetails",
           args: [upload],
         })) as MileStone;
-        //console.log("user deets", result.creator, address, result, id, upload);
         if ((result?.creator as any) == address && isConnected) {
           setLockedIn(true);
         } else {
@@ -151,7 +146,7 @@ const Chat = ({ email, upload, sessionId, namespace }: User) => {
     }, 1000);
 
     return () => clearInterval(interval);
-  }, [isConnected, upload, mileStonesAddress]);
+  }, [isConnected, upload, mileStonesAddress]); */
 
   useEffect(() => {
     if (email) {
@@ -207,7 +202,6 @@ const Chat = ({ email, upload, sessionId, namespace }: User) => {
                 const fileData = fileInput.files[0];
                 const formData = new FormData();
                 formData.append("file", fileData);
-                formData.append("upload", upload);
                 formData.append("sessionId", sessionId);
                 formData.append("namespace", namespace);
                 toast({
@@ -237,7 +231,9 @@ const Chat = ({ email, upload, sessionId, namespace }: User) => {
                       });
                       setTimeout(() => {
                         router.refresh();
-                        router.replace(`/chat/${data.message}`);
+                        router.replace(
+                          `/chat/${data.message}/${sessionId}/${namespace}`
+                        );
                       }, 100);
                       setMessages([]);
                       setDisabled(false);
@@ -258,7 +254,7 @@ const Chat = ({ email, upload, sessionId, namespace }: User) => {
             />
 
             {/* Wallet/Quiz Section - Dynamically sized */}
-            {!Object.keys(articleDict).includes(upload) && (
+            {/* {!Object.keys(articleDict).includes(upload) && (
               <>
                 {!isConnected && (
                   <div className="bg-black gap-3 text-white border-none w-full p-4 flex flex-col items-center">
@@ -305,6 +301,7 @@ const Chat = ({ email, upload, sessionId, namespace }: User) => {
             )}
 
             <hr className="m-0 border-gray-800" />
+            */}
 
             {/* Messages Section - Takes available space */}
             <CardContent className="bg-gray-1000 rounded p-4 flex-grow overflow-hidden">
@@ -392,4 +389,4 @@ const Chat = ({ email, upload, sessionId, namespace }: User) => {
     </>
   );
 };
-export default Chat;
+export default Stream;

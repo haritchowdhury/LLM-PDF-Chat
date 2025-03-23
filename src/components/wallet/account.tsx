@@ -5,13 +5,13 @@ import {
   useDisconnect,
   useEnsAvatar,
   useEnsName,
-  useBalance,
-  useSwitchAccount,
+  /*useBalance,
+  useSwitchAccount, */
 } from "wagmi";
 import { Button } from "@/components/ui/button";
-import { CardDescription } from "@/components/ui/card";
+//import { CardDescription } from "@/components/ui/card";
 import { config } from "@/wagmi";
-import { fetchBalance, getChainId, getBalance } from "@wagmi/core";
+import { /*fetchBalance,*/ getChainId, getBalance } from "@wagmi/core";
 import SwitchNetwork from "@/components/wallet/switchChain";
 
 export function Account() {

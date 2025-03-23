@@ -1,5 +1,5 @@
 import { useAccount, useConfig } from "wagmi";
-import { config } from "@/wagmi";
+//import { config } from "@/wagmi";
 import { useState, useEffect } from "react";
 import { switchChain } from "@wagmi/core";
 import { Button } from "@/components/ui/button";
