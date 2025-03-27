@@ -4,13 +4,7 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardDescription,
-  /* CardContent,
-  CardHeader,
-  CardTitle, */
-} from "@/components/ui/card";
+import { Card, CardDescription } from "@/components/ui/card";
 import axios, { AxiosError } from "axios";
 import { Input } from "@/components/ui/input";
 import { z } from "zod";
@@ -21,11 +15,11 @@ type Input = z.infer<typeof schema>;
 type Upload = {
   upload: string;
 };
-const TopicCreationButton = ({ upload }: Upload) => {
+const CommunityTopicCreationButton = ({ upload }: Upload) => {
   const [created, setCreated] = useState(true);
   const { mutate: getTopics, status } = useMutation({
     mutationFn: async () => {
-      const response = await axios.post("/api/topics", {
+      const response = await axios.post("/api/communityTopics", {
         upload,
       });
       return response.data;
@@ -83,4 +77,4 @@ const TopicCreationButton = ({ upload }: Upload) => {
   );
 };
 
-export { TopicCreationButton };
+export { CommunityTopicCreationButton };

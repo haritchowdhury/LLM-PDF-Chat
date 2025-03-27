@@ -46,14 +46,14 @@ const Statistics = async ({ params }: { params: Params }) => {
   accuracy = Math.round(accuracy * 100) / 100;
   let isClaimable = false;
   const topics = upload?.options as any[];
-  let j = topics.length;
-  for (let i = 0; i < topics.length; i++) {
+  let j = topics?.length;
+  for (let i = 0; i < topics?.length; i++) {
     if (game.topic == topics[i]) {
       j = i;
     }
   }
   const completed: boolean[] = JSON.parse(upload.isCompleted as string);
-  if (j != topics.length && completed[j] == false) {
+  if (j != topics?.length && completed[j] == false) {
     console.log("true");
     isClaimable = true;
   }
@@ -63,15 +63,12 @@ const Statistics = async ({ params }: { params: Params }) => {
       <div className="flex flex-col  p-1 px-2 overflow-y-auto">
         <div className="flex flex-col flex-grow item-center justify-between">
           <div className="flex flex-row justify-between">
-            <Link
-              href={`/chat/${upload.id}/${sessionId}/${namespace}`}
-              className={buttonVariants()}
-            >
+            <Link href={`/chat/${upload.id}`} className={buttonVariants()}>
               <LucideLayoutDashboard className="mr-2" />
               Chat
             </Link>
             <div>
-              {isClaimable && (
+              {isClaimable && upload.private && (
                 <ClaimMilestones
                   id={upload.id}
                   ix={j}

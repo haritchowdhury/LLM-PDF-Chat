@@ -4,6 +4,7 @@ import { queryUpstash } from "@/lib/upstash";
 import { Index } from "@upstash/vector";
 import db from "@/lib/db/db";
 import { auth } from "@/lib/auth";
+import { v4 as uuid } from "uuid";
 
 export const runtime = "nodejs";
 export const maxDuration = 60;
@@ -29,29 +30,32 @@ export async function POST(request: NextRequest) {
   const lastUpload = await db.upload.findFirst({
     where: {
       id: upload,
-      userId: id,
+      private: false,
+      //userId: id,
     },
   });
 
-  if (lastUpload) {
-    const isOptionsEmpty =
-      !lastUpload.options || Object.keys(lastUpload.options).length === 0;
-    if (!isOptionsEmpty) {
-      return NextResponse.json(
-        { error: "Topics already created." },
-        {
-          status: 500,
-        }
-      );
-    }
-  } else {
+  if (!lastUpload) {
     return NextResponse.json(
-      { error: "No record found, Topics cannot be created." },
+      { error: "No article record found, Topics cannot be created." },
       {
         status: 500,
       }
     );
   }
+
+  const communityQuiz = await db.communityquiz.findFirst({
+    where: { uploadId: lastUpload.id, userId: id },
+  });
+  if (communityQuiz) {
+    return NextResponse.json(
+      { error: "Quiz already created." },
+      {
+        status: 500,
+      }
+    );
+  }
+
   try {
     const topicData: string = await queryUpstash(
       index,
@@ -68,7 +72,7 @@ export async function POST(request: NextRequest) {
          "topic2": "string",
          "topic3": "string",
          "topic4": "string",
-         "topic5": "string"         }`,
+         "topic5": "string" }`,
 
       `You are to generate 5 main topics that thorougly capture the main subjects of the summary`,
       topicData
@@ -81,12 +85,14 @@ export async function POST(request: NextRequest) {
         topics.topic4,
         topics.topic5,
       ];
-      const updatedUpload = await db.upload.update({
-        where: {
-          id: lastUpload.id,
-        },
+      const communityQuiz = await db.communityquiz.create({
         data: {
+          id: uuid(),
+          timeStarted: new Date(),
+          userId: session?.user.id,
+          uploadId: lastUpload.id,
           options: topicsArray,
+          isCompleted: JSON.stringify([false, false, false, false, false]),
         },
       });
     } catch (err) {
@@ -116,10 +122,8 @@ export async function POST(request: NextRequest) {
     );
   }
 }
-
 export async function GET(request: NextRequest) {
   const session = await auth();
-
   const { searchParams } = request.nextUrl;
   const upload = searchParams.get("upload");
   if (!session?.user.id) {
@@ -138,13 +142,21 @@ export async function GET(request: NextRequest) {
     const lastUpload = await db.upload.findFirst({
       where: {
         id: upload,
+        private: false,
+      },
+    });
+
+    const communityQuiz = await db.communityquiz.findFirst({
+      where: {
+        uploadId: lastUpload.id,
         userId: id,
       },
     });
+    console.log("topics found");
     return NextResponse.json(
       {
-        topics: lastUpload.options,
-        completed: lastUpload.isCompleted,
+        topics: communityQuiz.options,
+        completed: communityQuiz.isCompleted,
       },
       {
         status: 200,
@@ -184,18 +196,22 @@ export async function PUT(request: NextRequest) {
     const lastUpload = await db.upload.findFirst({
       where: {
         id: upload,
+        private: false,
+      },
+    });
+    const lastCommunityQuiz = await db.communityquiz.findFirst({
+      where: {
+        uploadId: lastUpload.id,
         userId: id,
       },
     });
-    let options: boolean[] = JSON.parse(lastUpload.isCompleted as string);
+    let options: boolean[] = JSON.parse(
+      lastCommunityQuiz.isCompleted as string
+    );
     options[ix] = true;
-    const updatedUpload = await db.upload.update({
-      where: {
-        id: lastUpload.id,
-      },
-      data: {
-        isCompleted: JSON.stringify(options),
-      },
+    const updatedCommunityQuiz = await db.communityquiz.update({
+      where: { id: lastCommunityQuiz.id },
+      data: { isCompleted: JSON.stringify(options) },
     });
     return NextResponse.json(
       {

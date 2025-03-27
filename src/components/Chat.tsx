@@ -12,50 +12,29 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-import {
-  Card,
-  /*CardHeader, CardTitle,*/ CardContent,
-} from "@/components/ui/card";
-import QuizForm from "@/components/QuizForm";
-import { abi, contractAddresses } from "@/constants";
-import { readContract } from "@wagmi/core";
-import { useAccount, useChainId, useDisconnect, useReadContract } from "wagmi";
-import { config } from "@/wagmi";
-import CreateMilestones from "@/components/CreateMilestones";
-import { ConnectWallet } from "@/components/wallet/connect";
+import { Card, CardContent } from "@/components/ui/card";
 import { motion } from "framer-motion";
 import { MarkdownRenderer } from "@/components/MarkDown";
-//import { chatSession } from "@/schemas/chat/chatsession";
-//import { z } from "zod";
+import PersonalQuizBar from "@/components/PersonalQuizBar";
+import CommunityQuizBar from "@/components/CommunityQuizBar";
 
 type User = {
   email: string;
   upload: string;
   sessionId: string;
   namespace: string;
+  personal: boolean;
+  userId: string;
 };
 
-interface MileStone {
-  createdAt: bigint;
-  creator: string;
-  endsAt: bigint;
-  isCompleted: boolean;
-  milestoneCompleted: bigint;
-  totalAmount: bigint;
-  totalMilestones: bigint;
-}
-
-const articleDict = {
-  AttentionIsAllYouNeed:
-    "Ask from the groundbreaking article on transformers 'Attention is All You Need' " +
-    "by Ashish Vaswani, Noam Shazeer, Niki Parmar, Jakob Uszkoreit, " +
-    "Llion Jones, Aidan N. Gomez, Łukasz Kaiser, Illia Polosukhin",
-  bitcoinWhitepaper: "Ask from the Bitcoin Whitepaper",
-};
-
-const Chat = ({ email, upload, sessionId, namespace }: User) => {
-  // console.log("clent side:", upload);
-  const { disconnect } = useDisconnect();
+const Chat = ({
+  email,
+  upload,
+  sessionId,
+  namespace,
+  personal,
+  userId,
+}: User) => {
   const messagesEndRef = useRef<HTMLDivElement | null>(null);
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -72,6 +51,7 @@ const Chat = ({ email, upload, sessionId, namespace }: User) => {
     handleInputChange,
     handleSubmit,
     setMessages,
+    isLoading,
   } = useChat({
     body: {
       upload: upload,
@@ -92,66 +72,10 @@ const Chat = ({ email, upload, sessionId, namespace }: User) => {
     }
   }, [error]);
 
-  const { address, isConnected } = useAccount();
-  const chainId = useChainId();
-
-  const [id, setId] = useState<string | undefined>();
   const { toast } = useToast();
   const [disabled, setDisabled] = useState(true);
   const [loading, setLoading] = useState(true);
-  const [suggestions, setSuggestions] = useState();
   const [showLoader, setShowLoader] = useState(false);
-  const [lockedIn, setLockedIn] = useState(false);
-  const [loadingMilestones, setLoadingMilestones] = useState(true);
-  const [mileStonesAddress, setMileStoneAddress] = useState(
-    chainId in contractAddresses ? contractAddresses[chainId][0] : null
-  );
-
-  useEffect(() => {
-    if (chainId in contractAddresses) {
-      setMileStoneAddress(contractAddresses[chainId][0]);
-    } else {
-      setMileStoneAddress(null);
-      toast({
-        duration: 2000,
-        variant: "destructive",
-        description: "Contract not deployed on this chain.",
-      });
-    }
-  }, [chainId]);
-
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setId(upload);
-
-      async function getUserDetails() {
-        // console.log(mileStonesAddress);
-        if (!mileStonesAddress) {
-          toast({
-            duration: 2000,
-            variant: "destructive",
-            description: "Contract not deployed on this chain.",
-          });
-        }
-        const result = (await readContract(config, {
-          abi,
-          address: mileStonesAddress,
-          functionName: "getUserMilestoneDetails",
-          args: [upload],
-        })) as MileStone;
-        //console.log("user deets", result.creator, address, result, id, upload);
-        if ((result?.creator as any) == address && isConnected) {
-          setLockedIn(true);
-        } else {
-          setLockedIn(false);
-        }
-        setLoadingMilestones(false);
-      }
-      getUserDetails();
-    }, 1000);
-
-    return () => clearInterval(interval);
-  }, [isConnected, upload, mileStonesAddress]);
 
   useEffect(() => {
     if (email) {
@@ -181,6 +105,7 @@ const Chat = ({ email, upload, sessionId, namespace }: User) => {
         </div>
       ) : (
         <div className="w-full h-full flex items-center justify-center p-4">
+          {/* upload input section */}
           <Card className="w-full max-w-2xl mx-auto shadow-lg bg-black border-none flex flex-col h-[calc(100vh-8rem)] max-h-[800px]">
             <input
               type="file"
@@ -207,8 +132,6 @@ const Chat = ({ email, upload, sessionId, namespace }: User) => {
                 const fileData = fileInput.files[0];
                 const formData = new FormData();
                 formData.append("file", fileData);
-                //formData.append("upload", upload);
-                //formData.append("sessionId", sessionId);
                 formData.append("namespace", namespace);
                 formData.append("private", "true");
                 toast({
@@ -237,10 +160,10 @@ const Chat = ({ email, upload, sessionId, namespace }: User) => {
                           "Added the PDF to AI's knowledge successfully.",
                       });
                       setTimeout(() => {
-                        router.refresh();
+                        //router.refresh();
                         router.replace(`/chat/${data.message}`);
                       }, 100);
-                      setMessages([]);
+                      //setMessages([]);
                       setDisabled(false);
                     } else {
                       throw new Error("Upload ID missing in response");
@@ -259,69 +182,45 @@ const Chat = ({ email, upload, sessionId, namespace }: User) => {
             />
 
             {/* Wallet/Quiz Section - Dynamically sized */}
-            {!Object.keys(articleDict).includes(upload) && (
-              <>
-                {!isConnected && (
-                  <div className="bg-black gap-3 text-white border-none w-full p-4 flex flex-col items-center">
-                    <div>
-                      <ConnectWallet />
-                    </div>
-                    <small>Connect Wallet to Access Quiz!</small>
-                  </div>
-                )}
-                {isConnected && (
-                  <>
-                    <CardContent className="text-white bg-black flex-shrink-0 flex justify-center items-center p-0 pb-0 mb-0">
-                      {lockedIn &&
-                        isConnected &&
-                        !loadingMilestones &&
-                        upload !== "undefined" && (
-                          <div className="w-full px-2 py-4 bg-black">
-                            <QuizForm
-                              topic={""}
-                              id={upload}
-                              showLoader={showLoader}
-                              setShowLoader={setShowLoader}
-                            />
-                          </div>
-                        )}
-                      {isConnected && loadingMilestones && !lockedIn && (
-                        <div className="p-4 flex justify-center">
-                          <motion.div className="w-5 h-5 border-4 border-gray-300 border-t-blue-500 rounded-full animate-spin" />
-                        </div>
-                      )}
-                      {isConnected &&
-                        !loadingMilestones &&
-                        !lockedIn &&
-                        upload != "undefined" && (
-                          <div className="w-full px-2 py-8 bg-black">
-                            <CreateMilestones
-                              id={upload}
-                              sessionId={sessionId}
-                              namespace={namespace}
-                            />
-                          </div>
-                        )}
-                    </CardContent>
-                  </>
-                )}
-              </>
+            {personal ? (
+              <PersonalQuizBar
+                upload={upload}
+                sessionId={sessionId}
+                namespace={namespace}
+                showLoader={showLoader}
+                setShowLoader={setShowLoader}
+              />
+            ) : (
+              <CommunityQuizBar
+                upload={upload}
+                sessionId={sessionId}
+                namespace={namespace}
+                showLoader={showLoader}
+                setShowLoader={setShowLoader}
+                userId={userId}
+              />
             )}
-
-            <hr className="m-0 border-gray-800" />
 
             {/* Messages Section - Takes available space */}
             <CardContent className="bg-gray-1000 rounded p-4 flex-grow overflow-hidden">
               <div className="h-full overflow-y-auto rounded flex-grow custom-scrollbar">
                 {!messages?.length ? (
-                  Object.keys(articleDict).includes(upload) ? (
+                  !personal ? (
                     <p className="p-4 rounded bg-gray-400 text-gray-100">
-                      {articleDict[upload]}
+                      Ask Something
                     </p>
                   ) : (
-                    <p className="p-4 rounded bg-gray-400 text-gray-100">
-                      Upload a document and ask something
-                    </p>
+                    <>
+                      {upload === "undefined" ? (
+                        <p className="p-4 rounded bg-gray-400 text-gray-100">
+                          Upload a document
+                        </p>
+                      ) : (
+                        <p className="p-4 rounded bg-gray-400 text-gray-100">
+                          Ask something
+                        </p>
+                      )}
+                    </>
                   )
                 ) : (
                   <></>
@@ -353,7 +252,7 @@ const Chat = ({ email, upload, sessionId, namespace }: User) => {
             {!showLoader && (
               <CardContent className="p-2 bg-black flex-shrink-0">
                 <div className="flex w-full flex-row items-center justify-center bg-black">
-                  {!Object.keys(articleDict).includes(upload) && (
+                  {personal && (
                     <div className="cursor-pointer border px-2 py-1 pt-2 text-gray-400 hover:text-gray-800">
                       <TooltipProvider>
                         <Tooltip>

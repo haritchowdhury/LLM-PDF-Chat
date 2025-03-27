@@ -4,8 +4,9 @@ import { auth } from "@/lib/auth";
 import { ConnectWallet } from "@/components/wallet/connect";
 import Link from "next/link";
 //import { buttonVariants } from "@/components/ui/button";
-//import { LucideLayoutDashboard } from "lucide-react";
+import { CircleUserRound, Landmark } from "lucide-react";
 import Image from "next/image";
+import { buttonVariants } from "@/components/ui/button";
 
 const Header = async () => {
   const session = await auth();
@@ -17,20 +18,22 @@ const Header = async () => {
         {session ? (
           <>
             <ConnectWallet />
+            <Link href="/" className={buttonVariants()}>
+              Home
+              <Landmark />
+            </Link>
+            <Link
+              href={`/profile/${session?.user.id}`}
+              className={buttonVariants()}
+            >
+              Profile
+              <CircleUserRound />
+            </Link>
             <SignOut />
           </>
         ) : (
           <></>
         )}
-        <Link href="/">
-          <Image
-            src="/aiversity.jpg"
-            alt="Example Image"
-            width={50}
-            height={50}
-            className="rounded-lg shadow-md"
-          />
-        </Link>
       </nav>
     </header>
   );

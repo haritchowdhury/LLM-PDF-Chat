@@ -18,6 +18,7 @@ model User {
   sessions      Session[]
   games         Game[]
   uploads       Upload[]
+  communityQuiz Communityquiz[]
   // Optional for WebAuthn support
   Authenticator Authenticator[]
 
@@ -130,6 +131,7 @@ model Upload {
   wallet            String?
   userId            String
   games             Game[]
+  CommunityQuizes   Communityquiz[]
   uploadCount       Int?
   options           Json? 
   timeStarted       DateTime
@@ -137,7 +139,22 @@ model Upload {
   timeEnded         DateTime?
   isDeleted         Boolean?
   private           Boolean
-  user        User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user              User       @relation(fields: [userId], references: [id], onDelete: Cascade)
   
   @@index([userId])
+}
+
+model Communityquiz {
+  id                String   @id @default(cuid())
+  wallet            String?
+  userId            String
+  uploadId          String
+  options           Json? 
+  timeStarted       DateTime
+  isCompleted       Json?
+  timeEnded         DateTime?
+  user              User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  upload            Upload @relation(fields:[uploadId], references:[id])
+
+  @@index([userId, uploadId])
 }

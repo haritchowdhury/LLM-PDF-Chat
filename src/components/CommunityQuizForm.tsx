@@ -17,7 +17,7 @@ import { useMutation } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 import { useToast } from "@/hooks/use-toast";
 import { Card } from "@/components/ui/card";
-import { TopicCreationButton } from "@/components/TopicCreation";
+import { CommunityTopicCreationButton } from "@/components/CommunityTopicCreation";
 import axios, { AxiosError } from "axios";
 import { motion } from "framer-motion";
 
@@ -30,7 +30,7 @@ type Props = {
 
 type Input = z.infer<typeof quizCreationSchema>;
 
-const QuizForm = ({
+const CommunityQuizForm = ({
   topic: topicParam,
   showLoader,
   setShowLoader,
@@ -40,15 +40,20 @@ const QuizForm = ({
   const [finishedLoading, setFinishedLoading] = useState(false);
   const [topicsCreated, setTopicsCreated] = useState(false);
   const { toast } = useToast();
-  const { mutate: getQuestions, status } = useMutation({
+  const { mutate: getCommunityQuestions, status } = useMutation({
     mutationFn: async ({ amount, topic, id }: Input) => {
-      console.log("atclient", amount, topic, id);
-      const response = await axios.post("/api/game", {
-        amount,
-        topic,
-        id,
-      });
-      return response.data;
+      try {
+        console.log("Mutation input:", { amount, topic, id });
+        const response = await axios.post("/api/game", {
+          amount,
+          topic,
+          id,
+        });
+        return response.data;
+      } catch (error) {
+        console.error("Mutation error:", error);
+        throw error; // Re-throw to trigger onError handler
+      }
     },
   });
   const [topics, setTopics] = useState([]);
@@ -65,8 +70,8 @@ const QuizForm = ({
   useEffect(() => {
     const fetchTopics = async () => {
       try {
-        const res = await fetch(`/api/topics?upload=${uploadId}`).then((res) =>
-          res.json()
+        const res = await fetch(`/api/communityTopics?upload=${uploadId}`).then(
+          (res) => res.json()
         );
         setTopics(res.topics);
         setCompleted(res.completed);
@@ -83,10 +88,7 @@ const QuizForm = ({
     return () => clearInterval(interval);
   }, []);
 
-  useEffect(() => {
-    //console.log("Updated topics:", topics);
-    //console.log("Updated completed:", completed);
-  }, [topics, completed]);
+  useEffect(() => {}, [topics, completed]);
 
   useEffect(() => {
     if (uploadId) {
@@ -95,8 +97,9 @@ const QuizForm = ({
   }, [uploadId]);
 
   const onSubmit = async (data: Input) => {
+    console.log("submitting data", data);
     setShowLoader(true);
-    getQuestions(data, {
+    getCommunityQuestions(data, {
       onError: (error) => {
         setShowLoader(false);
         if (error.message === "Request failed with status code 429") {
@@ -192,7 +195,7 @@ const QuizForm = ({
 
         {!(topics?.length > 0) && topicsCreated && (
           <div className="p-2">
-            <TopicCreationButton upload={uploadId} />
+            <CommunityTopicCreationButton upload={uploadId} />
           </div>
         )}
 
@@ -227,4 +230,4 @@ const QuizForm = ({
   );
 };
 
-export default QuizForm;
+export default CommunityQuizForm;

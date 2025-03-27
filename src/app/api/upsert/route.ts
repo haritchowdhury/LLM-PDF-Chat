@@ -7,7 +7,7 @@ import { NextRequest, NextResponse } from "next/server";
 //import getUserSession from "@/lib/user.server";
 import { PDFLoader } from "@langchain/community/document_loaders/fs/pdf";
 import { Index } from "@upstash/vector";
-import { updateUpstash /*, deleteUpstash */ } from "@/lib/upstash";
+import { updateUpstash, deleteUpstash } from "@/lib/upstash";
 import db from "@/lib/db/db";
 import { v4 as uuid } from "uuid";
 import { auth } from "@/lib/auth";
@@ -39,14 +39,14 @@ export async function POST(request: NextRequest) {
   }  if(sessionId.split("_")[1] !== session?.user.id){
     throw new Error("Upload Could not be created");
   }*/
-  if (requestCount >= MAX_REQUESTS_PER_DAY) {
+  /*  if (requestCount >= MAX_REQUESTS_PER_DAY) {
     return NextResponse.json(
       {
         error: `You have exceeded the nuber of documents you can upload in a day. Daily limit ${MAX_REQUESTS_PER_DAY}`,
       },
       { status: 429 }
     );
-  }
+  } */
 
   if (!file) return new Response(null, { status: 400 });
   const arrayBuffer = await file.arrayBuffer();
@@ -74,6 +74,7 @@ export async function POST(request: NextRequest) {
           userId: userId,
           isCompleted: JSON.stringify([false, false, false, false, false]),
           private: personal === "true" ? true : false,
+          isDeleted: false,
         },
       });
       uploadId = Upload.id;
@@ -84,12 +85,6 @@ export async function POST(request: NextRequest) {
   } catch (err) {
     throw new Error("Upload Could not be created");
   }
-  /* try {
-    deleteUpstash(index, namespace, sessionId, 1);
-  } catch (err) {
-    console.log("error: ", err);
-    throw new Error("Upstash Could not be Cleaned");
-  } */
   try {
     await updateUpstash(index, namespace, docs);
   } catch (err) {
@@ -103,5 +98,45 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ message: uploadId }, { status: 200 });
   } catch (err) {
     throw new Error("Could not commit to redis");
+  }
+}
+
+export async function DELETE(request: Request) {
+  const { upload } = await request.json();
+
+  const session = await auth();
+  if (!session) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+
+  try {
+    const sessionId = upload + "_" + session.user.id;
+    const Upload = await db.upload.findFirst({
+      where: { id: upload },
+    });
+
+    if (session.user.id !== Upload.userId) {
+      return NextResponse.json({ error: "Not allowed" }, { status: 403 });
+    }
+
+    const index = new Index({
+      url: process.env.UPSTASH_VECTOR_REST_URL,
+      token: process.env.UPSTASH_VECTOR_REST_TOKEN,
+    });
+
+    await deleteUpstash(index, upload, sessionId, 1);
+
+    const updatedUpload = await db.upload.update({
+      where: {
+        id: upload,
+      },
+      data: {
+        isDeleted: true,
+      },
+    });
+
+    return NextResponse.json({ userId: session.user.id });
+  } catch (error) {
+    return NextResponse.json({ error: error.message }, { status: 500 });
   }
 }
