@@ -13,3 +13,7 @@ export const quizCreationSchema = z.object({
   amount: z.number().min(1).max(10),
   id: z.string().min(1),
 });
+
+export const withdrawlSchema = z.object({
+  value: z.string(),
+});

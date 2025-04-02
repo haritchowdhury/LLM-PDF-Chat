@@ -14,6 +14,7 @@ const signUp = async (formData: FormData) => {
       await db.user.create({
         data: {
           email: validatedData.email.toLocaleLowerCase(),
+          name: validatedData.email.toLocaleLowerCase(),
           password: hashedPassword,
         },
       });

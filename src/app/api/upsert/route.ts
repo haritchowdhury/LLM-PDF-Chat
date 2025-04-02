@@ -38,15 +38,15 @@ export async function POST(request: NextRequest) {
     throw new Error("User not found");
   }  if(sessionId.split("_")[1] !== session?.user.id){
     throw new Error("Upload Could not be created");
-  }*/
-  /*  if (requestCount >= MAX_REQUESTS_PER_DAY) {
+  }
+  if (requestCount >= MAX_REQUESTS_PER_DAY) {
     return NextResponse.json(
       {
         error: `You have exceeded the nuber of documents you can upload in a day. Daily limit ${MAX_REQUESTS_PER_DAY}`,
       },
       { status: 429 }
     );
-  } */
+  }*/
 
   if (!file) return new Response(null, { status: 400 });
   const arrayBuffer = await file.arrayBuffer();
@@ -56,8 +56,15 @@ export async function POST(request: NextRequest) {
   });
   //const userId: string = sessionId.split("_")[0];
   const docs = await loader.load();
-  //console.log(docs[0].pageContent);
-
+  console.log(docs.length);
+  if (docs.length >= 3) {
+    return NextResponse.json(
+      {
+        error: `Upload Exceeds maximum beta testing page count. Beta testing page count: 2.`,
+      },
+      { status: 429 }
+    );
+  }
   const index = new Index({
     url: process.env.UPSTASH_VECTOR_REST_URL,
     token: process.env.UPSTASH_VECTOR_REST_TOKEN,

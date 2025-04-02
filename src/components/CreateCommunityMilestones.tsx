@@ -1,5 +1,5 @@
 "use client";
-import { abi, contractAddresses } from "@/constants";
+import { abi, contractAddresses } from "@/creators-constants";
 import { readContract /*, writeContract */ } from "@wagmi/core";
 import {
   useAccount,
@@ -31,18 +31,19 @@ import axios, { AxiosError } from "axios";
 
 type Upload = {
   id: string;
-  sessionId: string;
-  namespace: string;
+  userId: string;
 };
 const milestoneSchema = z.object({
   id: z.string().min(1),
+  userId: z.string().min(1),
 });
 type Input = z.infer<typeof milestoneSchema>;
 
-const CreateMilestones = ({ id, sessionId, namespace }: Upload) => {
+const CreateCommunityMilestones = ({ id, userId }: Upload) => {
   const router = useRouter();
   const { disconnect } = useDisconnect();
   const { toast } = useToast();
+
   const { address, isConnected } = useAccount();
   const [fee, setFee] = useState<bigint>();
   const chainId = useChainId();
@@ -53,12 +54,12 @@ const CreateMilestones = ({ id, sessionId, namespace }: Upload) => {
     resolver: zodResolver(milestoneSchema),
     defaultValues: {
       id: id || "",
+      userId: userId || "",
     },
   });
   const { mutate: setMileStones, status } = useMutation({
-    mutationFn: async ({ id }: Input) => {
+    mutationFn: async ({ id, userId }: Input) => {
       //console.log("id:", id, fee);
-
       const result = await readContract(config, {
         abi,
         address: mileStonesAddress,
@@ -83,16 +84,16 @@ const CreateMilestones = ({ id, sessionId, namespace }: Upload) => {
       const priceInEth = String(ethers.formatEther(price));
       console.log("price in ETH:", priceInEth, typeof priceInEth, price);
       const provider = new ethers.BrowserProvider(window.ethereum);
-      const signer = await provider.getSigner(); // Get the connected wallet signer
+      const signer = await provider.getSigner();
 
       const contract = new ethers.Contract(mileStonesAddress, abi, signer);
       try {
-        const tx = await contract.lockFunds(id, {
+        const tx = await contract.lockFunds(`${id}_${userId}`, id, {
           value: ethers.parseEther(priceInEth),
         });
         await tx.wait();
         const upload = id;
-        const response = await axios.post("/api/topics", {
+        const response = await axios.post("/api/communityTopics", {
           upload,
         });
         console.log("Transaction successful:", tx, response);
@@ -116,7 +117,6 @@ const CreateMilestones = ({ id, sessionId, namespace }: Upload) => {
       router.push("/");
     }
   }, [chainId]);
-
   if (!mileStonesAddress) {
     router.push("/");
     toast({
@@ -126,6 +126,7 @@ const CreateMilestones = ({ id, sessionId, namespace }: Upload) => {
     });
     disconnect();
   }
+  //console.log("claim Milestone", mileStonesAddress, chainId);
 
   const onSubmit = async (data: Input) => {
     setMileStones(data, {
@@ -151,6 +152,7 @@ const CreateMilestones = ({ id, sessionId, namespace }: Upload) => {
     });
   };
   form.watch();
+
   return (
     <Card className="border-none bg-black text-white fixed top-20 p-0 left-1/2 -translate-x-1/2 w-[350px]">
       <form
@@ -162,6 +164,7 @@ const CreateMilestones = ({ id, sessionId, namespace }: Upload) => {
           type="submit"
           onClick={() => {
             form.setValue("id", id);
+            form.setValue("userId", userId);
           }}
         >
           Activate Milestones
@@ -171,4 +174,4 @@ const CreateMilestones = ({ id, sessionId, namespace }: Upload) => {
   );
 };
 
-export default CreateMilestones;
+export default CreateCommunityMilestones;

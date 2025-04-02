@@ -7,12 +7,7 @@ export async function summarizer(
   document_text: string,
   model: string = "llama-3.3-70b-versatile",
   temperature: number = 1
-) /*: Promise<
-  {
-    question: string;
-    answer: string;
-  }[]
->*/ {
+) {
   try {
     const groq = new ChatGroq({
       model: model,
@@ -35,8 +30,6 @@ export async function summarizer(
 
     const chain = partialedPrompt.pipe(groq);
     const res: any = await chain.invoke({ query: user_prompt });
-
-    //const list_output: boolean = Array.isArray(res);
 
     return res;
   } catch (error) {

@@ -16,7 +16,9 @@ type Upload = {
   upload: string;
 };
 const CommunityTopicCreationButton = ({ upload }: Upload) => {
+  const { toast } = useToast();
   const [created, setCreated] = useState(true);
+  const form = useForm<Input>();
   const { mutate: getTopics, status } = useMutation({
     mutationFn: async () => {
       const response = await axios.post("/api/communityTopics", {
@@ -25,10 +27,6 @@ const CommunityTopicCreationButton = ({ upload }: Upload) => {
       return response.data;
     },
   });
-
-  const { toast } = useToast();
-
-  const form = useForm<Input>();
 
   const onSubmit = async (data: Input) => {
     console.log(data);

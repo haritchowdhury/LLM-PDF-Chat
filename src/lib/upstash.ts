@@ -111,7 +111,7 @@ export const queryUpstashAndLLM = async (
     },
     { namespace }
   );
-  //console.log(queryResponse);
+  console.log("index query", queryResponse);
   if (queryResponse.length >= 1) {
     const contextPromises = queryResponse.map(async (result) => {
       try {

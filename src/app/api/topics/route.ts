@@ -32,7 +32,6 @@ export async function POST(request: NextRequest) {
       userId: id,
     },
   });
-
   if (lastUpload) {
     const isOptionsEmpty =
       !lastUpload.options || Object.keys(lastUpload.options).length === 0;
@@ -87,6 +86,7 @@ export async function POST(request: NextRequest) {
         },
         data: {
           options: topicsArray,
+          timeStarted: new Date(),
         },
       });
     } catch (err) {

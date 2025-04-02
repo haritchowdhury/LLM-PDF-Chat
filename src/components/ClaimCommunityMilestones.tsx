@@ -1,6 +1,6 @@
 "use client";
-import { abi, contractAddresses } from "@/constants";
-import { readContract, writeContract } from "@wagmi/core";
+import { abi, contractAddresses } from "@/creators-constants";
+import { /*readContract,*/ writeContract } from "@wagmi/core";
 import {
   useAccount,
   useChainId,
@@ -41,7 +41,13 @@ const milestoneSchema = z.object({
 });
 type Input = z.infer<typeof milestoneSchema>;
 
-const ClaimMilestones = ({ id, ix, sessionId, namespace, upload }: Upload) => {
+const ClaimCommunityMilestones = ({
+  id,
+  ix,
+  sessionId,
+  namespace,
+  upload,
+}: Upload) => {
   const router = useRouter();
   const { disconnect } = useDisconnect();
   const { toast } = useToast();
@@ -85,8 +91,9 @@ const ClaimMilestones = ({ id, ix, sessionId, namespace, upload }: Upload) => {
         functionName: "completeMilestone",
         args: [id as string],
         value: ethers.parseEther("0"),
+        account: address,
       } as any);
-      const response = await axios.put("/api/topics", {
+      const response = await axios.put("/api/communityTopics", {
         ix,
         upload,
       });
@@ -119,7 +126,7 @@ const ClaimMilestones = ({ id, ix, sessionId, namespace, upload }: Upload) => {
             description: "Milestone claimed succesfully!",
             variant: "default",
           });
-          router.push(`/chat/${id}`);
+          router.push(`/chat/${upload}`);
         }, 2000);
       },
     });
@@ -147,4 +154,4 @@ const ClaimMilestones = ({ id, ix, sessionId, namespace, upload }: Upload) => {
   );
 };
 
-export default ClaimMilestones;
+export default ClaimCommunityMilestones;

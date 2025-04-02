@@ -1,17 +1,19 @@
 import { http, createConfig } from "wagmi";
 import {
-  arbitrum,
+  /* arbitrum,
   base,
   mainnet,
   optimism,
-  polygon,
+  polygon, */
   sepolia,
 } from "wagmi/chains";
 import { hardhatChain } from "./localchains";
 import { eduTestnetChain } from "./testchains";
-import { injected, metaMask, safe, walletConnect } from "wagmi/connectors";
-import { getChainId } from "@wagmi/core";
-import { getDefaultConfig } from "@rainbow-me/rainbowkit";
+import {
+  metaMask /*, injected,  safe, walletConnect*/,
+} from "wagmi/connectors";
+//import { getChainId } from "@wagmi/core";
+//import { getDefaultConfig } from "@rainbow-me/rainbowkit";
 
 //const projectId = process.env.NEXT_PUBLIC_RAINBOW_PROJECT_ID;
 export const config = createConfig({
@@ -27,3 +29,4 @@ export const config = createConfig({
     ),
   },
 });
+//https://rpc.open-campus-codex.gelato.digital/035c8a8972f64444bc6416da80ac0dbd

@@ -37,9 +37,19 @@ const QuizForm = ({
   id: uploadId,
 }: Props) => {
   const router = useRouter();
+  const { toast } = useToast();
   const [finishedLoading, setFinishedLoading] = useState(false);
   const [topicsCreated, setTopicsCreated] = useState(false);
-  const { toast } = useToast();
+  const [topics, setTopics] = useState([]);
+  const [completed, setCompleted] = useState([]);
+  const form = useForm<Input>({
+    resolver: zodResolver(quizCreationSchema),
+    defaultValues: {
+      topic: topicParam || "",
+      amount: 3,
+      id: uploadId || "",
+    },
+  });
   const { mutate: getQuestions, status } = useMutation({
     mutationFn: async ({ amount, topic, id }: Input) => {
       console.log("atclient", amount, topic, id);
@@ -49,16 +59,6 @@ const QuizForm = ({
         id,
       });
       return response.data;
-    },
-  });
-  const [topics, setTopics] = useState([]);
-  const [completed, setCompleted] = useState([]);
-  const form = useForm<Input>({
-    resolver: zodResolver(quizCreationSchema),
-    defaultValues: {
-      topic: topicParam || "",
-      amount: 3,
-      id: uploadId || "",
     },
   });
 

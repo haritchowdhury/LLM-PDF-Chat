@@ -8,7 +8,7 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 import ErrorToast from "@/components/ErrorToast";
 import Image from "next/image";
-import { Card, CardContent, CardTitle } from "@/components/ui/card";
+import { Card /*CardContent, CardTitle*/ } from "@/components/ui/card";
 
 const Page = async () => {
   const session = await auth();

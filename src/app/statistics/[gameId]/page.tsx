@@ -11,11 +11,15 @@ import { buttonVariants } from "@/components/ui/button";
 import { LucideLayoutDashboard } from "lucide-react";
 import Link from "next/link";
 import ClaimMilestones from "@/components/ClaimMilestones";
+import ClaimCommunityMilestones from "@/components/ClaimCommunityMilestones";
+
 type Params = Promise<{ gameId: any }>;
 
 const Statistics = async ({ params }: { params: Params }) => {
   const { gameId } = await params;
   const session: any = await auth();
+  const weekAgo = new Date();
+  weekAgo.setDate(weekAgo.getDate() - 7);
 
   if (!session?.user) return redirect("/");
 
@@ -36,26 +40,55 @@ const Statistics = async ({ params }: { params: Params }) => {
   if (game.gameType === "mcq") {
     const totalCorrect = game.questions.filter((q) => q.isCorrect).length;
     accuracy = (totalCorrect / game.questions.length) * 100;
-  } else if (game.gameType === "open_ended") {
+  } /*else if (game.gameType === "open_ended") {
     const totalPercentage = game.questions.reduce(
       (acc, q) => acc + (q.percentageCorrect ?? 0),
       0
     );
     accuracy = totalPercentage / game.questions.length;
-  }
+  }*/
   accuracy = Math.round(accuracy * 100) / 100;
   let isClaimable = false;
-  const topics = upload?.options as any[];
-  let j = topics?.length;
-  for (let i = 0; i < topics?.length; i++) {
-    if (game.topic == topics[i]) {
-      j = i;
+  let j = 5;
+  console.log(upload);
+  if (upload.private === true) {
+    const topics = upload?.options as any[];
+    for (let i = 0; i < topics?.length; i++) {
+      if (game.topic == topics[i]) {
+        j = i;
+      }
     }
-  }
-  const completed: boolean[] = JSON.parse(upload.isCompleted as string);
-  if (j != topics?.length && completed[j] == false) {
-    console.log("true");
-    isClaimable = true;
+    const completed: boolean[] = JSON.parse(upload.isCompleted as string);
+    if (
+      j != topics?.length &&
+      completed[j] == false &&
+      upload.timeStarted >= weekAgo
+    ) {
+      console.log("true");
+      isClaimable = true;
+    }
+  } else {
+    const communityQuiz = await db.communityquiz.findFirst({
+      where: { uploadId: upload.id, userId: session?.user.id },
+    });
+    console.log(communityQuiz);
+    const topics = communityQuiz?.options as any[];
+    for (let i = 0; i < topics?.length; i++) {
+      if (game.topic == topics[i]) {
+        j = i;
+      }
+    }
+    const completed: boolean[] = JSON.parse(
+      communityQuiz.isCompleted as string
+    );
+    if (
+      j != topics?.length &&
+      completed[j] == false &&
+      communityQuiz.timeStarted >= weekAgo
+    ) {
+      console.log("true");
+      isClaimable = true;
+    }
   }
 
   return (
@@ -71,6 +104,15 @@ const Statistics = async ({ params }: { params: Params }) => {
               {isClaimable && upload.private && (
                 <ClaimMilestones
                   id={upload.id}
+                  ix={j}
+                  sessionId={sessionId}
+                  namespace={namespace}
+                  upload={upload.id}
+                />
+              )}
+              {isClaimable && !upload.private && (
+                <ClaimCommunityMilestones
+                  id={`${upload.id}_${session?.user.id}`}
                   ix={j}
                   sessionId={sessionId}
                   namespace={namespace}

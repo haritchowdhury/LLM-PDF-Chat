@@ -7,8 +7,10 @@ import { MessageSquareText, Boxes } from "lucide-react";
 import { Card, CardContent, CardTitle } from "@/components/ui/card";
 import Share from "@/components/Share";
 import Delete from "@/components/Delete";
-import ShareLinkModel from "@/components/ShareLink";
 import { headers } from "next/headers";
+import Shares from "@/components/Shares";
+import Withdrawl from "@/components/Withdrawl";
+import EditableUsername from "@/components/EditableUsername";
 
 type Params = Promise<{ userId: any }>;
 
@@ -33,7 +35,7 @@ const Profile = async ({ params }: { params: Params }) => {
     where: { userId: session?.user.id },
     orderBy: { timeStarted: "desc" },
   });
-  const Shares = await db.upload.findMany({
+  const shares = await db.upload.findMany({
     where: { userId: userId, private: false, isDeleted: false },
     orderBy: { timeStarted: "desc" },
   });
@@ -45,21 +47,31 @@ const Profile = async ({ params }: { params: Params }) => {
           className="flex flex-col gap-4 text-white bg-black border-gray-800 p-12 
                              h-[90vh] overflow-y-auto w-full max-w-md sm:max-w-lg lg:max-w-2xl mt-4 sm:mt-8"
         >
-          <Card className="p-3 bg-black border-gray-900 text-gray-200">
-            <div className="flex flex-col sm:flex-row gap-3 mt-2">
-              {user.name}
-              {user.email}
-            </div>
+          <Card className="flex flex-row p-3 gap-1 bg-black border-gray-900 text-gray-200">
+            {user.id === session?.user.id ? (
+              <div className="flex flex-col sm:flex-col gap-3 mt-2 item-center justify-center">
+                <EditableUsername
+                  initialUsername={user.name}
+                  userId={user.id}
+                />
+              </div>
+            ) : (
+              user.name
+            )}
+          </Card>
+          <Card className="flex flex-row p-3 gap-1 bg-black border-gray-900 text-gray-200">
+            {user.id === session?.user.id && (
+              <div className="flex item-center justify-center sm:flex-row gap-3 mt-2">
+                <Withdrawl />
+              </div>
+            )}
           </Card>
 
           {userId === session.user.id && (
             <>
               <Share namespace={"undefined"} />
               <Card className="flex justify-center w-full bg-gray-800 text-gray-200 border-none p-1 font-bold">
-                <div>
-                  Your uploads through this will be shared with the community.
-                  Be mindful!
-                </div>
+                <div>Publish article, and share with your friends.</div>
               </Card>
 
               <div className="flex justify-center w-full">
@@ -67,48 +79,31 @@ const Profile = async ({ params }: { params: Params }) => {
                   href={`/chat/undefined`}
                   className={` flex ${buttonVariants()} w-fit items-center  w-fit`}
                 >
-                  Upload a new document
+                  Create Workspace
                   <MessageSquareText />
                 </Link>
               </div>
               <Card className="flex justify-center w-full bg-gray-800 text-gray-200 p-2 border-none p-1 font-bold">
-                <div>Start a private conversation.</div>
+                <div>Start a private workspacen.</div>
               </Card>
             </>
           )}
 
-          <Card className="p-3 bg-black border-gray-900 text-gray-200">
-            <Card className="flex justify-center w-full bg-gray-800 text-gray-200 p-2 border-none font-bold">
-              Published Articles
-            </Card>
-            <div className="flex flex-col sm:flex-row gap-2 mt-2">
-              {!Shares.length && (
-                <div>
-                  <small>You have not shared anything yet!</small>
-                </div>
-              )}
-              {Shares.map((share) => (
-                <div key={share.id} className="gap-1 flex flex-row">
-                  <Link href={`/chat/${share.id}`} className={buttonVariants()}>
-                    {share.name.slice(0, 25)}
-                    <MessageSquareText />
-                  </Link>
-                  {userId === session.user.id && (
-                    <Delete upload={share.id as string} />
-                  )}
-                  <ShareLinkModel link={`${platformlink}${share.id}`} />
-                </div>
-              ))}
-            </div>
-          </Card>
+          <Shares
+            shares={shares}
+            userId={userId}
+            currentUser={session?.user.id}
+            platformlink={platformlink}
+          />
+
           {userId === session.user.id && (
             <>
               {" "}
               <Card className="p-3 bg-black border-gray-900 text-gray-200">
                 <Card className="flex justify-center w-full bg-gray-800 text-gray-200 p-2 border-none font-bold">
-                  Your Conversations
+                  Your Workspaces
                 </Card>
-                <div className="flex flex-row sm:flex-row gap-3 mt-2">
+                <div className="flex flex-wrap gap-3 mt-2">
                   {!Uploads.length && (
                     <div>
                       <small>You have no private chatrooms!</small>
@@ -128,29 +123,27 @@ const Profile = async ({ params }: { params: Params }) => {
                   ))}
                 </div>
               </Card>
-              <Card className="p-3 flex flex-col bg-black border-gray-800 text-gray-200">
+              <Card className="p-3 flex flex-wrap bg-black gap-1 border-gray-800 text-gray-200">
                 <Card className="flex justify-center w-full bg-gray-800 text-gray-200 p-2 font-bold border-none">
                   Your Quizzes
                 </Card>
-                <div className="flex flex-row sm:flex-row gap-3 mt-2">
-                  {!games.length && (
-                    <div>
-                      <small>You have not taken any quizzes!</small>
-                    </div>
-                  )}
-                  <div className="gap-1">
-                    {games.map((game) => (
-                      <Link
-                        key={game.id}
-                        href={`/statistics/${game.id}`}
-                        className={buttonVariants()}
-                      >
-                        {game.topic}
-                        <Boxes />
-                      </Link>
-                    ))}
+                {!games.length && (
+                  <div>
+                    <small>You have not taken any quizzes!</small>
                   </div>
-                </div>
+                )}
+
+                {games.map((game) => (
+                  <div key={game.id} className="gap-1">
+                    <Link
+                      href={`/statistics/${game.id}`}
+                      className={buttonVariants()}
+                    >
+                      {game.topic}
+                      <Boxes />
+                    </Link>
+                  </div>
+                ))}
               </Card>
             </>
           )}

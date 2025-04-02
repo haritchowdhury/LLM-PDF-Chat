@@ -108,7 +108,7 @@ const Share = ({ namespace }: User) => {
               }}
             />
 
-            {/* Input Section - Fixed height at bottom */}
+            {/* Input Section */}
             {!showLoader && (
               <CardContent className="p-2 bg-black flex-shrink-0 border-none">
                 <div className="flex w-full flex-row items-center justify-center bg-black">

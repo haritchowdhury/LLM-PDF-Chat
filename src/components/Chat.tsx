@@ -35,11 +35,16 @@ const Chat = ({
   personal,
   userId,
 }: User) => {
+  const router = useRouter();
+  const { toast } = useToast();
+  const [disabled, setDisabled] = useState(true);
+  const [loading, setLoading] = useState(true);
+  const [showLoader, setShowLoader] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement | null>(null);
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   };
-  const router = useRouter();
+
   if (!email) {
     router.push("/sign-in");
   }
@@ -72,11 +77,6 @@ const Chat = ({
     }
   }, [error]);
 
-  const { toast } = useToast();
-  const [disabled, setDisabled] = useState(true);
-  const [loading, setLoading] = useState(true);
-  const [showLoader, setShowLoader] = useState(false);
-
   useEffect(() => {
     if (email) {
       fetch(
@@ -94,8 +94,17 @@ const Chat = ({
   }, [email]);
 
   useEffect(() => {
+    if (!loading && messages.length > 0) {
+      // Add a slightly longer delay for initial load to ensure DOM is ready
+      setTimeout(() => {
+        messagesEndRef.current?.scrollIntoView({ behavior: "auto" });
+      }, 300);
+    }
+  }, [loading, messages.length]);
+
+  useEffect(() => {
     scrollToBottom();
-  }, [messages, setMessages]);
+  }, [messages, isLoading]);
 
   return (
     <>
@@ -174,7 +183,8 @@ const Chat = ({
                     toast({
                       duration: 2000,
                       variant: "destructive",
-                      description: "Something went wrong!",
+                      description:
+                        "Something went wrong! Currently we support text only PDFs.",
                     });
                     setDisabled(false);
                   });
@@ -202,8 +212,8 @@ const Chat = ({
             )}
 
             {/* Messages Section - Takes available space */}
-            <CardContent className="bg-gray-1000 rounded p-4 flex-grow overflow-hidden">
-              <div className="h-full overflow-y-auto rounded flex-grow custom-scrollbar">
+            <CardContent className="bg-gray-1000 rounded p-4 flex-grow overflow-hidden flex flex-col">
+              <div className="h-full w-full overflow-y-auto rounded custom-scrollbar flex flex-col">
                 {!messages?.length ? (
                   !personal ? (
                     <p className="p-4 rounded bg-gray-400 text-gray-100">
@@ -227,7 +237,7 @@ const Chat = ({
                 )}
                 {disabled ? (
                   <div className="text-gray-1000 flex gap-4 flex-row justify-center p-4">
-                    <motion.div className="w-5 h-5 border-4 border-gray-300 border-t-blue-500 rounded-full animate-spin" />
+                    <motion.div className="w-5 h-5 border-4 border-gray-300 border-t-blue-500 rounded-full animate-spin pb-4" />
                   </div>
                 ) : (
                   messages.map(({ content }, idx) => (
@@ -244,7 +254,14 @@ const Chat = ({
                     </div>
                   ))
                 )}
-                <div ref={messagesEndRef} className="h-0" />
+                {isLoading && (
+                  <div className="p-6">
+                    {" "}
+                    <motion.div className="w-5 h-5 border-4 border-gray-300 border-t-blue-500 rounded-full animate-spin " />
+                  </div>
+                )}
+                <div className="h-4" />
+                <div ref={messagesEndRef} className="h-px" />
               </div>
             </CardContent>
 

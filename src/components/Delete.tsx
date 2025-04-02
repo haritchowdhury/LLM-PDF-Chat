@@ -20,7 +20,12 @@ type Input = z.infer<typeof milestoneSchema>;
 const Delete = ({ upload }: Upload) => {
   const router = useRouter();
   const { toast } = useToast();
-
+  const form = useForm<Input>({
+    resolver: zodResolver(milestoneSchema),
+    defaultValues: {
+      upload: upload || "",
+    },
+  });
   const { mutate: deleteChat, status } = useMutation({
     mutationFn: async ({ upload }: Input) => {
       const response = await fetch("/api/upsert", {
@@ -37,13 +42,6 @@ const Delete = ({ upload }: Upload) => {
       }
 
       return await response.json();
-    },
-  });
-
-  const form = useForm<Input>({
-    resolver: zodResolver(milestoneSchema),
-    defaultValues: {
-      upload: upload || "",
     },
   });
 

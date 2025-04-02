@@ -64,11 +64,11 @@ const Home = async () => {
           <CardTitle className="text-center text-sm">
             Explore Community Articles
           </CardTitle>
-          <div className="flex flex-col sm:flex-row gap-3 mt-2">
+          <div className="flex flex-wrap gap-3 mt-2">
             {Shares.map((share) => (
               <div
                 key={share.id}
-                className="flex justify-center items-center gap-1"
+                className="flex flex-wrap justify-center items-center gap-1"
               >
                 <Link href={`/chat/${share.id}`} className={buttonVariants()}>
                   {share.name.slice(0, 25)}

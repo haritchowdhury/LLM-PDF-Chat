@@ -37,9 +37,11 @@ const CommunityQuizForm = ({
   id: uploadId,
 }: Props) => {
   const router = useRouter();
+  const { toast } = useToast();
   const [finishedLoading, setFinishedLoading] = useState(false);
   const [topicsCreated, setTopicsCreated] = useState(false);
-  const { toast } = useToast();
+  const [topics, setTopics] = useState([]);
+  const [completed, setCompleted] = useState([]);
   const { mutate: getCommunityQuestions, status } = useMutation({
     mutationFn: async ({ amount, topic, id }: Input) => {
       try {
@@ -52,12 +54,11 @@ const CommunityQuizForm = ({
         return response.data;
       } catch (error) {
         console.error("Mutation error:", error);
-        throw error; // Re-throw to trigger onError handler
+        throw error;
       }
     },
   });
-  const [topics, setTopics] = useState([]);
-  const [completed, setCompleted] = useState([]);
+
   const form = useForm<Input>({
     resolver: zodResolver(quizCreationSchema),
     defaultValues: {

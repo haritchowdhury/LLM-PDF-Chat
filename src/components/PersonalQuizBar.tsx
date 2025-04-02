@@ -10,6 +10,7 @@ import { ConnectWallet } from "@/components/wallet/connect";
 import QuizForm from "@/components/QuizForm";
 import { CardContent } from "@/components/ui/card";
 import { motion } from "framer-motion";
+import { useRouter } from "next/navigation";
 
 type Props = {
   upload: string;
@@ -34,6 +35,7 @@ const PersonalQuizBar = ({
   showLoader,
   setShowLoader,
 }: Props) => {
+  const router = useRouter();
   const { toast } = useToast();
   const { address, isConnected } = useAccount();
   const chainId = useChainId();
@@ -54,6 +56,7 @@ const PersonalQuizBar = ({
         variant: "destructive",
         description: "Contract not deployed on this chain.",
       });
+      router.push("/");
     }
   }, [chainId]);
 
@@ -83,10 +86,10 @@ const PersonalQuizBar = ({
         setLoadingMilestones(false);
       }
       getUserDetails();
-    }, 1000);
+    }, 5000);
 
     return () => clearInterval(interval);
-  }, [isConnected, upload, mileStonesAddress]);
+  }, [isConnected, upload, mileStonesAddress, chainId]);
 
   return (
     <>
@@ -115,11 +118,13 @@ const PersonalQuizBar = ({
                     showLoader={showLoader}
                     setShowLoader={setShowLoader}
                   />
+                  <hr className="m-0 border-gray-800" />
                 </div>
               )}
             {isConnected && loadingMilestones && !lockedIn && (
               <div className="p-4 flex justify-center">
                 <motion.div className="w-5 h-5 border-4 border-gray-300 border-t-blue-500 rounded-full animate-spin" />
+                <hr className="m-0 border-gray-800" />
               </div>
             )}
             {isConnected &&
@@ -135,7 +140,6 @@ const PersonalQuizBar = ({
                 </div>
               )}
           </CardContent>
-          <hr className="m-0 border-gray-800" />
         </>
       )}
     </>
