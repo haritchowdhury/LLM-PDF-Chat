@@ -20,13 +20,10 @@ export const config = createConfig({
   chains: [eduTestnetChain, hardhatChain, sepolia],
   connectors: [metaMask()],
   transports: {
-    [eduTestnetChain.id]: http(
-      "https://rpc.open-campus-codex.gelato.digital" /*"https://rpc.open-campus-codex.gelato.digital"*/
-    ),
+    [eduTestnetChain.id]: http("https://rpc.open-campus-codex.gelato.digital"),
     [hardhatChain.id]: http("http://127.0.0.1:8545/"),
     [sepolia.id]: http(
       "https://eth-sepolia.g.alchemy.com/v2/SFZcaZUs6CVxFa8Go-zyeEAzMabvuQ2D"
     ),
   },
 });
-//https://rpc.open-campus-codex.gelato.digital/035c8a8972f64444bc6416da80ac0dbd

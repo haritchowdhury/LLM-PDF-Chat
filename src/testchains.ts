@@ -20,5 +20,3 @@ export const eduTestnetChain = {
   },
   testnet: true,
 };
-
-//https://rpc.open-campus-codex.gelato.digital/035c8a8972f64444bc6416da80ac0dbd
