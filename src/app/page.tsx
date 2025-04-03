@@ -8,7 +8,7 @@ import Image from "next/image";
 import db from "@/lib/db/db";
 import ShareLinkModel from "@/components/ShareLink";
 import { headers } from "next/headers";
-
+import LandingPage from "@/components/LandingPage";
 const Home = async () => {
   const session = await auth();
   if (!session) redirect("/sign-in");
@@ -22,8 +22,9 @@ const Home = async () => {
     where: { private: false, isDeleted: false },
   });
 
-  return (
-    <main className="flex flex-col items-center min-h-screen bg-black p-2">
+  return <LandingPage id={id} platformlink={platformlink} shares={Shares} />;
+  {
+    /* <main className="flex flex-col items-center min-h-screen bg-black p-2">
       <Card
         className="flex flex-col gap-4 text-white bg-black border-gray-800 p-12 
                       h-[90vh] overflow-y-auto w-full max-w-md sm:max-w-lg lg:max-w-2xl mt-4 sm:mt-8"
@@ -86,8 +87,8 @@ const Home = async () => {
           </div>
         </Card>
       </Card>
-    </main>
-  );
+    </main> */
+  }
 };
 
 export default Home;

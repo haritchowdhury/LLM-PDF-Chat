@@ -52,7 +52,7 @@ other users by using the public upload functionality and share the chat room lin
 
 ```
 1. Milestones Contract - For private uploads : 0x5e831A94139712C7C480d9B9fD3290f3c234875c
-2. Creator-Economy Contract - For public uploads:
+2. Creator-Economy Contract - For public uploads: 0x8C8D84fB7CE0B68b8f5525CcB10fe4a2387B9C06
 ```
 
 ---

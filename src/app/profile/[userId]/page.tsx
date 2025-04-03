@@ -44,12 +44,12 @@ const Profile = async ({ params }: { params: Params }) => {
     <>
       <main className="flex relative items-center justify-center min-h-screen bg-black text-white">
         <Card
-          className="flex flex-col gap-4 text-white bg-black border-gray-800 p-12 
-                             h-[90vh] overflow-y-auto w-full max-w-md sm:max-w-lg lg:max-w-2xl mt-4 sm:mt-8"
+          className="flex flex-col gap-4 text-white bg-black border-none p-12 
+                     h-[90vh] overflow-y-auto w-full max-w-md sm:max-w-4xl lg:max-w-4xl mt-4 sm:mt-8"
         >
-          <Card className="flex flex-row p-3 gap-1 bg-black border-gray-900 text-gray-200">
+          <Card className="flex flex-row item-center justify-center p-3 gap-1 bg-black border-none text-gray-200">
             {user.id === session?.user.id ? (
-              <div className="flex flex-col sm:flex-col gap-3 mt-2 item-center justify-center">
+              <div className="flex flex-col sm:flex-col gap-3 mt-2 ">
                 <EditableUsername
                   initialUsername={user.name}
                   userId={user.id}
@@ -59,9 +59,9 @@ const Profile = async ({ params }: { params: Params }) => {
               user.name
             )}
           </Card>
-          <Card className="flex flex-row p-3 gap-1 bg-black border-gray-900 text-gray-200">
+          <Card className="flex flex-row item-center justify-center p-3 gap-1 bg-black border-gray-900 text-gray-200">
             {user.id === session?.user.id && (
-              <div className="flex item-center justify-center sm:flex-row gap-3 mt-2">
+              <div className="flex  sm:flex-row gap-3 mt-2">
                 <Withdrawl />
               </div>
             )}
@@ -69,11 +69,13 @@ const Profile = async ({ params }: { params: Params }) => {
 
           {userId === session.user.id && (
             <>
-              <Share namespace={"undefined"} />
               <Card className="flex justify-center w-full bg-gray-800 text-gray-200 border-none p-1 font-bold">
                 <div>Publish article, and share with your friends.</div>
               </Card>
-
+              <Share namespace={"undefined"} />
+              <Card className="flex justify-center w-full bg-gray-800 text-gray-200 p-2 border-none p-1 font-bold">
+                <div>Start a private workspacen.</div>
+              </Card>
               <div className="flex justify-center w-full">
                 <Link
                   href={`/chat/undefined`}
@@ -83,9 +85,6 @@ const Profile = async ({ params }: { params: Params }) => {
                   <MessageSquareText />
                 </Link>
               </div>
-              <Card className="flex justify-center w-full bg-gray-800 text-gray-200 p-2 border-none p-1 font-bold">
-                <div>Start a private workspacen.</div>
-              </Card>
             </>
           )}
 

@@ -16,8 +16,8 @@ const Page = async () => {
   return (
     <main className="flex relative items-center justify-center min-h-screen bg-black">
       <Card
-        className="flex flex-col gap-4 text-white bg-black border-gray-800 p-12 
-                      h-[90vh] overflow-y-auto w-full max-w-md sm:max-w-lg lg:max-w-2xl mt-4 sm:mt-8"
+        className="flex flex-col gap-4 text-white bg-black border-none p-12 
+                      h-[90vh] overflow-y-auto w-full max-w-md sm:max-w-4xl lg:max-w-4xl mt-4 sm:mt-8"
       >
         <div className="w-full max-w-sm mx-auto space-y-6">
           <div className="flex items-center justify-between">
@@ -91,7 +91,7 @@ const Page = async () => {
             </Button>
           </div>
 
-          <Card className="p-3 bg-black border-gray-900 text-gray-200 flex flex-col items-center gap-4 w-full max-w-md">
+          <Card className="p-3 bg-black border-gray-900 text-gray-200 flex flex-col items-center gap-4 w-full max-w-md ">
             <div>Upload your documents using the tooltip.</div>
             <Image
               src="/upload.png"
