@@ -24,14 +24,17 @@ export async function strict_output(
     });
     const parser = new JsonOutputParser<Topic[]>();
 
-    const context_prompt = `You are an assistant that strictly answers based on the provided document. 
-    If the information is not in the document or the document is empty, respond with "I don't know." you can make up the wrong
-    options from outside the document
-    
-    Here is the document:\n${document_text}`;
+    const context_prompt = `You are a precise document analyzer that extracts the most relevant topics based solely on the provided document content.
+    If the document is empty or doesn't contain sufficient information, respond with "Insufficient document content."
+    You are a document structure analyzer that identifies the main organizational sections and categories within the provided document.
+    Focus on categorizing content by its function rather than extracting specific details.
+
+    Document:
+    ${document_text}
+    `;
 
     const prompt = ChatPromptTemplate.fromTemplate(
-      "{context_prompt}\n\nAnswer the user query strictly in JSON format.\n{format_instructions}\n{query}"
+      "{context_prompt}\n\nIdentify the 5 most important high-level categories or sections in this document.\n{format_instructions}\n{query}"
     );
 
     const partialedPrompt = await prompt.partial({

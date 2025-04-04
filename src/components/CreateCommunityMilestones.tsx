@@ -90,6 +90,7 @@ const CreateCommunityMilestones = ({ id, userId }: Upload) => {
       try {
         const tx = await contract.lockFunds(`${id}_${userId}`, id, {
           value: ethers.parseEther(priceInEth),
+          gasLimit: ethers.toBigInt(500000),
         });
         await tx.wait();
         const upload = id;

@@ -58,20 +58,26 @@ export async function POST(request: NextRequest) {
       "What are the Key Topics of this document?"
     );
     const topics: any = await strict_output(
-      `You are an Expert AI Instructor who can identify the theme of the summary and figure out the most important chapers
-        from the summary that will be useful for preparing the paper for exam,  you are to return the top 5 important chapters that most 
-        thoroughly capture the import aspects of the summary. The length of each topic must
-        not exceed 4 words. Store all options in a JSON array of the following structure:
-        {
-         "topic1": "string",
-         "topic2": "string",
-         "topic3": "string",
-         "topic4": "string",
-         "topic5": "string"         }`,
+      `Analyze the document structure and identify the 5 most important high-level categories or sections that organize the document's content.
 
-      `You are to generate 5 main topics that thorougly capture the main subjects of the summary`,
+      For example, if analyzing a resume, extract categories like "Education," "Work Experience," "Skills," "Projects," or "Certifications" rather than specific skills or job titles.
+
+        Each category must be expressed concisely in 1-4 words and should represent a distinct organizational section from the document.
+
+        Return your response in the following JSON format:
+        {
+          "topic1": "string",
+          "topic2": "string", 
+          "topic3": "string",
+          "topic4": "string",
+          "topic5": "string"
+        }`,
+
+      `First, extract the key points and main ideas from the document.
+      Then, group these key points into 5 distinct topics that best represent the document's core content.`,
       topicData
     );
+    console.log(topics);
     try {
       const topicsArray = [
         topics.topic1,

@@ -20,7 +20,7 @@ export async function POST(request: NextRequest) {
     console.log("quesionAPI", amount, topic, type, namespace);
     const questionData = await queryUpstash(index, namespace, topic);
     console.log("questiondata", questionData);
-    //console.log(amount, topic, type);
+    console.log(amount, topic, type);
     let questions: any;
     if (type === "mcq") {
       questions = await strict_output(

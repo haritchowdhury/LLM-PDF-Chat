@@ -62,7 +62,7 @@ const LandingPage = ({ id, platformlink, shares }: Props) => {
 
   const ArticleCard = ({ article }) => (
     <article
-      className={`rounded-lg overflow-hidden shadow-lg transition-transform hover:scale-105 bg-black`}
+      className={`rounded-lg overflow-hidden shadow-lg transition-transform hover:scale-105 bg-black h-32`}
     >
       <div className="p-6">
         <Link href={`/chat/${article.id}`}>
@@ -70,7 +70,6 @@ const LandingPage = ({ id, platformlink, shares }: Props) => {
             {article.name}
           </h3>
         </Link>
-        <p className={`mb-4 text-gray-300`}>{article.description}</p>
         <div className={`flex items-center justify-between text-gray-400"  `}>
           <span>
             <ShareLinkModel link={`${platformlink}${article.id}`} />
