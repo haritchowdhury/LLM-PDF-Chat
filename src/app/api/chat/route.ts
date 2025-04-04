@@ -44,16 +44,14 @@ export async function POST(request: NextRequest) {
   if (!user) return new Response(null, { status: 403 });
   if (requestCount >= MAX_REQUESTS_PER_DAY) {
     return NextResponse.json(
-      {
-        error: `You have exceeded the nuber of questions you can ask in a day. Daily limit ${MAX_REQUESTS_PER_DAY}`,
-      },
+      `You have exceeded the nuber of questions you can ask in a day. Daily limit ${MAX_REQUESTS_PER_DAY}`,
       { status: 429 }
     );
   }
   if (!question)
     return new Response("No question in the request.", { status: 401 });
   if (!namespaceList.includes(namespace)) {
-    return new Response("This Namespace has not been created.", {
+    return NextResponse.json("This Namespace has not been created.", {
       status: 404,
     });
   }
@@ -66,7 +64,12 @@ export async function POST(request: NextRequest) {
     });
     response = await queryUpstashAndLLM(index, namespace, sessionId, question);
   } catch {
-    throw new Error("Chat could not be compiled");
+    return NextResponse.json(
+      "Unable to get response from model, contact the developer team.",
+      {
+        status: 401,
+      }
+    );
   }
 
   return aiUseChatAdapter(response);

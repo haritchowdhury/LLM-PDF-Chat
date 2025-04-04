@@ -71,8 +71,8 @@ const Chat = ({
       toast({
         duration: 2000,
         variant: "destructive",
-        description:
-          "You have exceeded 20 questions for the day. Come back tomorrow.",
+        description: error.message,
+        /* "You have exceeded 20 questions for the day. Come back tomorrow."*/
       });
     }
   }, [error]);

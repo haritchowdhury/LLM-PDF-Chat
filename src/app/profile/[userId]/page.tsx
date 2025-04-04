@@ -48,33 +48,38 @@ const Profile = async ({ params }: { params: Params }) => {
                      h-[90vh] overflow-y-auto w-full max-w-md sm:max-w-4xl lg:max-w-4xl mt-4 sm:mt-8"
         >
           <Card className="flex flex-row item-center justify-center p-3 gap-1 bg-black border-none text-gray-200">
-            {user.id === session?.user.id ? (
-              <div className="flex flex-col sm:flex-col gap-3 mt-2 ">
-                <EditableUsername
-                  initialUsername={user.name}
-                  userId={user.id}
-                />
-              </div>
-            ) : (
-              user.name
-            )}
-          </Card>
-          <Card className="flex flex-row item-center justify-center p-3 gap-1 bg-black border-gray-900 text-gray-200">
             {user.id === session?.user.id && (
               <div className="flex  sm:flex-row gap-3 mt-2">
                 <Withdrawl />
               </div>
             )}
+            <Card className="flex flex-row item-center justify-center p-3 gap-1 bg-black border-none text-gray-200">
+              {user.id === session?.user.id ? (
+                <div className="flex flex-col sm:flex-col gap-3 mt-2 ">
+                  <EditableUsername
+                    initialUsername={user.name}
+                    userId={user.id}
+                  />
+                </div>
+              ) : (
+                <Card className="flex flex-row item-center justify-center p-3 gap-1 bg-black border-none text-gray-200 bg-gray-500 p-2 py-1">
+                  {user.name}
+                </Card>
+              )}
+            </Card>
           </Card>
 
           {userId === session.user.id && (
             <>
-              <Card className="flex justify-center w-full bg-gray-800 text-gray-200 border-none p-1 font-bold">
-                <div>Publish article, and share with your friends.</div>
+              <Card className="flex justify-center w-full bg-black text-gray-100 border-none p-1 font-bold">
+                <div>
+                  Publish articles to share with your friends. Earn everytime
+                  someone unlocks quizzes in them.
+                </div>
               </Card>
               <Share namespace={"undefined"} />
-              <Card className="flex justify-center w-full bg-gray-800 text-gray-200 p-2 border-none p-1 font-bold">
-                <div>Start a private workspacen.</div>
+              <Card className="flex justify-center w-full bg-black text-gray-100 p-2 border-none p-1 font-bold">
+                <div>Start a private workspace.</div>
               </Card>
               <div className="flex justify-center w-full">
                 <Link
@@ -98,7 +103,7 @@ const Profile = async ({ params }: { params: Params }) => {
           {userId === session.user.id && (
             <>
               {" "}
-              <Card className="p-3 bg-black border-gray-900 text-gray-200">
+              <Card className="p-3 bg-black border-gray-700 text-gray-200">
                 <Card className="flex justify-center w-full bg-gray-800 text-gray-200 p-2 border-none font-bold">
                   Your Workspaces
                 </Card>
@@ -122,7 +127,7 @@ const Profile = async ({ params }: { params: Params }) => {
                   ))}
                 </div>
               </Card>
-              <Card className="p-3 flex flex-wrap bg-black gap-1 border-gray-800 text-gray-200">
+              <Card className="p-3 flex flex-wrap bg-black gap-1 border-gray-700 text-gray-200">
                 <Card className="flex justify-center w-full bg-gray-800 text-gray-200 p-2 font-bold border-none">
                   Your Quizzes
                 </Card>

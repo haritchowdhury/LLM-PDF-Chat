@@ -48,8 +48,8 @@ const Monetise = ({ uploadId, userId }: Props) => {
         await tx.wait();
         console.log("Monetised succesfully:", tx);
       } catch (error) {
-        console.log("error", error);
-        throw new Error("Failed to Monetise");
+        console.log("error", error.message);
+        throw new Error(error.message);
       }
     },
   });
@@ -74,7 +74,7 @@ const Monetise = ({ uploadId, userId }: Props) => {
         console.log(error);
         toast({
           title: "Error",
-          description: "Something went wrong. Could not Monetise!",
+          description: error.message,
           variant: "destructive",
         });
       },

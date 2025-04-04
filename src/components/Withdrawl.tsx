@@ -45,7 +45,7 @@ const Withdrawl = () => {
   const { toast } = useToast();
   const { address, isConnected } = useAccount();
   const [balance, setBalance] = useState<bigint>(BigInt(0));
-  const [stringBalance, setStringBalance] = useState<string>();
+  const [stringBalance, setStringBalance] = useState<string>("0");
   const chainId = useChainId();
   const [mileStonesAddress, setMileStoneAddress] = useState(
     chainId in contractAddresses ? contractAddresses[chainId][0] : null
@@ -111,9 +111,11 @@ const Withdrawl = () => {
           account: address,
           //args: [],
         })) as any;
-        console.log(typeof ethers.formatEther(result.balance));
-        setBalance(result.balance);
-        setStringBalance(ethers.formatEther(result.balance));
+        console.log(typeof ethers.formatEther(result.balance), result);
+        if (result.creator === address) {
+          setBalance(result.balance);
+          setStringBalance(ethers.formatEther(result.balance));
+        }
         setLoading(false);
       }
       getUserDetails();
@@ -146,15 +148,23 @@ const Withdrawl = () => {
   return (
     <>
       {loading ? (
-        <div className="flex gap-4 items-center justify-center bg-gray-900 rounded p-4">
+        <div className="flex gap-4 items-center justify-center rounded p-2">
           <small>Loading</small>
           <motion.div className="w-5 h-5 border-4 border-gray-300 border-t-blue-500 rounded-full animate-spin" />
         </div>
       ) : (
         <div className="flex flex-row items-center justify-center gap-8 p-4  rounded">
           {isConnected ? (
-            <>
-              <small>Your Balance: {stringBalance}</small>
+            <div className="fleax flex-row gap-2">
+              <div className="flex gap-2">
+                <small className="bg-gray-800 py-2 px-1 rounded">
+                  Your balance: {stringBalance}
+                </small>
+                <small>
+                  {address.slice(0, 5)}...
+                  {address.slice(-7, -1)}
+                </small>
+              </div>
               <Form {...form}>
                 <form onSubmit={form.handleSubmit(onSubmit)}>
                   <div className="flex flex-col sm:flex-row w-full gap-2">
@@ -176,10 +186,10 @@ const Withdrawl = () => {
                   </div>
                 </form>
               </Form>
-            </>
+            </div>
           ) : (
             <>
-              <div className="flex flex-row items-center justify-center gap-8 p-4  rounded">
+              <div className="flex flex-row items-center justify-center gap-2 p-1  rounded">
                 <div>
                   <ConnectWallet />
                 </div>

@@ -27,7 +27,7 @@ const LandingPage = ({ id, platformlink, shares }: Props) => {
 
   const HeroSection = () => (
     <section className={`pt-24 pb-2  bg-black text-white`}>
-      <div className="container mx-auto px-4 py-2 text-center">
+      <div className="container mx-auto px-4 py-0 text-center">
         <div className="flex items-center justify-center">
           <Image
             src="/aiversety.jpg"
@@ -37,22 +37,20 @@ const LandingPage = ({ id, platformlink, shares }: Props) => {
             className="rounded-lg shadow-md"
           />
         </div>
-        <h1 className="text-4xl md:text-3xl font-bold mb-6">
+        <h1 className="text-4xl md:text-4xl font-bold mb-2">
           Skim Fast! Automate Retendtion
         </h1>
-        <p className="text-xl md:text-xl mb-2 max-w-2xl mx-auto">
-          Upload your documents and chat with them privately, or share with your
-          followers. Find out the important topics and take AI generated quizzes
-          from documents of your choice.
+        <p className="text-xl md:text-xl mb-2 max-w-3xl mx-auto">
+          Chat with your documents find important topics and take AI generated
+          quizzes.
         </p>
         <Link href={`/chat/undefined`} className={buttonVariants()}>
           Shart here!
           <MessageSquareText />
         </Link>
 
-        <p className="text-xl md:text-xl mb-2 max-w-2xl mx-auto">
-          You can publish an article and share with the community from your
-          profile.
+        <p className="text-xl md:text-xl mb-2 max-w-3xl mx-auto">
+          You can publish an article from your profile.
         </p>
         <Link href={`/profile/${id}`} className={buttonVariants()}>
           Profile
@@ -108,7 +106,7 @@ const LandingPage = ({ id, platformlink, shares }: Props) => {
   return (
     <div
       className={
-        "bg-gray-600 min-h-screen h-full overflow-y-auto flex flex-col"
+        "bg-gray-900 min-h-screen h-full overflow-y-auto flex flex-col"
       }
     >
       <HeroSection />

@@ -65,7 +65,7 @@ const EditableUsername = ({ initialUsername, userId }: Props) => {
   };
 
   return (
-    <div className="px-2 max-w-md ml-0 bg-gray-400 text-white bg-gray-500 rounded-lg shadow">
+    <div className="px-2 max-w-md ml-0 bg-gray-400 text-gray-200 bg-gray-700 rounded-lg shadow">
       {isEditing ? (
         <div className="space-y-2">
           <div className="flex items-center space-x-2 p-1">

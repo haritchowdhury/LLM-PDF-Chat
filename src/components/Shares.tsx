@@ -69,7 +69,7 @@ const Shares = ({ shares, userId, currentUser, platformlink }: Props) => {
       })) as any;
       setMonetisedProducts(result.identifier_list);
       setLoadingShares(false);
-      console.log(result);
+      console.log("shares:", result);
       console.log(result.identifier_list);
     }
     getUserDetails();
@@ -86,7 +86,7 @@ const Shares = ({ shares, userId, currentUser, platformlink }: Props) => {
           <motion.div className="w-5 h-5 border-4 border-gray-300 border-t-blue-500 rounded-full animate-spin" />
         </div>
       ) : (
-        <Card className="p-3 bg-black border-gray-900 text-gray-200">
+        <Card className="p-3 bg-black border-gray-700 text-gray-200">
           <Card className="flex justify-center w-full bg-gray-800 text-gray-200 p-2 border-none font-bold">
             Published Articles
           </Card>
