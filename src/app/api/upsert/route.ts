@@ -18,7 +18,7 @@ const redis = new Redis({
   token: process.env.UPSTASH_REDIS_REST_TOKEN,
 });
 const MAX_REQUESTS_PER_DAY = 2;
-const EXPIRATION_TIME = 24 * 60 * 60;
+const EXPIRATION_TIME = 24 * 60 * 60 * 7;
 
 export async function POST(request: NextRequest) {
   const data = await request.formData();

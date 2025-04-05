@@ -16,7 +16,7 @@ const redis = new Redis({
 });
 
 const MAX_REQUESTS_PER_DAY = 5;
-const EXPIRATION_TIME = 24 * 60 * 60;
+const EXPIRATION_TIME = 24 * 60 * 60 * 7;
 
 export async function POST(request: NextRequest) {
   const session = await auth();
