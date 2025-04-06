@@ -30,10 +30,10 @@ const LandingPage = ({ id, platformlink, shares }: Props) => {
       <div className="container mx-auto px-4 py-0 text-center">
         <div className="flex items-center justify-center">
           <Image
-            src="/aiversety.jpg"
+            src="/aiversety.png"
             alt="Aiversity Logo"
-            width={75}
-            height={75}
+            width={150}
+            height={150}
             className="rounded-lg shadow-md"
           />
         </div>
@@ -41,7 +41,7 @@ const LandingPage = ({ id, platformlink, shares }: Props) => {
           Skim Fast! Automate Retention
         </h1>
         <p className="text-xl md:text-xl mb-2 max-w-3xl mx-auto pb-4">
-          Chat with your documents find important topics and take AI generated
+          Chat with your documents, find important topics, and take AI generated
           quizzes.
         </p>
         <div className="pb-4">
