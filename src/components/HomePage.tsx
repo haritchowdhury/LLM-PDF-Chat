@@ -77,7 +77,7 @@ const LandingPage = () => {
     >
       <HeroSection />
       <main className="container mx-auto px-4 py-2 flex flex-grow item-center justify-center">
-        <Card className="p-3 bg-black border-none text-gray-200 flex flex-col items-center gap-4 w-full max-w-md pb-24">
+        <Card className="p-3 text-center bg-black border-none text-gray-200 flex flex-col items-center gap-4 w-full max-w-md pb-24">
           <div>Upload your documents using the tooltip.</div>
           <Image
             src="/upload.png"
@@ -87,9 +87,9 @@ const LandingPage = () => {
             className="rounded-lg shadow-md"
           />
 
-          <small>
+          <div>
             Connect Metamask to unlock Milestones and take personalized Quizzes!
-          </small>
+          </div>
           <Image
             src="/Quiz.png"
             alt="Quiz"
@@ -98,9 +98,9 @@ const LandingPage = () => {
             className="rounded-lg shadow-md"
           />
 
-          <small>
+          <div>
             Claim Milestones to get refunds! Remember to complete within 7 days.
-          </small>
+          </div>
           <Image
             src="/claim.png"
             alt="Claim Milestones"
@@ -116,7 +116,7 @@ const LandingPage = () => {
             height={50}
             className="rounded-lg shadow-md"
           />
-          <small>Happy Skimming!</small>
+          <div>Happy Skimming!</div>
         </Card>
       </main>
     </div>
