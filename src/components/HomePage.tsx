@@ -12,7 +12,8 @@ const LandingPage = () => {
     <section
       className="relative pt-24 pb-2 text-white overflow-hidden bg-cover bg-center bg-no-repeat"
       style={{
-        backgroundImage: "url('/milkyway.jpg')",
+        backgroundImage:
+          "linear-gradient(rgba(0,0,0,0.85), rgba(0,0,0,0.85)), url('/milkyway.jpg')",
         backgroundSize: "cover",
       }}
     >
