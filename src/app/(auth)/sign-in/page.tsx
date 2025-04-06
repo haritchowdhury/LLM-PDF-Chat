@@ -90,50 +90,6 @@ const Page = async () => {
               </Link>
             </Button>
           </div>
-
-          <Card className="p-3 bg-black border-gray-900 text-gray-200 flex flex-col items-center gap-4 w-full max-w-md ">
-            <div>Upload your documents using the tooltip.</div>
-            <Image
-              src="/upload.png"
-              alt="Upload"
-              width={500}
-              height={50}
-              className="rounded-lg shadow-md"
-            />
-
-            <small>
-              Connect Metamask to unlock Milestones and take personalized
-              Quizzes!
-            </small>
-            <Image
-              src="/Quiz.png"
-              alt="Quiz"
-              width={500}
-              height={50}
-              className="rounded-lg shadow-md"
-            />
-
-            <small>
-              Claim Milestones to get refunds! Remember to complete within 7
-              days.
-            </small>
-            <Image
-              src="/claim.png"
-              alt="Claim Milestones"
-              width={500}
-              height={50}
-              className="rounded-lg shadow-md"
-            />
-
-            <Image
-              src="/product.png"
-              alt="Claim Milestones"
-              width={500}
-              height={50}
-              className="rounded-lg shadow-md"
-            />
-            <small>Happy Skimming!</small>
-          </Card>
         </div>
       </Card>
     </main>

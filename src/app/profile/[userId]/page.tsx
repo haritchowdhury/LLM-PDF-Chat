@@ -74,7 +74,7 @@ const Profile = async ({ params }: { params: Params }) => {
               <Card className="flex justify-center w-full bg-black text-gray-100 border-none p-1 font-bold">
                 <div>
                   Publish articles to share with your friends. Earn everytime
-                  someone unlocks quizzes in them.
+                  someone unlocks milestones in them.
                 </div>
               </Card>
               <Share namespace={"undefined"} />

@@ -17,7 +17,7 @@ const geistMono = Geist_Mono({
 });
 
 const metadata: Metadata = {
-  title: "aiversity",
+  title: "aiversety",
   description:
     "Multi Agent Learning Platform. Upload your pdfs and start learning.",
 };

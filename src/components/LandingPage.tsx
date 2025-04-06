@@ -37,10 +37,10 @@ const LandingPage = ({ id, platformlink, shares }: Props) => {
             className="rounded-lg shadow-md"
           />
         </div>
-        <h1 className="text-4xl md:text-4xl font-bold mb-2">
+        <h1 className="text-4xl md:text-4xl font-bold mb-2 pb-4">
           Skim Fast! Automate Retention
         </h1>
-        <p className="text-xl md:text-xl mb-2 max-w-3xl mx-auto">
+        <p className="text-xl md:text-xl mb-2 max-w-3xl mx-auto ">
           Chat with your documents find important topics and take AI generated
           quizzes.
         </p>
