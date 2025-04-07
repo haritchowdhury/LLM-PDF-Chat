@@ -45,7 +45,7 @@ export async function POST(request: NextRequest) {
   if (!user) return new Response(null, { status: 403 });
   if (requestCount >= 100) {
     return NextResponse.json(
-      `You have exceeded the nuber of questions you can ask in a week. Weekly limit ${200}`,
+      `You have exceeded the nuber of questions you can ask in a week. Weekly limit ${100}`,
       { status: 429 }
     );
   }
