@@ -32,7 +32,37 @@ const Header = async () => {
             <SignOut />
           </>
         ) : (
-          <></>
+          <>
+            {" "}
+            <Link
+              href="/sign-in"
+              className="
+                      relative inline-flex items-center justify-center gap-2
+                      px-6 py-3 overflow-hidden
+                      font-medium text-white rounded-lg
+                      bg-gradient-to-br from-gray-700 via-gray-800 to-gray-900
+                      hover:from-gray-800 hover:via-gray-900 hover:to-black
+                      shadow-lg transition-all duration-300 ease-out
+                      hover:shadow-gray-700/40
+                      group
+                  "
+            >
+              {/* Shine effect */}
+              <span
+                className="absolute top-0 left-[-100%] w-full h-full bg-gradient-to-r 
+                          from-transparent via-white/20 to-transparent
+                          transition-all duration-1000 ease-in-out
+                          group-hover:left-[100%]"
+                style={{ transform: "skewX(-25deg)" }}
+              ></span>
+
+              {/* Button text and icon */}
+              <span className="relative flex items-center gap-2">
+                Sign in
+                <CircleUserRound className="w-5 h-5" />
+              </span>
+            </Link>
+          </>
         )}
       </nav>
     </header>
