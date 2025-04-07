@@ -31,13 +31,20 @@ export async function POST(request: NextRequest) {
       }
     );
   }
-  if (requestCount >= MAX_REQUESTS_PER_DAY) {
-    return NextResponse.json(
-      {
-        error: `You have exceeded the nuber of documents you can upload in a day. Daily limit ${MAX_REQUESTS_PER_DAY}`,
-      },
-      { status: 429 }
-    );
+  const betaTester = await db.betatesters.findFirst({
+    where: {
+      email: session?.user.email,
+    },
+  });
+  if (!betaTester) {
+    if (requestCount >= MAX_REQUESTS_PER_DAY) {
+      return NextResponse.json(
+        {
+          error: `You have exceeded number of quizzes you can take in a Week. Weekly limit ${MAX_REQUESTS_PER_DAY}`,
+        },
+        { status: 429 }
+      );
+    }
   }
   const user = await getUserSession();
   // const [_, namespace] = user;

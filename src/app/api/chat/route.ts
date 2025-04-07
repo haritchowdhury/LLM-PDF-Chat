@@ -11,6 +11,7 @@ import { queryUpstashAndLLM } from "@/lib/upstash";
 import { auth } from "@/lib/auth";
 import { Redis } from "@upstash/redis";
 import { NextRequest, NextResponse } from "next/server";
+import db from "@/lib/db/db";
 
 interface ChatRequest {
   upload: string;
@@ -23,7 +24,7 @@ const redis = new Redis({
   url: process.env.UPSTASH_REDIS_REST_URL,
   token: process.env.UPSTASH_REDIS_REST_TOKEN,
 });
-const MAX_REQUESTS_PER_DAY = 20;
+const MAX_REQUESTS_PER_DAY = 0;
 const EXPIRATION_TIME = 24 * 60 * 60 * 7;
 const index = new Index({
   url: process.env.UPSTASH_VECTOR_REST_URL,
@@ -42,11 +43,24 @@ export async function POST(request: NextRequest) {
     (await redis.get<number>(`chat_rate_limit:${userId}`)) || 0;
 
   if (!user) return new Response(null, { status: 403 });
-  if (requestCount >= MAX_REQUESTS_PER_DAY) {
+  if (requestCount >= 100) {
     return NextResponse.json(
-      `You have exceeded the nuber of questions you can ask in a day. Daily limit ${MAX_REQUESTS_PER_DAY}`,
+      `You have exceeded the nuber of questions you can ask in a week. Weekly limit ${200}`,
       { status: 429 }
     );
+  }
+  const betaTester = await db.betatesters.findFirst({
+    where: {
+      email: session?.user.email,
+    },
+  });
+  if (!betaTester) {
+    if (requestCount >= MAX_REQUESTS_PER_DAY) {
+      return NextResponse.json(
+        `You have exceeded the nuber of questions you can ask in a week. Weekly limit ${MAX_REQUESTS_PER_DAY}`,
+        { status: 429 }
+      );
+    }
   }
   if (!question)
     return new Response("No question in the request.", { status: 401 });

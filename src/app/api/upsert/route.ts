@@ -31,22 +31,13 @@ export async function POST(request: NextRequest) {
   const userId = String(session.user.id);
   const requestCount =
     (await redis.get<number>(`upsert_rate_limit:${userId}`)) || 0;
-  /* const userExists = await db.user.findUnique({
+
+  const userExists = await db.user.findUnique({
     where: { id: userId },
   });
   if (!userExists) {
     throw new Error("User not found");
-  }  if(sessionId.split("_")[1] !== session?.user.id){
-    throw new Error("Upload Could not be created");
   }
-  if (requestCount >= MAX_REQUESTS_PER_DAY) {
-    return NextResponse.json(
-      {
-        error: `You have exceeded the nuber of documents you can upload in a day. Daily limit ${MAX_REQUESTS_PER_DAY}`,
-      },
-      { status: 429 }
-    );
-  }*/
 
   if (!file) return new Response(null, { status: 400 });
   const arrayBuffer = await file.arrayBuffer();
@@ -54,17 +45,41 @@ export async function POST(request: NextRequest) {
   const loader = new PDFLoader(fileSource, {
     splitPages: true,
   });
-  //const userId: string = sessionId.split("_")[0];
   const docs = await loader.load();
   console.log(docs.length);
-  if (docs.length >= 3) {
+  const betaTester = await db.betatesters.findFirst({
+    where: {
+      email: session?.user.email,
+    },
+  });
+  if (!betaTester) {
+    if (docs.length >= 3) {
+      return NextResponse.json(
+        {
+          error: `Upload Exceeds maximum beta testing page count. Beta testing page count: 2.`,
+        },
+        { status: 429 }
+      );
+    }
+    if (requestCount >= MAX_REQUESTS_PER_DAY) {
+      return NextResponse.json(
+        {
+          error: `You have exceeded the nuber of documents you can upload in a Week. Weekly limit ${MAX_REQUESTS_PER_DAY}`,
+        },
+        { status: 429 }
+      );
+    }
+  }
+
+  if (requestCount >= 10) {
     return NextResponse.json(
       {
-        error: `Upload Exceeds maximum beta testing page count. Beta testing page count: 2.`,
+        error: `You have exceeded the nuber of documents you can upload in a Week. Weekly limit ${10}`,
       },
       { status: 429 }
     );
   }
+
   const index = new Index({
     url: process.env.UPSTASH_VECTOR_REST_URL,
     token: process.env.UPSTASH_VECTOR_REST_TOKEN,

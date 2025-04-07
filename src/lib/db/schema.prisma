@@ -158,3 +158,8 @@ model Communityquiz {
 
   @@index([userId, uploadId])
 }
+
+model betatesters {
+  id                String   @id @default(cuid())
+  email             String?  @unique
+}
