@@ -24,7 +24,7 @@ const redis = new Redis({
   url: process.env.UPSTASH_REDIS_REST_URL,
   token: process.env.UPSTASH_REDIS_REST_TOKEN,
 });
-const MAX_REQUESTS_PER_DAY = 0;
+const MAX_REQUESTS_PER_DAY = 20;
 const EXPIRATION_TIME = 24 * 60 * 60 * 7;
 const index = new Index({
   url: process.env.UPSTASH_VECTOR_REST_URL,
