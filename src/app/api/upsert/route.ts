@@ -53,10 +53,10 @@ export async function POST(request: NextRequest) {
     },
   });
   if (!betaTester) {
-    if (docs.length >= 3) {
+    if (docs.length >= 11) {
       return NextResponse.json(
         {
-          error: `Upload Exceeds maximum beta testing page count. Beta testing page count: 2.`,
+          error: `Upload Exceeds maximum beta testing page count. Beta testing page count: 10.`,
         },
         { status: 429 }
       );
