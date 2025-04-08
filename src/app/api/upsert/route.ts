@@ -103,6 +103,20 @@ export async function POST(request: NextRequest) {
       //upload = uploadId;
       namespace = uploadId;
       //sessionId = (uploadId + "_" + session?.user.id) as string;
+    } else {
+      const Upload = await db.upload.findFirst({
+        where: { id: namespace, name: "ERASED" },
+      });
+      if (Upload) {
+        const updatedUpload = await db.upload.update({
+          where: {
+            id: Upload.id,
+          },
+          data: {
+            name: docs[0].pageContent.slice(0, 50),
+          },
+        });
+      }
     }
   } catch (err) {
     throw new Error("Upload Could not be created");
@@ -125,27 +139,22 @@ export async function POST(request: NextRequest) {
 
 export async function DELETE(request: Request) {
   const { upload, type } = await request.json();
-
   const session = await auth();
   if (!session) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
-
   try {
     const sessionId = upload + "_" + session.user.id;
     const Upload = await db.upload.findFirst({
       where: { id: upload },
     });
-
     if (session.user.id !== Upload.userId) {
       return NextResponse.json({ error: "Not allowed" }, { status: 403 });
     }
-
     const index = new Index({
       url: process.env.UPSTASH_VECTOR_REST_URL,
       token: process.env.UPSTASH_VECTOR_REST_TOKEN,
     });
-
     await deleteUpstash(index, upload, sessionId, 1);
     if (type === "delete") {
       const updatedUpload = await db.upload.update({
@@ -156,8 +165,16 @@ export async function DELETE(request: Request) {
           isDeleted: true,
         },
       });
+    } else {
+      const updatedUpload = await db.upload.update({
+        where: {
+          id: upload,
+        },
+        data: {
+          name: "ERASED",
+        },
+      });
     }
-
     return NextResponse.json({ userId: session.user.id });
   } catch (error) {
     return NextResponse.json({ error: error.message }, { status: 500 });
