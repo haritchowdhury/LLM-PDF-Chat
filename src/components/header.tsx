@@ -32,8 +32,7 @@ const Header = async () => {
             <SignOut />
           </>
         ) : (
-          <>
-            {" "}
+          <div className="flex justify-center justify-between">
             <Link
               href="/sign-in"
               className="
@@ -62,7 +61,7 @@ const Header = async () => {
                 <CircleUserRound className="w-5 h-5" />
               </span>
             </Link>
-          </>
+          </div>
         )}
       </nav>
     </header>

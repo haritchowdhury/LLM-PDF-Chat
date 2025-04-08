@@ -6,7 +6,7 @@ import { z } from "zod";
 import { useToast } from "@/hooks/use-toast";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useRouter } from "next/navigation";
-import { Trash2 } from "lucide-react";
+import { Eraser, Trash2 } from "lucide-react";
 type Upload = {
   upload: string;
 };

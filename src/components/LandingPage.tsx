@@ -71,7 +71,7 @@ const LandingPage = ({ id, platformlink, shares }: Props) => {
       <div className="p-6">
         <Link href={`/chat/${article.id}`}>
           <h3 className={`text-xl font-bold mb-2 text-white`}>
-            {article.name}
+            {article.name.slice(0, 16)}
           </h3>
         </Link>
         <div className={`flex items-center justify-between text-gray-400"  `}>
