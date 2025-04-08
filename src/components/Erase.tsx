@@ -6,7 +6,7 @@ import { z } from "zod";
 import { useToast } from "@/hooks/use-toast";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useRouter } from "next/navigation";
-import { Eraser, Trash2 } from "lucide-react";
+import { Eraser } from "lucide-react";
 type Upload = {
   upload: string;
 };
@@ -17,7 +17,7 @@ const milestoneSchema = z.object({
 
 type Input = z.infer<typeof milestoneSchema>;
 
-const Delete = ({ upload }: Upload) => {
+const Erase = ({ upload }: Upload) => {
   const router = useRouter();
   const { toast } = useToast();
   const form = useForm<Input>({
@@ -33,7 +33,7 @@ const Delete = ({ upload }: Upload) => {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ upload: upload, type: "delete" }),
+        body: JSON.stringify({ upload: upload, type: "erase" }),
       });
 
       if (!response.ok) {
@@ -78,11 +78,11 @@ const Delete = ({ upload }: Upload) => {
             form.setValue("upload", upload);
           }}
         >
-          <Trash2 />
+          <Eraser />
         </Button>
       </form>
     </div>
   );
 };
 
-export default Delete;
+export default Erase;

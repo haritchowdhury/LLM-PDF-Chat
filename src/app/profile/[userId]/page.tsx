@@ -7,6 +7,7 @@ import { MessageSquareText, Boxes } from "lucide-react";
 import { Card, CardContent, CardTitle } from "@/components/ui/card";
 import Share from "@/components/Share";
 import Delete from "@/components/Delete";
+import Erase from "@/components/Erase";
 import { headers } from "next/headers";
 import Shares from "@/components/Shares";
 import Withdrawl from "@/components/Withdrawl";
@@ -123,6 +124,7 @@ const Profile = async ({ params }: { params: Params }) => {
                         <MessageSquareText />
                       </Link>
                       <Delete upload={upload.id as string} />
+                      <Erase upload={upload.id as string} />
                     </div>
                   ))}
                 </div>

@@ -124,7 +124,7 @@ export async function POST(request: NextRequest) {
 }
 
 export async function DELETE(request: Request) {
-  const { upload } = await request.json();
+  const { upload, type } = await request.json();
 
   const session = await auth();
   if (!session) {
@@ -147,15 +147,16 @@ export async function DELETE(request: Request) {
     });
 
     await deleteUpstash(index, upload, sessionId, 1);
-
-    const updatedUpload = await db.upload.update({
-      where: {
-        id: upload,
-      },
-      data: {
-        isDeleted: true,
-      },
-    });
+    if (type === "delete") {
+      const updatedUpload = await db.upload.update({
+        where: {
+          id: upload,
+        },
+        data: {
+          isDeleted: true,
+        },
+      });
+    }
 
     return NextResponse.json({ userId: session.user.id });
   } catch (error) {

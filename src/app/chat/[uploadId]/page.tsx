@@ -33,9 +33,9 @@ const ChatPage = async ({ params }: { params: Params }) => {
     if (lastUpload.private == true && lastUpload.userId !== id) {
       redirect("/sign-in");
     }
-    /*if (lastUpload.userId === id) {
+    if (lastUpload.userId === id) {
       personal = true;
-    }*/
+    }
   }
   console.log(personal);
   return (

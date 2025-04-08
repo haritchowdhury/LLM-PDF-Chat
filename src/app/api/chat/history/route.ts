@@ -21,6 +21,5 @@ export async function GET(request: NextRequest) {
     amount: 100,
     sessionId: sessionId,
   });
-  console.log(messages);
   return NextResponse.json({ messages });
 }

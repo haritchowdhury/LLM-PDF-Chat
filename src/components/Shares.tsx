@@ -3,6 +3,7 @@ import { Upload } from "@prisma/client";
 import { Card, CardContent, CardTitle } from "@/components/ui/card";
 import { MessageSquareText } from "lucide-react";
 import Delete from "@/components/Delete";
+import Erase from "@/components/Erase";
 import Link from "next/link";
 import ShareLinkModel from "@/components/ShareLink";
 import { buttonVariants } from "@/components/ui/button";
@@ -103,7 +104,10 @@ const Shares = ({ shares, userId, currentUser, platformlink }: Props) => {
                   <MessageSquareText />
                 </Link>
                 {userId === currentUser && (
-                  <Delete upload={share.id as string} />
+                  <>
+                    <Delete upload={share.id as string} />
+                    <Erase upload={share.id as string} />
+                  </>
                 )}
                 <ShareLinkModel link={`${platformlink}${share.id}`} />
                 {isConnected && currentUser === userId ? (
