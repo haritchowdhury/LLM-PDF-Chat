@@ -38,7 +38,7 @@ const Erase = ({ upload }: Upload) => {
 
       if (!response.ok) {
         const error = await response.json();
-        throw new Error(error.error || "Could not be deleted");
+        throw new Error(error.error || "Could not be Erased");
       }
 
       return await response.json();
@@ -51,7 +51,7 @@ const Erase = ({ upload }: Upload) => {
         console.log(error);
         toast({
           title: "Error",
-          description: "Something went wrong. Could not Delete!",
+          description: "Something went wrong. Could not Erased!",
           variant: "destructive",
         });
       },
@@ -59,7 +59,7 @@ const Erase = ({ upload }: Upload) => {
         setTimeout(() => {
           toast({
             title: "Success",
-            description: "Upload deleted successfully!",
+            description: "Namespace erased successfully!",
             variant: "default",
           });
           router.push(`/profile/${data.userId}`);

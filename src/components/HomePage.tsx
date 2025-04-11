@@ -27,8 +27,8 @@ const LandingPage = () => {
             className="rounded-lg shadow-md"
           />
         </div>
-        <h1 className="text-4xl md:text-4xl font-bold mb-2 pb-6">
-          First AI publishing Platform
+        <h1 className="text-4xl md:text-4xl font-bold mb-2 pb-6 text-yellow-200">
+          First AI Publishing Platform
         </h1>
 
         <p className="text-xl md:text-2xl mb-2 max-w-3xl mx-auto pb-6">
@@ -77,7 +77,7 @@ const LandingPage = () => {
     >
       <HeroSection />
       <main className="container mx-auto px-4 py-2 flex flex-grow item-center justify-center">
-        <Card className="p-3 text-center bg-black border-none text-gray-200 flex flex-col items-center gap-4 w-full max-w-md pb-24">
+        <Card className="p-3 text-center text-xl text-yellow-100 bg-black border-none flex flex-col items-center gap-4 w-full max-w-6xl pb-24">
           <div>Upload your documents using the tooltip.</div>
           <Image
             src="/upload.png"

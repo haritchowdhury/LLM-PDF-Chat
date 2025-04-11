@@ -37,7 +37,7 @@ const LandingPage = ({ id, platformlink, shares }: Props) => {
             className="rounded-lg shadow-md"
           />
         </div>
-        <h1 className="text-4xl md:text-4xl font-bold mb-2 pb-4">
+        <h1 className="text-4xl md:text-4xl font-bold mb-2 pb-4 text-yellow text-yellow-200">
           Skim Fast! Automate Retention
         </h1>
         <p className="text-xl md:text-xl mb-2 max-w-3xl mx-auto pb-4">

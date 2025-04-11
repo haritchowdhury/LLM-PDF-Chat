@@ -15,7 +15,7 @@ const redis = new Redis({
   token: process.env.UPSTASH_REDIS_REST_TOKEN,
 });
 
-const MAX_REQUESTS_PER_DAY = 5;
+const MAX_REQUESTS_PER_DAY = 10;
 const EXPIRATION_TIME = 24 * 60 * 60 * 7;
 
 export async function POST(request: NextRequest) {
@@ -46,8 +46,7 @@ export async function POST(request: NextRequest) {
       );
     }
   }
-  const user = await getUserSession();
-  // const [_, namespace] = user;
+  //const user = await getUserSession();
   const body = await request.json();
   const { topic, amount, id } = quizCreationSchema.parse(body);
   const namespace = id;

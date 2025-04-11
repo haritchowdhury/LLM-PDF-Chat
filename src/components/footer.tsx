@@ -18,8 +18,8 @@ const Footer = () => {
       }}
     >
       <small className="inline-block bg-gray-300 hover:bg-gray-800 text-black font-semibold px-1 py-1 rounded transition duration-300">
-        <Link href="https://docs.google.com/forms/d/e/1FAIpQLSem8OlduXTZCeUqi_tY2gnBIMlFgq-KMIozShzCH9WGDLDLHA/viewform?usp=sharing">
-          aiversity-beta | Feedback
+        <Link href="https://docs.google.com/forms/d/e/1FAIpQLSfGNiD5AspNDsQIoUHhWDjDGH6qlmMtwqWiPhPgOwkEikIyew/viewform?usp=header">
+          join aiversity-beta
         </Link>
       </small>
       <Link href="https://x.com/Ainiversity">

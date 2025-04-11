@@ -43,12 +43,6 @@ export async function POST(request: NextRequest) {
     (await redis.get<number>(`chat_rate_limit:${userId}`)) || 0;
 
   if (!user) return new Response(null, { status: 403 });
-  if (requestCount >= 100) {
-    return NextResponse.json(
-      `You have exceeded the nuber of questions you can ask in a week. Weekly limit ${100}`,
-      { status: 429 }
-    );
-  }
   const betaTester = await db.betatesters.findFirst({
     where: {
       email: session?.user.email,
@@ -61,6 +55,12 @@ export async function POST(request: NextRequest) {
         { status: 429 }
       );
     }
+  }
+  if (requestCount >= 100) {
+    return NextResponse.json(
+      `You have exceeded the nuber of questions you can ask in a week. Weekly limit ${100}`,
+      { status: 429 }
+    );
   }
   if (!question)
     return new Response("No question in the request.", { status: 401 });

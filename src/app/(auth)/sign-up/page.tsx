@@ -4,6 +4,7 @@ import { Input } from "@/components/ui/input";
 import { redirect } from "next/navigation";
 import Link from "next/link";
 import { auth } from "@/lib/auth";
+import { GithubSignIn } from "@/components/github-sign-in";
 
 const Page = async () => {
   const session = await auth();
@@ -15,6 +16,8 @@ const Page = async () => {
         <h1 className="text-white text-2xl font-bold text-center mb-6">
           Create Account
         </h1>
+        <GithubSignIn />
+
         <div className="relative">
           <div className="absolute inset-0 flex items-center">
             <span className="w-full border-t" />
