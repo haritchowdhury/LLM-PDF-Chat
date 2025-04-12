@@ -22,6 +22,11 @@ const Profile = async ({ params }: { params: Params }) => {
   /* if (userId != session?.user.id) {
     redirect("/sign-in");
   }*/
+  const betaTester = await db.betatesters.findFirst({
+    where: {
+      email: session?.user.email,
+    },
+  });
   const headersList = await headers();
   const host = await headersList.get("host");
   const platformlink = `http://${host as string}/chat/`;
@@ -75,21 +80,67 @@ const Profile = async ({ params }: { params: Params }) => {
               <Card className="flex justify-center w-full bg-black text-gray-100 border-none p-1 font-bold">
                 <div>
                   Publish articles to share with your friends. Earn everytime
-                  someone unlocks milestones in them.
+                  someone unlocks milestones.
                 </div>
               </Card>
-              <Share namespace={"undefined"} />
+              {betaTester ? (
+                <>
+                  {shares.length < 3 ? (
+                    <Share namespace={"undefined"} />
+                  ) : (
+                    <div className="text-red-500">
+                      You have reached maximum numbers of Publications
+                    </div>
+                  )}
+                </>
+              ) : (
+                <>
+                  {shares.length < 1 ? (
+                    <Share namespace={"undefined"} />
+                  ) : (
+                    <div className="text-red-500">
+                      You have reached maximum numbers of Publications
+                    </div>
+                  )}
+                </>
+              )}
               <Card className="flex justify-center w-full bg-black text-gray-100 p-2 border-none p-1 font-bold">
                 <div>Start a private workspace.</div>
               </Card>
               <div className="flex justify-center w-full">
-                <Link
-                  href={`/chat/undefined`}
-                  className={` flex ${buttonVariants()} w-fit items-center  w-fit`}
-                >
-                  Create Workspace
-                  <MessageSquareText />
-                </Link>
+                {betaTester ? (
+                  <>
+                    {Uploads.length < 3 ? (
+                      <Link
+                        href={`/chat/undefined`}
+                        className={` flex ${buttonVariants()} w-fit items-center  w-fit`}
+                      >
+                        Create Workspace
+                        <MessageSquareText />
+                      </Link>
+                    ) : (
+                      <div className="text-red-500">
+                        You have reached maximum numbers of Workspaces
+                      </div>
+                    )}
+                  </>
+                ) : (
+                  <>
+                    {Uploads.length < 1 ? (
+                      <Link
+                        href={`/chat/undefined`}
+                        className={` flex ${buttonVariants()} w-fit items-center  w-fit`}
+                      >
+                        Create Workspace
+                        <MessageSquareText />
+                      </Link>
+                    ) : (
+                      <div className="text-red-500">
+                        You have reached maximum numbers of Workspaces
+                      </div>
+                    )}
+                  </>
+                )}
               </div>
             </>
           )}

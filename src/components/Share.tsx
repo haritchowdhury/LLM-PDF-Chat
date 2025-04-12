@@ -126,8 +126,7 @@ const Share = ({ namespace }: User) => {
                           <div className={buttonVariants()}>
                             {" "}
                             <div className="flex flex-row gap-2">
-                              <Upload className="size-[20px]" /> Publish to
-                              Share!
+                              <Upload className="size-[20px]" /> Publish
                             </div>
                           </div>
                         </TooltipTrigger>

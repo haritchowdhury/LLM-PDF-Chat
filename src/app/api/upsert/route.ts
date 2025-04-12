@@ -53,11 +53,10 @@ export async function POST(request: NextRequest) {
     },
   });
   if (!betaTester) {
-    if (requestCount >= 0 /*MAX_REQUESTS_PER_DAY*/) {
+    if (requestCount >= MAX_REQUESTS_PER_DAY) {
       return NextResponse.json(
         {
-          /* error: `You have exceeded the nuber of documents you can upload in a Week. Weekly limit ${MAX_REQUESTS_PER_DAY}`, */
-          error: `Join Beta Users for upload privileges and increased chat limit, Fill the form at the bottom!`,
+          error: `You have exceeded the nuber of documents you can upload in a Week. Weekly limit ${MAX_REQUESTS_PER_DAY}`,
         },
         { status: 429 }
       );
@@ -68,13 +67,13 @@ export async function POST(request: NextRequest) {
       {
         error: `You can only upload 10 pages at a time!`,
       },
-      { status: 429 }
+      { status: 419 }
     );
   }
-  if (requestCount >= 15) {
+  if (requestCount >= 30) {
     return NextResponse.json(
       {
-        error: `You have exceeded the nuber of documents you can upload in a Week. Weekly limit ${15}`,
+        error: `You have exceeded the nuber of documents you can upload in a Week. Weekly limit ${30}`,
       },
       { status: 429 }
     );

@@ -63,6 +63,15 @@ const LandingPage = () => {
             <CircleUserRound className="w-5 h-5" />
           </span>
         </Link>
+        <br />
+        <br />
+        <Link
+          href={`https://t.me/+CRAp6PqTVA40MjM1`}
+          className="bg-yellow-200 hover:bg-yellow-700 text-black font-medium py-2 px-2 rounded"
+        >
+          Join Community
+        </Link>
+
         <p className="text-xl md:text-2xl mb-2 max-w-3xl mx-auto pt-6 pb-6">
           Or organize your research with our personal work-spaces.
         </p>
