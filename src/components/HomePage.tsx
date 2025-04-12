@@ -69,7 +69,7 @@ const LandingPage = () => {
           href={`https://t.me/+CRAp6PqTVA40MjM1`}
           className="bg-yellow-200 hover:bg-yellow-700 text-black font-medium py-2 px-2 rounded"
         >
-          Join Community
+          Join Beta Users
         </Link>
 
         <p className="text-xl md:text-2xl mb-2 max-w-3xl mx-auto pt-6 pb-6">
