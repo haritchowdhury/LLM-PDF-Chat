@@ -139,7 +139,7 @@ const LandingPage = () => {
             </div>
             <Image
               src="/product.png"
-              alt="Claim Milestones"
+              alt="Chat room"
               width={500}
               height={50}
               className="rounded-lg shadow-md"
@@ -152,7 +152,7 @@ const LandingPage = () => {
             </div>
             <Image
               src="/Publish.png"
-              alt="Claim Milestones"
+              alt="Publish"
               width={100}
               height={50}
               className="rounded-lg shadow-md"
@@ -161,18 +161,16 @@ const LandingPage = () => {
               Click Publish button from your profile. Select the document.
             </div>
             <Image
-              src="/Published.png"
-              alt="Claim Milestones"
+              src="/published.png"
+              alt="Monetise"
               width={500}
               height={50}
               className="rounded-lg shadow-md"
             />
-            <div>
-              Monetise your publications by clicking the button next to it.{" "}
-            </div>
+            <div>Monetise your publications by clicking the button. </div>
             <Image
               src="/Withdraw.png"
-              alt="Claim Milestones"
+              alt="Withdraw"
               width={300}
               height={50}
               className="rounded-lg shadow-md"
