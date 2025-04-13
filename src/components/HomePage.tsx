@@ -27,9 +27,23 @@ const LandingPage = () => {
             className="rounded-lg shadow-md"
           />
         </div>
-        <h1 className="text-4xl md:text-4xl font-bold mb-2 pb-6 text-yellow-200">
+        <h1 className="text-4xl md:text-4xl font-bold mb-2 pb-4 text-yellow-200">
           First AI Publishing Platform
         </h1>
+
+        <p className="text-xl md:text-xl mb-2 max-w-3xl mx-auto">
+          Powered by EDU
+        </p>
+
+        <div className="flex items-center justify-center pb-4">
+          <Image
+            src="/edu.png"
+            alt="Aiversity Logo"
+            width={50}
+            height={50}
+            className="rounded-lg shadow-md"
+          />
+        </div>
 
         <p className="text-xl md:text-2xl mb-2 max-w-3xl mx-auto pb-6">
           Publish your articles with one click, earn a flat 50% for every
@@ -86,47 +100,86 @@ const LandingPage = () => {
     >
       <HeroSection />
       <main className="container mx-auto px-4 py-2 flex flex-grow item-center justify-center">
-        <Card className="p-3 text-center text-xl text-yellow-100 bg-black border-none flex flex-col items-center gap-4 w-full max-w-6xl pb-24">
-          <div>Upload your documents using the tooltip.</div>
-          <Image
-            src="/upload.png"
-            alt="Upload"
-            width={500}
-            height={50}
-            className="rounded-lg shadow-md"
-          />
+        <div className="flex flex-row gap-12 pb-24">
+          <Card className="p-3 text-center text-xl text-yellow-100 bg-black border-gray-900 flex flex-col items-center gap-4 w-full max-w-2xl h-auto max-h-fit">
+            <div className="md:text-2xl text-yellow-200">
+              Manage your research in Private Workspaces.
+            </div>
+            <Image
+              src="/upload.png"
+              alt="Upload"
+              width={500}
+              height={50}
+              className="rounded-lg shadow-md"
+            />
+            <div>Upload your documents using the tooltip.</div>
 
-          <div>
-            Connect Metamask to unlock Milestones and take personalized Quizzes!
-          </div>
-          <Image
-            src="/Quiz.png"
-            alt="Quiz"
-            width={500}
-            height={50}
-            className="rounded-lg shadow-md"
-          />
+            <Image
+              src="/Quiz.png"
+              alt="Quiz"
+              width={500}
+              height={50}
+              className="rounded-lg shadow-md"
+            />
+            <div>
+              Connect Metamask to unlock Milestones and take personalized
+              Quizzes!
+            </div>
 
-          <div>
-            Claim Milestones to get refunds! Remember to complete within 7 days.
-          </div>
-          <Image
-            src="/claim.png"
-            alt="Claim Milestones"
-            width={500}
-            height={50}
-            className="rounded-lg shadow-md"
-          />
-
-          <Image
-            src="/product.png"
-            alt="Claim Milestones"
-            width={500}
-            height={50}
-            className="rounded-lg shadow-md"
-          />
-          <div>Happy Skimming!</div>
-        </Card>
+            <Image
+              src="/claim.png"
+              alt="Claim Milestones"
+              width={500}
+              height={50}
+              className="rounded-lg shadow-md"
+            />
+            <div>
+              Claim Milestones to get refunds! Remember to complete within 7
+              days.
+            </div>
+            <Image
+              src="/product.png"
+              alt="Claim Milestones"
+              width={500}
+              height={50}
+              className="rounded-lg shadow-md"
+            />
+            <div>Happy Skimming!</div>
+          </Card>
+          <Card className="p-3 text-center text-xl text-yellow-100 bg-black border-gray-900 flex flex-col items-center gap-4 w-full max-w-2xl h-auto max-h-fit">
+            <div className="md:text-2xl text-yellow-200">
+              Publish and Monetise easily.
+            </div>
+            <Image
+              src="/Publish.png"
+              alt="Claim Milestones"
+              width={100}
+              height={50}
+              className="rounded-lg shadow-md"
+            />
+            <div>
+              Click Publish button from your profile. Select the document.
+            </div>
+            <Image
+              src="/Published.png"
+              alt="Claim Milestones"
+              width={500}
+              height={50}
+              className="rounded-lg shadow-md"
+            />
+            <div>
+              Monetise your publications by clicking the button next to it.{" "}
+            </div>
+            <Image
+              src="/Withdraw.png"
+              alt="Claim Milestones"
+              width={300}
+              height={50}
+              className="rounded-lg shadow-md"
+            />
+            <div>Withdraw funds whenever you like! </div>
+          </Card>
+        </div>
       </main>
     </div>
   );
