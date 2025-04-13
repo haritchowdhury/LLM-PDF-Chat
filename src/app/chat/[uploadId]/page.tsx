@@ -19,6 +19,27 @@ const ChatPage = async ({ params }: { params: Params }) => {
 
   let personal = true;
 
+  const betaTester = await db.betatesters.findFirst({
+    where: {
+      email: session?.user.email,
+    },
+  });
+
+  const Uploads = await db.upload.findMany({
+    where: { userId: session?.user.id, private: true, isDeleted: false },
+    orderBy: { timeStarted: "desc" },
+  });
+
+  if (betaTester) {
+    if (Uploads.length >= 3) {
+      redirect(`/profile/${session?.user.id}`);
+    }
+  } else {
+    if (Uploads.length >= 1) {
+      redirect(`/profile/${session?.user.id}`);
+    }
+  }
+
   if (uploadId !== "undefined") {
     const lastUpload = await db.upload.findFirst({
       where: {
@@ -26,7 +47,7 @@ const ChatPage = async ({ params }: { params: Params }) => {
       },
     });
     personal = lastUpload.private;
-    //console.log(lastUpload);
+
     if (!lastUpload) {
       redirect("/sign-in");
     }
