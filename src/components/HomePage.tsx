@@ -1,11 +1,9 @@
 "use client";
 import Link from "next/link";
-import { buttonVariants } from "@/components/ui/button";
-import { auth } from "@/lib/auth";
 import { CircleUserRound } from "lucide-react";
 
 import Image from "next/image";
-import { Card /*CardContent, CardTitle*/ } from "@/components/ui/card";
+import { Card } from "@/components/ui/card";
 
 const LandingPage = () => {
   const HeroSection = () => (
@@ -70,8 +68,6 @@ const LandingPage = () => {
                 group-hover:left-[100%]"
             style={{ transform: "skewX(-25deg)" }}
           ></span>
-
-          {/* Button text and icon */}
           <span className="relative flex items-center gap-2">
             Sign up
             <CircleUserRound className="w-5 h-5" />
@@ -113,7 +109,6 @@ const LandingPage = () => {
               className="rounded-lg shadow-md"
             />
             <div>Upload your documents using the tooltip.</div>
-
             <Image
               src="/Quiz.png"
               alt="Quiz"
@@ -125,7 +120,6 @@ const LandingPage = () => {
               Connect Metamask to unlock Milestones and take personalized
               Quizzes!
             </div>
-
             <Image
               src="/claim.png"
               alt="Claim Milestones"
@@ -167,7 +161,7 @@ const LandingPage = () => {
               height={50}
               className="rounded-lg shadow-md"
             />
-            <div>Monetise your publications by clicking the button. </div>
+            <div>Monetise your publications by clicking the button.</div>
             <Image
               src="/Withdraw.png"
               alt="Withdraw"
