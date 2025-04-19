@@ -190,9 +190,6 @@ const Withdrawl = () => {
           ) : (
             <>
               <div className="flex flex-row items-center justify-center gap-2 p-1  rounded">
-                <div>
-                  <ConnectWallet />
-                </div>
                 <div>Connect Wallet to access finances!</div>
               </div>
               <hr className="m-0 border-gray-800" />

@@ -129,10 +129,7 @@ const CommunityQuizBar = ({
       {!isConnected && (
         <>
           <div className="bg-black gap-3 text-white border-none w-full p-4 flex flex-col items-center">
-            <div>
-              <ConnectWallet />
-            </div>
-            <small>Connect Wallet to Access Quiz!</small>
+            <div>Connect Wallet to Access Quiz!</div>
           </div>
           <hr className="m-0 border-gray-800" />
         </>
@@ -146,9 +143,7 @@ const CommunityQuizBar = ({
           {isConnected && !quizExists && (
             <>
               <div className="bg-black gap-3 text-white border-none w-full p-4 flex flex-col items-center">
-                <small>
-                  Creator has not published Quizzes for this article!
-                </small>
+                <div>Creator has not published Quizzes for this article!</div>
               </div>
               <hr className="m-0 border-gray-800" />
             </>

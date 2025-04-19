@@ -96,10 +96,7 @@ const PersonalQuizBar = ({
       {!isConnected && upload !== "undefined" && (
         <>
           <div className="bg-black gap-3 text-white border-none w-full p-4 flex flex-col items-center">
-            <div>
-              <ConnectWallet />
-            </div>
-            <small>Connect Wallet to Access Quiz!</small>
+            <div>Connect Wallet to Access Quiz!</div>
           </div>
           <hr className="m-0 border-gray-800" />
         </>

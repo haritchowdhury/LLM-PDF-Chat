@@ -62,7 +62,7 @@ export async function POST(request: NextRequest) {
       );
     }
   }
-  if (docs.length >= 11) {
+  if (docs.length >= 31) {
     return NextResponse.json(
       {
         error: `You can only upload 10 pages at a time!`,

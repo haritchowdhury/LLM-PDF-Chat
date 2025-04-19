@@ -115,7 +115,7 @@ const Chat = ({
       ) : (
         <div className="w-full h-full flex items-center justify-center p-4">
           {/* upload input section */}
-          <Card className="w-full max-w-2xl mx-auto shadow-lg bg-black border-none flex flex-col h-[calc(100vh-8rem)] max-h-[800px]">
+          <Card className="w-full max-w-2xl mx-auto shadow-lg bg-black border-none flex flex-col h-[calc(100vh-8rem)] max-h-[800px] max-w-3xl">
             <input
               type="file"
               id="fileInput"
@@ -244,10 +244,10 @@ const Chat = ({
                     <div
                       key={idx}
                       className={clsx(
-                        "font-sans-semibold text-sm p-2 rounded-lg text-justify mt-1",
+                        "font-sans-semibold text-sm p-2 rounded-lg text-justify mt-1 md:text-xl",
                         idx % 2 == 0
                           ? "text-white bg-gray-1000 self-end"
-                          : "text-gray-100 bg-gray-600 self-start"
+                          : "text-gray-100 bg-gray-800 self-start"
                       )}
                     >
                       <MarkdownRenderer text={content} />
