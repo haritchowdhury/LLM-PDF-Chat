@@ -88,7 +88,7 @@ const Profile = async ({ params }: { params: Params }) => {
                   {shares.length < 3 ? (
                     <Share namespace={"undefined"} />
                   ) : (
-                    <div className="text-red-500">
+                    <div className="text-red-500 flex justify-center ">
                       You have reached maximum numbers of Publications
                     </div>
                   )}
@@ -98,7 +98,7 @@ const Profile = async ({ params }: { params: Params }) => {
                   {shares.length < 1 ? (
                     <Share namespace={"undefined"} />
                   ) : (
-                    <div className="text-red-500">
+                    <div className="text-red-500 flex justify-center ">
                       You have reached maximum numbers of Publications
                     </div>
                   )}
@@ -175,7 +175,7 @@ const Profile = async ({ params }: { params: Params }) => {
                         <MessageSquareText />
                       </Link>
                       <Delete upload={upload.id as string} />
-                      <Erase upload={upload.id as string} />
+                      {/* <Erase upload={upload.id as string} /> */}
                     </div>
                   ))}
                 </div>

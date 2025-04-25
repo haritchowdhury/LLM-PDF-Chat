@@ -18,6 +18,7 @@ const ChatPage = async ({ params }: { params: Params }) => {
   const space = uploadId;
 
   let personal = true;
+  let publisher: string;
 
   if (uploadId !== "undefined") {
     const lastUpload = await db.upload.findFirst({
@@ -26,17 +27,17 @@ const ChatPage = async ({ params }: { params: Params }) => {
       },
     });
     personal = lastUpload.private;
-
+    publisher = lastUpload.userId;
     if (!lastUpload) {
       redirect("/sign-in");
     }
     if (lastUpload.private == true && lastUpload.userId !== id) {
       redirect("/sign-in");
     }
-    if (lastUpload.userId === id) {
-      personal = true;
+    if (lastUpload.userId !== id) {
+      personal = false;
     }
-  } else {
+  } /*else {
     const betaTester = await db.betatesters.findFirst({
       where: {
         email: session?.user.email,
@@ -57,7 +58,7 @@ const ChatPage = async ({ params }: { params: Params }) => {
         redirect(`/profile/${session?.user.id}`);
       }
     }
-  }
+  } */
   console.log(personal);
   return (
     <>
@@ -74,6 +75,7 @@ const ChatPage = async ({ params }: { params: Params }) => {
           namespace={space}
           personal={personal}
           userId={session?.user.id}
+          publisher={publisher}
         />
       </main>
     </>

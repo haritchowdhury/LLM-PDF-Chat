@@ -35,18 +35,14 @@ const Statistics = async ({ params }: { params: Params }) => {
     where: { id: game.uploadId },
   });
   if (!game) return redirect("/");
+  if (!upload) return redirect("/");
+
   let accuracy = 0;
 
   if (game.gameType === "mcq") {
     const totalCorrect = game.questions.filter((q) => q.isCorrect).length;
     accuracy = (totalCorrect / game.questions.length) * 100;
-  } /*else if (game.gameType === "open_ended") {
-    const totalPercentage = game.questions.reduce(
-      (acc, q) => acc + (q.percentageCorrect ?? 0),
-      0
-    );
-    accuracy = totalPercentage / game.questions.length;
-  }*/
+  }
   accuracy = Math.round(accuracy * 100) / 100;
   let isClaimable = false;
   let j = 5;
@@ -71,6 +67,8 @@ const Statistics = async ({ params }: { params: Params }) => {
     const communityQuiz = await db.communityquiz.findFirst({
       where: { uploadId: upload.id, userId: session?.user.id },
     });
+    if (!communityQuiz) return redirect("/");
+
     console.log(communityQuiz);
     const topics = communityQuiz?.options as any[];
     for (let i = 0; i < topics?.length; i++) {

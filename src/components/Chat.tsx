@@ -25,6 +25,7 @@ type User = {
   namespace: string;
   personal: boolean;
   userId: string;
+  publisher: string;
 };
 
 const Chat = ({
@@ -34,6 +35,7 @@ const Chat = ({
   namespace,
   personal,
   userId,
+  publisher,
 }: User) => {
   const router = useRouter();
   const { toast } = useToast();

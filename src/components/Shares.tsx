@@ -106,7 +106,7 @@ const Shares = ({ shares, userId, currentUser, platformlink }: Props) => {
                 {userId === currentUser && (
                   <>
                     <Delete upload={share.id as string} />
-                    <Erase upload={share.id as string} />
+                    {/* <Erase upload={share.id as string} /> */}
                   </>
                 )}
                 <ShareLinkModel link={`${platformlink}${share.id}`} />
