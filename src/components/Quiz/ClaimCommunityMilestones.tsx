@@ -77,7 +77,7 @@ const ClaimCommunityMilestones = ({ id, topic, upload }: Upload) => {
             form.setValue("topic", topic);
           }}
         >
-          Claim Milestones
+          Mark as complete
         </Button>
       </form>
     </div>

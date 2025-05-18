@@ -20,20 +20,9 @@ const Page = async () => {
                       h-[90vh] overflow-y-auto w-full max-w-md sm:max-w-4xl lg:max-w-4xl mt-4 sm:mt-8"
       >
         <div className="w-full max-w-sm mx-auto space-y-6">
-          <div className="flex items-center justify-between">
-            <Link href="/">
-              <Image
-                src="/aiversety.png"
-                alt="Aiversity Logo"
-                width={75}
-                height={25}
-                className="rounded-lg shadow-md"
-              />
-            </Link>
-            <small className="text-gray-300">
-              Skim fast, automate retention!
-            </small>
-          </div>
+          <h1 className="text-white text-2xl font-bold text-center mb-6">
+            Log In to your account
+          </h1>
           <ErrorToast />
           <div className="text-black">
             <GithubSignIn />
@@ -43,7 +32,7 @@ const Page = async () => {
                 <span className="w-full border-t" />
               </div>
               <div className="relative flex justify-center text-sm">
-                <span className="bg-background px-2 text-muted-foreground bg-black text-white">
+                <span className="bg-background px-2 text-muted-foreground  text-black mt-2">
                   Or continue with email
                 </span>
               </div>

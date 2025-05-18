@@ -59,14 +59,15 @@ const LandingPage = ({ id, platformlink, shares }: Props) => {
                 className={buttonVariants({
                   variant: "outline",
                   size: "lg",
-                  className: "border-gray-300 text-gray-800 hover:bg-gray-800",
+                  className:
+                    "bg-gradient-to-b from-indigo-200  border-gray-300 text-gray-800 hover:bg-gray-800",
                 })}
               >
                 View profile <CircleUserRound className="ml-2 h-5 w-5" />
               </Link>
             </div>
           </div>
-          <div className="md:w-1/2">
+          {/*  <div className="md:w-1/2">
             <div className="relative">
               <div className="absolute -inset-1 rounded-lg bg-gradient-to-r from-purple-400 to-blue-500 opacity-75 blur"></div>
               <div className="relative bg-gray-800 p-8 rounded-lg shadow-xl">
@@ -79,7 +80,7 @@ const LandingPage = ({ id, platformlink, shares }: Props) => {
                 />
               </div>
             </div>
-          </div>
+          </div> */}
         </div>
       </div>
     </section>

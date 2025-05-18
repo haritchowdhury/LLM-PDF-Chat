@@ -48,7 +48,7 @@ const HomePage = () => {
         </div>
 
         <h1
-          className={`text-5xl md:text-6xl font-bold mb-6 bg-clip-text text-transparent bg-gradient-to-r from-yellow-200 to-yellow-400 transition-all duration-1000 delay-300 ${animateClass}`}
+          className={`text-5xl md:text-6xl font-bold mb-6 bg-clip-text text-transparent bg-gradient-to-r from-blue-200 to-blue-800 transition-all duration-1000 delay-300 ${animateClass}`}
         >
           Publish your RAG bots in one click
         </h1>
@@ -68,7 +68,7 @@ const HomePage = () => {
               relative inline-flex items-center justify-center gap-2
               px-8 py-4 overflow-hidden
               font-bold text-lg text-white rounded-lg
-              bg-gradient-to-r from-yellow-500 via-yellow-400 to-yellow-300
+              bg-gradient-to-r from-blue-500 via-blue-400 to-blue-300
               text-black
               hover:shadow-lg hover:shadow-yellow-500/30
               transition-all duration-300 ease-out
@@ -100,7 +100,7 @@ const HomePage = () => {
         <div
           className={`flex justify-center transition-all duration-1000 delay-1000 ${animateClass}`}
         >
-          <div className="animate-bounce mt-12 text-yellow-300">
+          <div className="animate-bounce mt-12 text-blue-300">
             <svg
               xmlns="http://www.w3.org/2000/svg"
               className="h-8 w-8"
@@ -124,7 +124,7 @@ const HomePage = () => {
   const FeatureSection = () => (
     <section className="py-20 bg-gradient-to-b from-black to-gray-900">
       <div className="container mx-auto px-4">
-        <h2 className="text-4xl font-bold text-center text-yellow-200 mb-16">
+        <h2 className="text-4xl font-bold text-center text-blue-200 mb-16">
           Why Choose AIversety?
         </h2>
 
@@ -132,10 +132,10 @@ const HomePage = () => {
           <div className="bg-gray-900 p-6 rounded-xl border border-gray-800 transform transition-all duration-300 hover:scale-105 hover:shadow-lg hover:shadow-yellow-500/10">
             <div className="flex justify-center mb-4">
               <div className="bg-yellow-500/20 p-3 rounded-full">
-                <FileText className="w-10 h-10 text-yellow-300" />
+                <FileText className="w-10 h-10 text-blue-300" />
               </div>
             </div>
-            <h3 className="text-xl font-semibold text-yellow-100 mb-3 text-center">
+            <h3 className="text-xl font-semibold text-blue-100 mb-3 text-center">
               Smart Research Management
             </h3>
             <p className="text-gray-300 text-center">
@@ -146,11 +146,11 @@ const HomePage = () => {
 
           <div className="bg-gray-900 p-6 rounded-xl border border-gray-800 transform transition-all duration-300 hover:scale-105 hover:shadow-lg hover:shadow-yellow-500/10">
             <div className="flex justify-center mb-4">
-              <div className="bg-yellow-500/20 p-3 rounded-full">
-                <Lightbulb className="w-10 h-10 text-yellow-300" />
+              <div className="bg-blue-500/20 p-3 rounded-full">
+                <Lightbulb className="w-10 h-10 text-blue-300" />
               </div>
             </div>
-            <h3 className="text-xl font-semibold text-yellow-100 mb-3 text-center">
+            <h3 className="text-xl font-semibold text-blue-100 mb-3 text-center">
               Personalized Learning
             </h3>
             <p className="text-gray-300 text-center">
@@ -161,11 +161,11 @@ const HomePage = () => {
 
           <div className="bg-gray-900 p-6 rounded-xl border border-gray-800 transform transition-all duration-300 hover:scale-105 hover:shadow-lg hover:shadow-yellow-500/10">
             <div className="flex justify-center mb-4">
-              <div className="bg-yellow-500/20 p-3 rounded-full">
-                <DollarSign className="w-10 h-10 text-yellow-300" />
+              <div className="bg-blue-500/20 p-3 rounded-full">
+                <DollarSign className="w-10 h-10 text-blue-300" />
               </div>
             </div>
-            <h3 className="text-xl font-semibold text-yellow-100 mb-3 text-center">
+            <h3 className="text-xl font-semibold text-blue-100 mb-3 text-center">
               Publish your RAG bots
             </h3>
             <p className="text-gray-300 text-center">
@@ -187,7 +187,7 @@ const HomePage = () => {
       <FeatureSection />
 
       <main className="container mx-auto px-4 py-16 flex flex-grow">
-        <div className="grid md:grid-cols-2 gap-12 w-full">
+        {/*  <div className="grid md:grid-cols-2 gap-12 w-full">
           <Card className="p-8 text-center bg-gray-900 border-gray-800 rounded-xl shadow-xl hover:shadow-yellow-500/5 transition-all duration-300 flex flex-col items-center gap-6">
             <div className="md:text-3xl text-2xl font-bold text-yellow-200 mb-4">
               Manage your research in Private Workspaces
@@ -266,25 +266,25 @@ const HomePage = () => {
               </div>
             </div>
           </Card>
-        </div>
+        </div> */}
       </main>
 
       <section className="bg-black py-16">
         <div className="container mx-auto px-4 text-center">
-          <h2 className="text-4xl font-bold text-yellow-200 mb-8">
+          <h2 className="text-4xl font-bold text-blue-200 mb-8">
             Ready to get started?
           </h2>
-          <p className="text-xl text-gray-300 mb-8 max-w-2xl mx-auto">
+          {/* <p className="text-xl text-gray-300 mb-8 max-w-2xl mx-auto">
             Join AIversety today and transform how you publish, share, and
             monetize your research.
-          </p>
+          </p> */}
           <Link
             href="/sign-up"
             className="
               inline-flex items-center justify-center gap-2
               px-8 py-4
               font-bold text-lg text-black rounded-lg
-              bg-yellow-300 hover:bg-yellow-400
+              bg-blue-300 hover:bg-blue-700
               transition-all duration-300 ease-out
               shadow-lg hover:shadow-yellow-400/30
               transform hover:scale-105

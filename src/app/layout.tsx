@@ -32,7 +32,7 @@ const Layout = ({ children }: LayoutProps) => {
       lang="en"
       className={`${geistSans.variable} ${geistMono.variable} antialiased`}
     >
-      <body className="min-h-screen flex flex-col bg-black">
+      <body className="min-h-screen flex flex-col bg-gradient-to-b from-indigo-900 to-gray-900">
         <Providers>
           <Header />
           {children}

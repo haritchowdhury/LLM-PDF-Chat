@@ -71,7 +71,7 @@ const Statistics = async ({ params }: { params: Params }) => {
 
   return (
     <main className="min-h-screen bg-black text-white p-4 md:p-8 lg:p-12">
-      <div className="max-w-5xl mx-auto pt-8">
+      <div className="max-w-5xl mx-auto pt-16">
         <div className="mb-8 flex flex-col space-y-6">
           <div className="flex justify-between items-center">
             <Link
@@ -79,7 +79,7 @@ const Statistics = async ({ params }: { params: Params }) => {
               className={buttonVariants({
                 variant: "outline",
                 className:
-                  "bg-gray-900 border-gray-700 hover:bg-gray-800 hover:border-gray-600 text-white",
+                  "bg-gray-900 border-gray-700  hover:border-gray-600 text-white",
               })}
             >
               <ArrowLeft className="mr-2 h-4 w-4" />

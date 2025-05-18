@@ -11,8 +11,8 @@ const ResultsCard = ({ accuracy }: Props) => {
       return {
         title: "Impressive!",
         subtitle: "> 75% accuracy",
-        color: "text-yellow-400",
-        iconColor: "text-yellow-400",
+        color: "text-yellow-300",
+        iconColor: "text-yellow-300",
         bgGradient: "from-yellow-900/30 to-transparent",
       };
     } else if (accuracy > 25) {
@@ -27,8 +27,8 @@ const ResultsCard = ({ accuracy }: Props) => {
       return {
         title: "Nice try!",
         subtitle: "< 25% accuracy",
-        color: "text-yellow-700",
-        iconColor: "text-yellow-700",
+        color: "text-yellow-300",
+        iconColor: "text-yellow-300",
         bgGradient: "from-yellow-900/20 to-transparent",
       };
     }
@@ -40,7 +40,7 @@ const ResultsCard = ({ accuracy }: Props) => {
     <Card
       className={`border-none overflow-hidden bg-gradient-to-r ${result.bgGradient} rounded-lg`}
     >
-      <CardContent className="p-6">
+      <CardContent className="p-6 bg-gradient-to-b from-indigo-900 to-gray-900">
         <div className="flex items-center">
           <div className="mr-6">
             <div className="p-3 rounded-full bg-gray-900/60 flex items-center justify-center">
@@ -52,7 +52,9 @@ const ResultsCard = ({ accuracy }: Props) => {
             <h2 className={`text-3xl font-bold ${result.color}`}>
               {result.title}
             </h2>
-            <p className="text-sm opacity-70 mt-1">{result.subtitle}</p>
+            <p className="text-sm opacity-70 mt-1 text-white">
+              {result.subtitle}
+            </p>
           </div>
 
           <div className="hidden sm:flex items-center justify-center">
