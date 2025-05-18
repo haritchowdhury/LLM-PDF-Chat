@@ -4,13 +4,7 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardDescription,
-  /* CardContent,
-  CardHeader,
-  CardTitle, */
-} from "@/components/ui/card";
+import { Card, CardDescription } from "@/components/ui/card";
 import axios, { AxiosError } from "axios";
 import { Input } from "@/components/ui/input";
 import { z } from "zod";
@@ -61,7 +55,7 @@ const TopicCreationButton = ({ upload }: Upload) => {
   form.watch();
 
   return (
-    <Card className="border-none bg-black text-white">
+    <Card className="border-none bg-gray-900 text-white">
       {!created ? (
         <CardDescription className="mb-0">
           {" "}

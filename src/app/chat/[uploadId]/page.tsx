@@ -1,10 +1,10 @@
-import Chat from "@/components/Chat";
+import Chat from "@/components/Chat/Chat";
 import { auth } from "@/lib/auth";
 import { redirect } from "next/navigation";
 import db from "@/lib/db/db";
-//import { Card, CardContent, CardTitle } from "@/components/ui/card";
+import { Upload, Game } from "@prisma/client";
 
-type Params = Promise<{ uploadId: any /* chatSession: any; space: any*/ }>;
+type Params = Promise<{ uploadId: any }>;
 
 const ChatPage = async ({ params }: { params: Params }) => {
   const session = await auth();
@@ -59,23 +59,34 @@ const ChatPage = async ({ params }: { params: Params }) => {
       }
     }
   } */
-  console.log(personal);
+  let Uploads: Upload[];
+  if (personal) {
+    Uploads = await db.upload.findMany({
+      where: { userId: session?.user.id, private: true, isDeleted: false },
+      orderBy: { timeStarted: "desc" },
+    });
+  } else {
+    Uploads = await db.upload.findMany({
+      where: { userId: session?.user.id, private: false, isDeleted: false },
+      orderBy: { timeStarted: "desc" },
+    });
+  }
+
+  const Games: Game[] = await db.game.findMany({
+    where: { userId: session?.user.id, uploadId: uploadId },
+    orderBy: { timeStarted: "desc" },
+  });
+  console.log(personal, Uploads, Games);
   return (
     <>
-      <main className="flex relative items-center justify-center min-h-screen bg-black">
-        {/*  <Card className="p-3 bg-black border-gray-900 text-gray-200 flex flex-col items-center gap-4 w-full max-w-md overflow-y-auto">
-          <small>Upload your documents using the tooltip.</small>
-          
-          <small>Happy Skimming!</small>
-        </Card> */}
+      <main className="flex relative items-center justify-center min-h-screen bg-black pb-16 pt-16">
         <Chat
-          email={email}
-          upload={uploadId}
           sessionId={chatSession}
           namespace={space}
-          personal={personal}
+          isPersonal={personal}
           userId={session?.user.id}
-          publisher={publisher}
+          workspaces={Uploads}
+          games={Games}
         />
       </main>
     </>

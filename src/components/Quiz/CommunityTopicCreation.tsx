@@ -55,7 +55,7 @@ const CommunityTopicCreationButton = ({ upload }: Upload) => {
   form.watch();
 
   return (
-    <Card className="border-none bg-black text-white">
+    <Card className="border-none bg-gray-900 text-white">
       {!created ? (
         <CardDescription className="mb-0">
           {" "}

@@ -4,85 +4,84 @@ import { useMutation } from "@tanstack/react-query";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { useToast } from "@/hooks/use-toast";
+import { Input } from "@/components/ui/input";
 import { zodResolver } from "@hookform/resolvers/zod";
+import axios, { AxiosError } from "axios";
 import { useRouter } from "next/navigation";
-import { Eraser } from "lucide-react";
+
 type Upload = {
+  id: string;
+  topic: string;
   upload: string;
 };
-
 const milestoneSchema = z.object({
-  upload: z.string().min(1),
+  id: z.string().min(1),
+  topic: z.string().min(1),
 });
-
 type Input = z.infer<typeof milestoneSchema>;
 
-const Erase = ({ upload }: Upload) => {
+const ClaimCommunityMilestones = ({ id, topic, upload }: Upload) => {
   const router = useRouter();
   const { toast } = useToast();
+
+  const { mutate: updateMilestones, status } = useMutation({
+    mutationFn: async ({ id, topic }: Input) => {
+      console.log("id:", id);
+      const response = await axios.put("/api/communityTopics", {
+        topic: topic,
+        upload: id,
+      });
+    },
+  });
+
   const form = useForm<Input>({
     resolver: zodResolver(milestoneSchema),
     defaultValues: {
-      upload: upload || "",
-    },
-  });
-  const { mutate: deleteChat, status } = useMutation({
-    mutationFn: async ({ upload }: Input) => {
-      const response = await fetch("/api/upsert", {
-        method: "DELETE",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ upload: upload, type: "erase" }),
-      });
-
-      if (!response.ok) {
-        const error = await response.json();
-        throw new Error(error.error || "Could not be Erased");
-      }
-
-      return await response.json();
+      id: id || "",
+      topic: topic || "",
     },
   });
 
   const onSubmit = async (data: Input) => {
-    deleteChat(data, {
+    updateMilestones(data, {
       onError: (error) => {
         console.log(error);
         toast({
           title: "Error",
-          description: "Something went wrong. Could not Erased!",
+          description: "Something went wrong. Could not Claim Milestone!",
           variant: "destructive",
         });
       },
-      onSuccess: (data) => {
+      onSuccess: () => {
         setTimeout(() => {
           toast({
             title: "Success",
-            description: "Namespace erased successfully!",
+            description: "Milestone claimed succesfully!",
             variant: "default",
           });
-          router.push(`/profile/${data.userId}`);
+          router.push(`/chat/${upload}`);
         }, 2000);
       },
     });
   };
+  form.watch();
 
   return (
-    <div className="border-none ">
+    <div className="border-none">
       <form className="flex flex-grow" onSubmit={form.handleSubmit(onSubmit)}>
         <Button
           disabled={status === "pending"}
           type="submit"
           onClick={() => {
-            form.setValue("upload", upload);
+            form.setValue("id", id);
+            form.setValue("topic", topic);
           }}
         >
-          <Eraser />
+          Claim Milestones
         </Button>
       </form>
     </div>
   );
 };
 
-export default Erase;
+export default ClaimCommunityMilestones;

@@ -11,8 +11,8 @@ const Page = async () => {
   if (session) redirect("/");
 
   return (
-    <main className="flex relative items-center justify-center min-h-screen bg-black">
-      <div className="w-full max-w-sm mx-auto space-y-6">
+    <main className="flex relative items-center justify-center min-h-screen bg-gradient-to-b from-indigo-900 to-gray-900 text-whitk">
+      <div className="w-full max-w-sm mx-auto space-y-6 bg-gradient-to-b from-indigo-900 to-gray-900 text-whit rounded p-4">
         <h1 className="text-white text-2xl font-bold text-center mb-6">
           Create Account
         </h1>

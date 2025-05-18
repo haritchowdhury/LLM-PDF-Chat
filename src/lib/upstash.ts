@@ -1,12 +1,13 @@
 import { RecursiveCharacterTextSplitter } from "@langchain/textsplitters";
 import { HuggingFaceInferenceEmbeddings } from "@langchain/community/embeddings/hf";
-import ragChat from "@/lib/rag.server";
 import { Redis } from "@upstash/redis";
 import { Index } from "@upstash/vector";
 import { Document } from "langchain/document";
 import { summarizer } from "@/lib/groqSummarizer";
 import { v4 as uuid } from "uuid";
 import { SparseVector } from "@upstash/vector";
+import { qaChain } from "@/lib/qaChain";
+import { strict_output } from "@/lib/groqTopicSetter";
 
 interface Metadata {
   content: string;
@@ -21,8 +22,11 @@ interface Vector {
 export const updateUpstash = async (
   index: Index,
   namespace: string,
-  docs: Document[]
+  docs: Document[],
+  fileName: string
 ) => {
+  let extractedTopics: string[] = [];
+  let topics: string[] = [];
   const promiseList = docs.map(async (doc, counter) => {
     const text = doc["pageContent"];
     const textSplitter = new RecursiveCharacterTextSplitter({
@@ -37,20 +41,19 @@ export const updateUpstash = async (
       );
 
     const batchSize = 500;
-    //let batch: Array<Vector> = [];
-    let batch /*: Array<{
-      id: string;
-      vector: number[];
-      metadata: Metadata;
-    }> */ = [];
+    let batch = [];
     let pageContent = "";
     const batchPromises = chunks.map(async (chunk, idx) => {
-      const vector /*: Vector*/ = {
+      const sourceName = `${fileName}, Page ${counter + 1}`;
+
+      const vector = {
         id: uuid(),
         vector: embeddingsArrays[idx],
-        //sparseVector: undefined, // Ensures compatibility
         metadata: {
           content: chunk.pageContent,
+          source: sourceName,
+          fileName: fileName,
+          pageNumber: counter + 1,
         },
       };
 
@@ -58,29 +61,22 @@ export const updateUpstash = async (
       batch.push(vector);
 
       if (batch.length === batchSize || idx === chunks.length - 1) {
-        const response = await index.upsert(
-          /* {
-            id: batch[idx].id,
-            vector: batch[idx].values,
-            metadata: { content: pageContent },
-          },*/
-          batch,
-          { namespace: namespace }
-        );
-        const summary: any = await summarizer(
-          `You are an expert summarizer who is able to capture the main talking points from a text.`,
+        const response = await index.upsert(batch, { namespace: namespace });
+        console.log(`Batch: ${counter} response: ${JSON.stringify(response)}`);
+        topics = [];
+        topics = await strict_output(
+          `You are an Expert AI Instructor who can identify the theme of the summary and figure out the most important chapers
+        from the summary that will be useful for preparing the paper for exam,  you are to return the important chapters that most 
+        thoroughly capture the import aspects of the summary. The length of each topic must
+        not exceed 4 words. Store all options in a JSON array of the following structure:`,
 
-          `Summarize the text in less than 150 words.`,
+          `You are to generate main topics that thorougly capture the main subjects of the summary`,
           pageContent
         );
-        //console.log("summary before adding context", summary.content);
-        await ragChat.context.add({
-          type: "text",
-          data: summary.content,
-          options: { namespace: namespace },
-        });
+        //console.log("upstash topics", topics);
+        extractedTopics = extractedTopics.concat(topics);
+        //console.log("upstash topics", topics, extractedTopics);
 
-        console.log(`Batch: ${counter} response: ${JSON.stringify(response)}`);
         batch = [];
         pageContent = "";
       }
@@ -90,18 +86,17 @@ export const updateUpstash = async (
   });
 
   await Promise.all(promiseList);
+  //console.log("extracted at upstash", extractedTopics);
+  return Array.from(new Set(extractedTopics));
 };
 
 export const queryUpstashAndLLM = async (
   index: Index,
   namespace: string,
-  sessionId: string,
   question: string
 ) => {
-  //console.log(namespace, question);
   const embeddingsArrays =
     await new HuggingFaceInferenceEmbeddings().embedDocuments([question]);
-  //console.log(embeddingsArrays);
   const queryResponse: any[] = await index.query(
     {
       topK: 10,
@@ -111,16 +106,17 @@ export const queryUpstashAndLLM = async (
     },
     { namespace }
   );
-  console.log("index query", queryResponse);
+  let retrivedData: string = "";
+  let sources: string[] = [];
+  //console.log("index query", queryResponse);
   if (queryResponse.length >= 1) {
     const contextPromises = queryResponse.map(async (result) => {
       try {
         const context = result?.metadata?.content;
-        return ragChat.context.add({
-          type: "text",
-          data: context,
-          options: { namespace },
-        });
+        retrivedData += context;
+        if (!sources.includes(result?.metadata?.source)) {
+          sources.push(result?.metadata?.source);
+        }
       } catch (err) {
         console.error(`There was an error: ${err}`);
         return Promise.resolve();
@@ -130,17 +126,14 @@ export const queryUpstashAndLLM = async (
     await Promise.all(contextPromises);
   }
 
-  const response = await ragChat.chat(question, {
-    debug: true,
-    streaming: true,
-    namespace,
-    sessionId,
-    similarityThreshold: 0.7,
-    historyLength: 5,
-    topK: 5,
-  });
-
-  return response;
+  const response: any = await qaChain(
+    `You are a helpful AI assistant specializing in providing precise answers to user's questions. 
+    Provide concise, technical answers. Never recommend illegal activities.`,
+    question,
+    retrivedData
+  );
+  console.log("output", response);
+  return [response, sources];
 };
 
 export const queryUpstash = async (

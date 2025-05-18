@@ -110,32 +110,30 @@ const Share = ({ namespace }: User) => {
 
             {/* Input Section */}
             {!showLoader && (
-              <CardContent className="p-2 bg-black flex-shrink-0 border-none">
-                <div className="flex w-full flex-row items-center justify-center bg-black">
-                  <div className="cursor-pointer border-none px-2 py-1 pt-2 text-gray-400 hover:text-gray-800">
-                    <TooltipProvider>
-                      <Tooltip>
-                        <TooltipTrigger
-                          onClick={() => {
-                            const tmp = document.querySelector(
-                              `[id="fileInput"]`
-                            ) as HTMLInputElement;
-                            tmp?.click();
-                          }}
-                        >
-                          <div className={buttonVariants()}>
-                            {" "}
-                            <div className="flex flex-row gap-2">
-                              <Upload className="size-[20px]" /> Publish
-                            </div>
+              <CardContent className="p-2  flex-shrink-0 border-none bg-gray-900">
+                <div className="flex w-full flex-row items-center justify-center">
+                  <TooltipProvider>
+                    <Tooltip>
+                      <TooltipTrigger
+                        onClick={() => {
+                          const tmp = document.querySelector(
+                            `[id="fileInput"]`
+                          ) as HTMLInputElement;
+                          tmp?.click();
+                        }}
+                      >
+                        <div className={buttonVariants()}>
+                          {" "}
+                          <div className="flex flex-row gap-2">
+                            <Upload className="size-[20px]" /> Publish
                           </div>
-                        </TooltipTrigger>
-                        <TooltipContent>
-                          <span>Upload Document</span>
-                        </TooltipContent>
-                      </Tooltip>
-                    </TooltipProvider>
-                  </div>
+                        </div>
+                      </TooltipTrigger>
+                      <TooltipContent>
+                        <span>Upload Document</span>
+                      </TooltipContent>
+                    </Tooltip>
+                  </TooltipProvider>
                 </div>
               </CardContent>
             )}

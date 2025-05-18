@@ -3,88 +3,198 @@ export const dynamic = "force-dynamic";
 export const fetchCache = "force-no-store";
 export const maxDuration = 60;
 
-import type { Message } from "ai";
 import { Index } from "@upstash/vector";
-import { aiUseChatAdapter } from "@upstash/rag-chat/nextjs";
-import getUserSession from "@/lib/user.server";
-import { queryUpstashAndLLM } from "@/lib/upstash";
-import { auth } from "@/lib/auth";
 import { Redis } from "@upstash/redis";
 import { NextRequest, NextResponse } from "next/server";
+
+import getUserSession from "@/lib/user.server";
+import { queryUpstashAndLLM } from "@/lib/upstash";
+import { saveMessage } from "@/lib/redisChat";
+import { auth } from "@/lib/auth";
 import db from "@/lib/db/db";
 
+// Define message type for consistency
+type Message = {
+  role: "user" | "assistant";
+  content: string;
+  sources?: string[];
+  timestamp?: number;
+};
+
+// Define request interface
 interface ChatRequest {
-  upload: string;
-  sessionId: string;
-  namespace: string;
-  messages: Message[];
+  user_prompt: string; // New API uses user_prompt instead of messages array
+  upload?: string; // Document upload ID
+  sessionId?: string; // Session identifier
+  namespace?: string; // Vector namespace
 }
 
+// Initialize Redis client
 const redis = new Redis({
-  url: process.env.UPSTASH_REDIS_REST_URL,
-  token: process.env.UPSTASH_REDIS_REST_TOKEN,
+  url: process.env.UPSTASH_REDIS_REST_URL as string,
+  token: process.env.UPSTASH_REDIS_REST_TOKEN as string,
 });
-const MAX_REQUESTS_PER_DAY = 20;
-const EXPIRATION_TIME = 24 * 60 * 60 * 7;
+
+// Initialize Vector index
 const index = new Index({
-  url: process.env.UPSTASH_VECTOR_REST_URL,
-  token: process.env.UPSTASH_VECTOR_REST_TOKEN,
+  url: process.env.UPSTASH_VECTOR_REST_URL as string,
+  token: process.env.UPSTASH_VECTOR_REST_TOKEN as string,
 });
 
-export async function POST(request: NextRequest) {
-  const session = await auth();
-  const userId = String(session.user.id);
-  const user = await getUserSession();
-  const namespaceList = await new Index().listNamespaces();
-  const { upload, sessionId, namespace, messages } =
-    (await request.json()) as ChatRequest;
-  const question: string | undefined = messages.at(-1)?.content;
-  const requestCount =
-    (await redis.get<number>(`chat_rate_limit:${userId}`)) || 0;
+// Rate limit constants
+const MAX_REQUESTS_PER_DAY = 20;
+const MAX_REQUESTS_FOR_BETA = 100;
+const EXPIRATION_TIME = 24 * 60 * 60 * 7; // 7 days in seconds
 
-  if (!user) return new Response(null, { status: 403 });
-  const betaTester = await db.betatesters.findFirst({
-    where: {
-      email: session?.user.email,
-    },
-  });
-  if (!betaTester) {
-    if (requestCount >= MAX_REQUESTS_PER_DAY) {
+/**
+ * Chat API endpoint handler
+ * Processes user questions, checks rate limits, queries vector store, and returns AI responses
+ */
+export async function POST(request: NextRequest) {
+  try {
+    // Get user session and authenticate
+    const session = await auth();
+    if (!session?.user?.id) {
       return NextResponse.json(
-        `You have exceeded the nuber of questions you can ask in a week. Weekly limit ${MAX_REQUESTS_PER_DAY}`,
+        { content: "Authentication required" },
+        { status: 403 }
+      );
+    }
+
+    const userId = String(session.user.id);
+    const userEmail = session.user.email;
+
+    // Get user session details from custom function
+    const user = await getUserSession();
+    if (!user) {
+      return NextResponse.json(
+        { content: "User session not found" },
+        { status: 403 }
+      );
+    }
+
+    // Parse request data
+    const { user_prompt, sessionId, namespace }: ChatRequest =
+      await request.json();
+
+    // Use provided sessionId or fallback to user session
+    const effectiveSessionId = sessionId || user[0];
+
+    // Use provided namespace or fallback to user namespace
+    const effectiveNamespace = namespace || user[1];
+
+    // Validate namespace exists
+    const namespaceList = await index.listNamespaces();
+    if (!namespaceList.includes(effectiveNamespace)) {
+      return NextResponse.json(
+        {
+          content:
+            "This namespace has not been created. Please upload a document first.",
+        },
+        { status: 404 }
+      );
+    }
+
+    // Validate question exists
+    if (!user_prompt) {
+      return NextResponse.json(
+        { content: "No question provided in request." },
+        { status: 400 }
+      );
+    }
+
+    // Check rate limits
+    const requestCount =
+      (await redis.get<number>(`chat_rate_limit:${userId}`)) || 0;
+
+    // Check if user is a beta tester
+    const betaTester = await db.betatesters.findFirst({
+      where: {
+        email: userEmail,
+      },
+    });
+
+    // Apply rate limiting based on user type
+    if (!betaTester && requestCount >= MAX_REQUESTS_PER_DAY) {
+      return NextResponse.json(
+        {
+          content: `You have exceeded the number of questions you can ask in a week. Weekly limit: ${MAX_REQUESTS_PER_DAY}`,
+        },
         { status: 429 }
       );
     }
-  }
-  if (requestCount >= 100) {
-    return NextResponse.json(
-      `You have exceeded the nuber of questions you can ask in a week. Weekly limit ${100}`,
-      { status: 429 }
-    );
-  }
-  if (!question)
-    return new Response("No question in the request.", { status: 401 });
-  if (!namespaceList.includes(namespace)) {
-    return NextResponse.json("This Namespace has not been created.", {
-      status: 404,
-    });
-  }
-  //console.log("payload at chat", upload, sessionId, namespace);
 
-  let response: any;
-  try {
+    if (betaTester && requestCount >= MAX_REQUESTS_FOR_BETA) {
+      return NextResponse.json(
+        {
+          content: `You have exceeded the number of questions you can ask in a week. Weekly limit: ${MAX_REQUESTS_FOR_BETA}`,
+        },
+        { status: 429 }
+      );
+    }
+
+    // Increment rate limit counter
     await redis.set(`chat_rate_limit:${userId}`, requestCount + 1, {
       ex: EXPIRATION_TIME,
     });
-    response = await queryUpstashAndLLM(index, namespace, sessionId, question);
-  } catch {
+
+    // Save user question to chat history
+    await saveMessage(effectiveSessionId, {
+      role: "user",
+      content: user_prompt,
+      sources: [],
+    });
+
+    // Query the vector store and LLM
+    const response = await queryUpstashAndLLM(
+      index,
+      effectiveNamespace,
+      //effectiveSessionId,
+      user_prompt
+    );
+
+    // Extract response content and sources
+    const result = response[0]; // LLM's answer
+    let sources = response[1] || []; // Source data
+
+    // Format response content
+    let responseContent = "";
+    if (typeof result === "object" && result?.content) {
+      responseContent = result.content;
+    } else if (typeof result === "string") {
+      responseContent = result;
+    } else {
+      responseContent = "Unable to process response from AI model.";
+    }
+
+    // Ensure sources is an array
+    if (!sources || !Array.isArray(sources) || !sources.length) {
+      sources = ["No Sources"];
+    }
+
+    // Save AI response to chat history
+    await saveMessage(effectiveSessionId, {
+      role: "assistant",
+      content: responseContent,
+      sources: sources,
+    });
+
+    // Return formatted response
     return NextResponse.json(
-      "Unable to get response from model, contact the developer team.",
+      { content: responseContent, sources: sources },
+      { status: 200 }
+    );
+  } catch (error) {
+    // Log the error
+    console.error("Error processing chat request:", error);
+
+    // Return error response
+    return NextResponse.json(
       {
-        status: 401,
-      }
+        content:
+          "Unable to get response from model. Please try again or contact the developer team.",
+      },
+      { status: 500 }
     );
   }
-
-  return aiUseChatAdapter(response);
 }

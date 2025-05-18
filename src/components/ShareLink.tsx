@@ -8,7 +8,7 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { CopyIcon } from "lucide-react";
+import { Copy, ExternalLink, Share } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import {
   FaXTwitter,
@@ -16,7 +16,6 @@ import {
   FaFacebookF,
   FaLinkedinIn,
 } from "react-icons/fa6";
-import { Share } from "lucide-react";
 
 type Link = {
   link: string;
@@ -24,6 +23,7 @@ type Link = {
 
 const ShareLinkModal = ({ link }: Link) => {
   const [isOpen, setIsOpen] = useState(false);
+  const [copiedAnimation, setCopiedAnimation] = useState(false);
   const { toast } = useToast();
 
   // Social media sharing URLs
@@ -34,14 +34,46 @@ const ShareLinkModal = ({ link }: Link) => {
     linkedin: `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(link)}`,
   };
 
+  // Social media platform configurations
+  const platforms = [
+    {
+      name: "Twitter",
+      icon: <FaXTwitter className="h-5 w-5" />,
+      key: "twitter",
+      color: "hover:bg-[#1DA1F2]/10 hover:text-[#1DA1F2]",
+    },
+    {
+      name: "WhatsApp",
+      icon: <FaWhatsapp className="h-5 w-5" />,
+      key: "whatsapp",
+      color: "hover:bg-[#25D366]/10 hover:text-[#25D366]",
+    },
+    {
+      name: "Facebook",
+      icon: <FaFacebookF className="h-5 w-5" />,
+      key: "facebook",
+      color: "hover:bg-[#1877F2]/10 hover:text-[#1877F2]",
+    },
+    {
+      name: "LinkedIn",
+      icon: <FaLinkedinIn className="h-5 w-5" />,
+      key: "linkedin",
+      color: "hover:bg-[#0A66C2]/10 hover:text-[#0A66C2]",
+    },
+  ];
+
   // Copy link to clipboard
   const handleCopyLink = async () => {
     try {
       await navigator.clipboard.writeText(link);
+      setCopiedAnimation(true);
+
       toast({
         title: "Link Copied",
         description: "The link has been copied to your clipboard.",
       });
+
+      setTimeout(() => setCopiedAnimation(false), 1500);
     } catch (err) {
       toast({
         title: "Copy Failed",
@@ -52,73 +84,116 @@ const ShareLinkModal = ({ link }: Link) => {
   };
 
   // Open social media share link
-  const handleSocialShare = (platform: any) => {
-    window.open(socialShareLinks[platform], "_blank");
+  const handleSocialShare = (platform: string) => {
+    window.open(
+      socialShareLinks[platform as keyof typeof socialShareLinks],
+      "_blank"
+    );
+  };
+
+  // Truncate link for display
+  const displayLink = () => {
+    if (link.length > 30) {
+      // Show fewer characters on small screens
+      const isMobileView =
+        typeof window !== "undefined" && window.innerWidth < 640;
+      const startLength = isMobileView ? 15 : 20;
+      const endLength = isMobileView ? 5 : 10;
+
+      return `${link.substring(0, startLength)}...${link.substring(link.length - endLength)}`;
+    }
+    return link;
   };
 
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogTrigger asChild>
-        <Button>
-          <Share />
+        <Button
+          variant="outline"
+          size="icon"
+          className="bg-gray-900 border-gray-700 hover:bg-gray-800 hover:border-gray-600 text-white"
+        >
+          <Share className="h-4 w-4" />
         </Button>
       </DialogTrigger>
-      <DialogContent className="max-w-xl  p-6  bg-black border-[1px] border-gray-700">
-        <DialogHeader>
-          <DialogTitle>Share this Link</DialogTitle>
-        </DialogHeader>
+      <DialogContent className="sm:max-w-lg w-full p-0 bg-black border border-gray-800 rounded-lg overflow-hidden">
+        <div className="bg-gradient-to-r from-gray-900 to-black p-4 border-b border-gray-800">
+          <DialogTitle className="text-lg font-medium flex items-center gap-2 text-white">
+            <Share className="h-5 w-5 text-blue-400" />
+            Share this content
+          </DialogTitle>
+        </div>
 
-        <div className="flex flex-col space-y-4">
-          <div className="flex flex-wrap justify-start gap-2">
-            {/* Social Media Share Buttons */}
-            <Button
-              variant="outline"
-              size="icon"
-              onClick={() => handleSocialShare("twitter")}
-              className="hover:bg-gray-400 w-16 h-16 bg-black text-white border-[1px] border-gray-700"
-            >
-              <FaXTwitter />
-            </Button>
-            <Button
-              variant="outline"
-              size="icon"
-              onClick={() => handleSocialShare("whatsapp")}
-              className="hover:bg-gray-400 w-16 h-16 bg-black text-white border-[1px] border-gray-700"
-            >
-              <FaWhatsapp />
-            </Button>
-            <Button
-              variant="outline"
-              size="icon"
-              onClick={() => handleSocialShare("facebook")}
-              className="hover:bg-gray-400 w-16 h-16 bg-black text-white border-[1px] border-gray-700"
-            >
-              <FaFacebookF />
-            </Button>
-            <Button
-              variant="outline"
-              size="icon"
-              onClick={() => handleSocialShare("linkedin")}
-              className="hover:bg-gray-400 w-16 h-16 bg-black text-white border-[1px] border-gray-700"
-            >
-              <FaLinkedinIn />
-            </Button>
+        <div className="p-4 sm:p-6 space-y-6">
+          {/* Social Media Share Section */}
+          <div className="space-y-3">
+            <h3 className="text-sm font-medium text-gray-400">Share via</h3>
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+              {platforms.map((platform) => (
+                <div
+                  key={platform.key}
+                  className="flex flex-col items-center gap-2"
+                >
+                  <Button
+                    variant="outline"
+                    size="icon"
+                    onClick={() => handleSocialShare(platform.key)}
+                    className={`w-12 h-12 rounded-full bg-gray-900 border-gray-800 ${platform.color} transition-all duration-200`}
+                  >
+                    {platform.icon}
+                  </Button>
+                  <span className="text-xs text-gray-500">{platform.name}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Divider */}
+          <div className="relative">
+            <div className="absolute inset-0 flex items-center">
+              <div className="w-full border-t border-gray-800"></div>
+            </div>
+            <div className="relative flex justify-center text-xs">
+              <span className="px-2 text-gray-500 bg-black">or copy link</span>
+            </div>
           </div>
 
           {/* Copy Link Section */}
-          <div className="flex items-center space-x-2">
-            <div className="flex-grow p-2 border rounded-md text-sm text-gray-600 truncate border-[1px] border-gray-700">
-              {link}
+          <div className="flex flex-col sm:flex-row sm:items-center space-y-2 sm:space-y-0 sm:space-x-2">
+            <div className="flex-grow bg-gray-900 rounded-lg border border-gray-800 p-3 text-sm text-gray-300 font-mono truncate">
+              {displayLink()}
             </div>
-            <Button
-              variant="outline"
-              size="icon"
-              onClick={handleCopyLink}
-              className="hover:bg-gray-400 bg-black text-white border-[1px] border-gray-700"
-            >
-              <CopyIcon className="h-4 w-4" />
-            </Button>
+            <div className="flex space-x-2">
+              <Button
+                variant="outline"
+                onClick={handleCopyLink}
+                className={`h-10 px-3 rounded-md bg-gray-800 border-gray-700 hover:bg-gray-700 transition-all duration-200 flex-shrink-0 ${copiedAnimation ? "bg-green-900 text-green-400" : ""}`}
+              >
+                {copiedAnimation ? (
+                  <span className="text-xs font-medium flex items-center">
+                    <Copy className="h-4 w-4 mr-1" /> Copied!
+                  </span>
+                ) : (
+                  <span className="flex items-center">
+                    <Copy className="h-4 w-4 mr-1" /> Copy
+                  </span>
+                )}
+              </Button>
+              <Button
+                variant="outline"
+                onClick={() => window.open(link, "_blank")}
+                className="h-10 px-3 rounded-md bg-gray-800 border-gray-700 hover:bg-gray-700 flex-shrink-0"
+              >
+                <span className="flex items-center">
+                  <ExternalLink className="h-4 w-4 mr-1" /> Open
+                </span>
+              </Button>
+            </div>
           </div>
+
+          <p className="text-xs text-gray-500 text-center">
+            Anyone with this link can view this content
+          </p>
         </div>
       </DialogContent>
     </Dialog>

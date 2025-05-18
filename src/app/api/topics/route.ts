@@ -173,7 +173,7 @@ export async function GET(request: NextRequest) {
 export async function PUT(request: NextRequest) {
   const session = await auth();
   const body = await request.json();
-  const { ix, upload } = body;
+  const { topic, upload } = body;
   if (!session?.user.id) {
     throw new Error("User not found");
   }
@@ -191,10 +191,17 @@ export async function PUT(request: NextRequest) {
       where: {
         id: upload,
         userId: id,
+        isDeleted: false,
       },
     });
-    let options: boolean[] = JSON.parse(lastUpload.isCompleted as string);
-    options[ix] = true;
+    console.log("upload ", lastUpload.id, upload);
+
+    let options: string[] = JSON.parse(lastUpload.isCompleted as string) || [];
+    console.log(options, "topics put");
+    if (!options.includes(topic)) {
+      options.push(topic);
+    }
+    console.log(options, "topics put", lastUpload.id);
     const updatedUpload = await db.upload.update({
       where: {
         id: lastUpload.id,

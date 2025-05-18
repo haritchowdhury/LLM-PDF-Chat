@@ -36,7 +36,7 @@ export async function POST(request: NextRequest) {
       email: session?.user.email,
     },
   });
-  if (!betaTester) {
+  /* if (!betaTester) {
     if (requestCount >= MAX_REQUESTS_PER_DAY) {
       return NextResponse.json(
         {
@@ -45,7 +45,7 @@ export async function POST(request: NextRequest) {
         { status: 429 }
       );
     }
-  }
+  } */
   //const user = await getUserSession();
   const body = await request.json();
   const { topic, amount, id } = quizCreationSchema.parse(body);

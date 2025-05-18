@@ -4,7 +4,6 @@ export const fetchCache = "force-no-store";
 export const maxDuration = 60;
 
 import { NextRequest, NextResponse } from "next/server";
-//import getUserSession from "@/lib/user.server";
 import { PDFLoader } from "@langchain/community/document_loaders/fs/pdf";
 import { Index } from "@upstash/vector";
 import { updateUpstash, deleteUpstash } from "@/lib/upstash";
@@ -22,13 +21,15 @@ const EXPIRATION_TIME = 24 * 60 * 60 * 7;
 
 export async function POST(request: NextRequest) {
   const data = await request.formData();
-  const file = data.get("file") as File;
-  //let upload = data.get("upload") as string;
-  //let sessionId = data.get("sessionId") as string;
   let namespace = data.get("namespace") as string;
   let personal = data.get("private") as string;
+
+  const file = data.get("file") as File;
+  const baseName = file.name.replace(/\.[^/.]+$/, "");
+
   const session = await auth();
   const userId = String(session.user.id);
+
   const requestCount =
     (await redis.get<number>(`upsert_rate_limit:${userId}`)) || 0;
 
@@ -45,14 +46,16 @@ export async function POST(request: NextRequest) {
   const loader = new PDFLoader(fileSource, {
     splitPages: true,
   });
+  //console.log("filesource", fileSource, file.name);
   const docs = await loader.load();
-  console.log(docs.length);
+  //console.log(docs.length);
+
   const betaTester = await db.betatesters.findFirst({
     where: {
       email: session?.user.email,
     },
   });
-  if (!betaTester) {
+  /* if (!betaTester) {
     if (requestCount >= MAX_REQUESTS_PER_DAY) {
       return NextResponse.json(
         {
@@ -61,7 +64,7 @@ export async function POST(request: NextRequest) {
         { status: 429 }
       );
     }
-  }
+  } */
   if (docs.length >= 31) {
     return NextResponse.json(
       {
@@ -91,17 +94,15 @@ export async function POST(request: NextRequest) {
         data: {
           id: uuid(),
           timeStarted: new Date(),
-          name: docs[0].pageContent.slice(0, 50),
+          name: baseName,
           userId: userId,
-          isCompleted: JSON.stringify([false, false, false, false, false]),
+          //isCompleted: JSON.stringify([false, false, false, false, false]),
           private: personal === "true" ? true : false,
           isDeleted: false,
         },
       });
       uploadId = Upload.id;
-      //upload = uploadId;
       namespace = uploadId;
-      //sessionId = (uploadId + "_" + session?.user.id) as string;
     } else {
       const Upload = await db.upload.findFirst({
         where: { id: namespace, name: "ERASED" },
@@ -112,7 +113,7 @@ export async function POST(request: NextRequest) {
             id: Upload.id,
           },
           data: {
-            name: docs[0].pageContent.slice(0, 50),
+            name: baseName,
           },
         });
       }
@@ -121,7 +122,29 @@ export async function POST(request: NextRequest) {
     throw new Error("Upload Could not be created");
   }
   try {
-    await updateUpstash(index, namespace, docs);
+    function filterStringsOnly(topics) {
+      return topics.filter((item) => typeof item === "string");
+    }
+    let topics = await updateUpstash(index, namespace, docs, baseName);
+    const foundUpload = await db.upload.findFirst({
+      where: {
+        id: uploadId,
+      },
+    });
+    const existingTopics: string[] = JSON.parse(foundUpload.options as string);
+    console.log("topics at upsert", topics, existingTopics);
+    topics = topics.concat(existingTopics);
+    const filteredTopics = filterStringsOnly(topics);
+
+    await db.upload.update({
+      where: {
+        id: foundUpload.id,
+      },
+      data: {
+        options: JSON.stringify(filteredTopics),
+        // isCompleted: JSON.stringify(["Placeholder"]),
+      },
+    });
   } catch (err) {
     console.log("error: ", err);
     throw new Error("Upstash Could be Updated");
@@ -156,7 +179,7 @@ export async function DELETE(request: Request) {
     });
     await deleteUpstash(index, upload, sessionId, 1);
     if (type === "delete") {
-      const updatedUpload = await db.upload.update({
+      await db.upload.update({
         where: {
           id: upload,
         },
@@ -165,7 +188,7 @@ export async function DELETE(request: Request) {
         },
       });
     } else {
-      const updatedUpload = await db.upload.update({
+      await db.upload.update({
         where: {
           id: upload,
         },

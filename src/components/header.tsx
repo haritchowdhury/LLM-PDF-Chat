@@ -1,11 +1,11 @@
 import { SignOut } from "@/components/sign-out";
 import { auth } from "@/lib/auth";
 //import { redirect } from "next/navigation";
-import { ConnectWallet } from "@/components/wallet/connect";
+//import { ConnectWallet } from "@/components/wallet/connect";
 import Link from "next/link";
 //import { buttonVariants } from "@/components/ui/button";
 import { CircleUserRound, Landmark } from "lucide-react";
-import Image from "next/image";
+//import Image from "next/image";
 import { buttonVariants } from "@/components/ui/button";
 
 const Header = async () => {
@@ -17,7 +17,7 @@ const Header = async () => {
       <nav className="flex justify-end h-full max-w-7xl mx-auto px-4  gap-2 py-2 ">
         {session ? (
           <>
-            <ConnectWallet />
+            {/* <ConnectWallet /> */}
             <Link href="/" className={buttonVariants()}>
               Home
               <Landmark />

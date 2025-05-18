@@ -14,16 +14,16 @@ const Page = async () => {
   const session = await auth();
   if (session) redirect("/");
   return (
-    <main className="flex relative items-center justify-center min-h-screen bg-black">
+    <main className="flex relative items-center justify-center min-h-screen bg-gradient-to-b from-indigo-900 to-gray-900 text-white">
       <Card
-        className="flex flex-col gap-4 text-white bg-black border-none p-12 
+        className="flex flex-col gap-4 text-white bg-gradient-to-b from-indigo-900 to-gray-900 text-whit border-none p-12 
                       h-[90vh] overflow-y-auto w-full max-w-md sm:max-w-4xl lg:max-w-4xl mt-4 sm:mt-8"
       >
         <div className="w-full max-w-sm mx-auto space-y-6">
           <div className="flex items-center justify-between">
             <Link href="/">
               <Image
-                src="/aiversety.jpg"
+                src="/aiversety.png"
                 alt="Aiversity Logo"
                 width={75}
                 height={25}

@@ -1,6 +1,6 @@
 import { auth } from "@/lib/auth";
 import db from "@/lib/db/db";
-import MCQ from "@/components/MCQ";
+import MCQ from "@/components/Quiz/MCQ";
 import { redirect } from "next/navigation";
 import * as React from "react";
 

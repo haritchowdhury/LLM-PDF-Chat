@@ -1,13 +1,16 @@
 import { ChatPromptTemplate } from "@langchain/core/prompts";
 import { ChatGroq } from "@langchain/groq";
 import { JsonOutputParser } from "@langchain/core/output_parsers";
-
+/*
 interface Topic {
   topic1: string;
   topic2: string;
   topic3: string;
   topic4: string;
   topic5: string;
+} */
+interface Topic {
+  topics: string;
 }
 
 export async function strict_output(
@@ -34,7 +37,7 @@ export async function strict_output(
     `;
 
     const prompt = ChatPromptTemplate.fromTemplate(
-      "{context_prompt}\n\nIdentify the 5 most important high-level categories or sections in this document.\n{format_instructions}\n{query}"
+      "{context_prompt}\n\nIdentify the most important high-level categories or sections in this document.\n{format_instructions}\n{query}"
     );
 
     const partialedPrompt = await prompt.partial({
@@ -45,8 +48,6 @@ export async function strict_output(
     const chain = partialedPrompt.pipe(groq).pipe(parser);
     const res: any = await chain.invoke({ query: user_prompt });
 
-    //const list_output: boolean = Array.isArray(res);
-    //console.log("parsed output", res);
     return res;
   } catch (error) {
     return error as any;

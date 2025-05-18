@@ -7,11 +7,11 @@ import AccuracyCard from "@/components/statistics/AccuracyCard";
 import TimeTakenCard from "@/components/statistics/TimeTakenCard";
 import QuestionsList from "@/components/statistics/QuestionsList";
 import { buttonVariants } from "@/components/ui/button";
-
 import { LucideLayoutDashboard } from "lucide-react";
 import Link from "next/link";
-import ClaimMilestones from "@/components/ClaimMilestones";
-import ClaimCommunityMilestones from "@/components/ClaimCommunityMilestones";
+import ClaimMilestones from "@/components/Quiz/ClaimMilestones";
+import ClaimCommunityMilestones from "@/components/Quiz/ClaimCommunityMilestones";
+import { ArrowLeft } from "lucide-react";
 
 type Params = Promise<{ gameId: any }>;
 
@@ -23,9 +23,6 @@ const Statistics = async ({ params }: { params: Params }) => {
 
   if (!session?.user) return redirect("/");
 
-  const sessionId = `${session.user.id}_session`;
-  const namespace = `${session.user.id}_documents`;
-
   const game = await db.game.findUnique({
     where: { id: gameId },
     include: { questions: true },
@@ -34,6 +31,7 @@ const Statistics = async ({ params }: { params: Params }) => {
   const upload = await db.upload.findUnique({
     where: { id: game.uploadId },
   });
+  console.log(upload.id, "upload id");
   if (!game) return redirect("/");
   if (!upload) return redirect("/");
 
@@ -45,90 +43,81 @@ const Statistics = async ({ params }: { params: Params }) => {
   }
   accuracy = Math.round(accuracy * 100) / 100;
   let isClaimable = false;
-  let j = 5;
-  console.log(upload);
+
+  console.log(game.topic, upload.options);
+
+  let quizId: string;
+
   if (upload.private === true) {
-    const topics = upload?.options as any[];
-    for (let i = 0; i < topics?.length; i++) {
-      if (game.topic == topics[i]) {
-        j = i;
-      }
-    }
-    const completed: boolean[] = JSON.parse(upload.isCompleted as string);
-    if (
-      j != topics?.length &&
-      completed[j] == false &&
-      upload.timeStarted >= weekAgo
-    ) {
-      console.log("true");
+    const completed: string[] = JSON.parse(upload.isCompleted as string) || [];
+
+    if (!completed.includes(game?.topic)) {
+      console.log(" claimable true");
       isClaimable = true;
     }
   } else {
     const communityQuiz = await db.communityquiz.findFirst({
       where: { uploadId: upload.id, userId: session?.user.id },
     });
-    if (!communityQuiz) return redirect("/");
+    quizId = communityQuiz.id;
 
-    console.log(communityQuiz);
-    const topics = communityQuiz?.options as any[];
-    for (let i = 0; i < topics?.length; i++) {
-      if (game.topic == topics[i]) {
-        j = i;
-      }
-    }
-    const completed: boolean[] = JSON.parse(
-      communityQuiz.isCompleted as string
-    );
-    if (
-      j != topics?.length &&
-      completed[j] == false &&
-      communityQuiz.timeStarted >= weekAgo
-    ) {
+    const completed: string[] =
+      JSON.parse(communityQuiz.isCompleted as string) || [];
+    if (!completed.includes(game?.topic)) {
       console.log("true");
       isClaimable = true;
     }
   }
 
   return (
-    <main className="flex flex-grow items-center p-20 justify-center  bg-black">
-      <div className="flex flex-col  p-1 px-2 overflow-y-auto">
-        <div className="flex flex-col flex-grow item-center justify-between">
-          <div className="flex flex-row justify-between">
-            <Link href={`/chat/${upload.id}`} className={buttonVariants()}>
-              <LucideLayoutDashboard className="mr-2" />
-              Chat
+    <main className="min-h-screen bg-black text-white p-4 md:p-8 lg:p-12">
+      <div className="max-w-5xl mx-auto pt-8">
+        <div className="mb-8 flex flex-col space-y-6">
+          <div className="flex justify-between items-center">
+            <Link
+              href={`/chat/${upload.id}`}
+              className={buttonVariants({
+                variant: "outline",
+                className:
+                  "bg-gray-900 border-gray-700 hover:bg-gray-800 hover:border-gray-600 text-white",
+              })}
+            >
+              <ArrowLeft className="mr-2 h-4 w-4" />
+              Back to Chat
             </Link>
-            <div>
-              {isClaimable && upload.private && (
-                <ClaimMilestones
-                  id={upload.id}
-                  ix={j}
-                  sessionId={sessionId}
-                  namespace={namespace}
-                  upload={upload.id}
-                />
-              )}
-              {isClaimable && !upload.private && (
-                <ClaimCommunityMilestones
-                  id={`${upload.id}_${session?.user.id}`}
-                  ix={j}
-                  sessionId={sessionId}
-                  namespace={namespace}
-                  upload={upload.id}
-                />
-              )}
-            </div>
+
+            {isClaimable && (
+              <div className="animate-pulse">
+                {upload.private ? (
+                  <ClaimMilestones id={upload.id} topic={game.topic} />
+                ) : (
+                  <ClaimCommunityMilestones
+                    id={quizId}
+                    topic={game.topic}
+                    upload={upload.id}
+                  />
+                )}
+              </div>
+            )}
           </div>
+
           <ResultsCard accuracy={accuracy} />
-          <div className="flex flex-row justify-between">
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <AccuracyCard accuracy={accuracy} />
             <TimeTakenCard
               timeEnded={new Date(game.timeEnded ?? 0)}
               timeStarted={new Date(game.timeStarted ?? 0)}
             />
           </div>
-          <div className="flex-grow">
-            <QuestionsList questions={game.questions} />
+
+          <div className="bg-gray-900 rounded-lg overflow-hidden border border-gray-800">
+            <h2 className="px-4 py-3 text-lg font-semibold border-b border-gray-800">
+              Questions Review
+            </h2>
+            <div className="p-2">
+              <QuestionsList questions={game.questions} />
+            </div>
           </div>
         </div>
       </div>

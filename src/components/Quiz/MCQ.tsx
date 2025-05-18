@@ -17,7 +17,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Button, buttonVariants } from "@/components/ui/button";
-import MCQCounter from "@/components/MCQCounter";
+import MCQCounter from "@/components/Quiz/MCQCounter";
 
 type Props = {
   game: Game & { questions: Pick<Question, "id" | "options" | "question">[] };
@@ -184,7 +184,7 @@ const MCQ = ({ game }: Props) => {
       <div className="flex flex-col items-center justify-center w-full mt-4">
         {options.map((option, index) => (
           <Button
-            key={option}
+            key={index}
             variant={selectedChoice === index ? "default" : "outline"}
             className="justify-start w-full py-8 mb-4"
             onClick={() => setSelectedChoice(index)}

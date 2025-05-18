@@ -1,5 +1,5 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Hourglass } from "lucide-react";
+import { Clock } from "lucide-react";
 import { formatTimeDelta } from "@/lib/utils";
 import { differenceInSeconds } from "date-fns";
 
@@ -9,15 +9,25 @@ type Props = {
 };
 
 const TimeTakenCard = ({ timeEnded, timeStarted }: Props) => {
+  const totalSeconds = differenceInSeconds(timeEnded, timeStarted);
+  const formattedTime = formatTimeDelta(totalSeconds);
+
   return (
-    <Card className="md:col-span-3 align-right border-none bg-black text-white h-full">
-      <CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0">
-        <CardTitle className="text-lg font-bold">Time Taken</CardTitle>
-        <Hourglass className="w-4 h-4" />
+    <Card className="border border-gray-800 bg-gray-900 text-white rounded-lg overflow-hidden">
+      <CardHeader className="pb-2 border-b border-gray-800">
+        <div className="flex items-center justify-between">
+          <CardTitle className="text-base font-medium">Time Taken</CardTitle>
+          <Clock className="w-5 h-5 text-purple-400" />
+        </div>
       </CardHeader>
-      <CardContent>
-        <div className="text-sm font-medium">
-          {formatTimeDelta(differenceInSeconds(timeEnded, timeStarted))}
+      <CardContent className="pt-4">
+        <div className="flex items-end">
+          <span className="text-3xl font-bold">{formattedTime}</span>
+        </div>
+        <div className="flex items-center mt-3 text-xs text-gray-400">
+          <span>Started: {timeStarted.toLocaleTimeString()}</span>
+          <span className="mx-1">•</span>
+          <span>Finished: {timeEnded.toLocaleTimeString()}</span>
         </div>
       </CardContent>
     </Card>
