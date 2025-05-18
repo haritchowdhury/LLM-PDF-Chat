@@ -131,7 +131,7 @@ const HomePage = () => {
         <div className="grid md:grid-cols-3 gap-8 max-w-6xl mx-auto">
           <div className="bg-gray-900 p-6 rounded-xl border border-gray-800 transform transition-all duration-300 hover:scale-105 hover:shadow-lg hover:shadow-yellow-500/10">
             <div className="flex justify-center mb-4">
-              <div className="bg-yellow-500/20 p-3 rounded-full">
+              <div className="bg-blue-500/20 p-3 rounded-full">
                 <FileText className="w-10 h-10 text-blue-300" />
               </div>
             </div>
