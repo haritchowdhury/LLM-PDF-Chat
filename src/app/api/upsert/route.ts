@@ -16,7 +16,7 @@ const redis = new Redis({
   url: process.env.UPSTASH_REDIS_REST_URL,
   token: process.env.UPSTASH_REDIS_REST_TOKEN,
 });
-const MAX_REQUESTS_PER_DAY = 2;
+const MAX_REQUESTS_PER_WEEK = 2;
 const EXPIRATION_TIME = 24 * 60 * 60 * 7;
 
 export async function POST(request: NextRequest) {
@@ -55,20 +55,21 @@ export async function POST(request: NextRequest) {
       email: session?.user.email,
     },
   });
-  /* if (!betaTester) {
-    if (requestCount >= MAX_REQUESTS_PER_DAY) {
+
+  if (!betaTester) {
+    if (requestCount >= MAX_REQUESTS_PER_WEEK) {
       return NextResponse.json(
         {
-          error: `You have exceeded the nuber of documents you can upload in a Week. Weekly limit ${MAX_REQUESTS_PER_DAY}`,
+          error: `You have exceeded the nuber of documents you can upload in a Week. Weekly limit ${MAX_REQUESTS_PER_WEEK}`,
         },
         { status: 429 }
       );
     }
-  } */
+  }
   if (docs.length >= 31) {
     return NextResponse.json(
       {
-        error: `You can only upload 10 pages at a time!`,
+        error: `You can only upload 30 pages at a time!`,
       },
       { status: 419 }
     );
@@ -90,13 +91,32 @@ export async function POST(request: NextRequest) {
 
   try {
     if (namespace === "undefined") {
+      const Uploads = await db.upload.findMany({
+        where: { userId: session?.user.id, private: true, isDeleted: false },
+        orderBy: { timeStarted: "desc" },
+      });
+
+      const Shares = await db.upload.findMany({
+        where: { userId: userId, private: false, isDeleted: false },
+        orderBy: { timeStarted: "desc" },
+      });
+      if (
+        (!betaTester && (Uploads.length >= 1 || Shares.length >= 1)) ||
+        (betaTester && (Uploads.length >= 3 || Shares.length >= 3))
+      ) {
+        return NextResponse.json(
+          {
+            error: `You have exceeded the number of spaces you can create`,
+          },
+          { status: 429 }
+        );
+      }
       const Upload = await db.upload.create({
         data: {
           id: uuid(),
           timeStarted: new Date(),
           name: baseName,
           userId: userId,
-          //isCompleted: JSON.stringify([false, false, false, false, false]),
           private: personal === "true" ? true : false,
           isDeleted: false,
         },
@@ -142,7 +162,6 @@ export async function POST(request: NextRequest) {
       },
       data: {
         options: JSON.stringify(filteredTopics),
-        // isCompleted: JSON.stringify(["Placeholder"]),
       },
     });
   } catch (err) {

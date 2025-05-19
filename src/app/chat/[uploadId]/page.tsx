@@ -59,6 +59,7 @@ const ChatPage = async ({ params }: { params: Params }) => {
       }
     }
   } */
+
   let Uploads: Upload[];
   if (personal) {
     Uploads = await db.upload.findMany({
