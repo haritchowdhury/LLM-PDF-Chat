@@ -182,7 +182,8 @@ const LandingPage = ({ id, platformlink, shares }: Props) => {
                 href={`/profile/${id}`}
                 className={buttonVariants({
                   variant: "outline",
-                  className: "border-gray-600 text-gray-300 hover:bg-gray-700",
+                  className:
+                    "border-gray-600 text-gray-500 hover:bg-white-700 hover:text-gray-900",
                 })}
               >
                 Publish your first article{" "}

@@ -36,7 +36,7 @@ const Page = async () => {
             </div>
           </div>
           <form
-            className="space-y-4"
+            className="space-y-4 text-black"
             action={async (formData) => {
               "use server";
               const res = await signUp(formData);
