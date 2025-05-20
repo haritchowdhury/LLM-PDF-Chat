@@ -49,3 +49,18 @@ export async function saveMessage(
     return false;
   }
 }
+
+/**
+ * Delete a user's chat history from Redis
+ * @param userId - The user's ID
+ */
+export async function deleteChatHistory(userId: string): Promise<boolean> {
+  try {
+    const chatHistoryKey = `chat:history:${userId}`;
+    await redis.del(chatHistoryKey);
+    return true;
+  } catch (error) {
+    console.error("Failed to delete chat history from Redis:", error);
+    return false;
+  }
+}

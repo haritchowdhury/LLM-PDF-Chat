@@ -16,9 +16,22 @@ const redis = new Redis({
   url: process.env.UPSTASH_REDIS_REST_URL,
   token: process.env.UPSTASH_REDIS_REST_TOKEN,
 });
+
+const index = new Index({
+  url: process.env.UPSTASH_VECTOR_REST_URL,
+  token: process.env.UPSTASH_VECTOR_REST_TOKEN,
+});
+
+function filterStringsOnly(topics) {
+  return topics.filter((item) => typeof item === "string");
+}
+
 const MAX_REQUESTS_PER_WEEK = 2;
 const EXPIRATION_TIME = 24 * 60 * 60 * 7;
 
+/*
+ * Endpoint to create a chat room
+ */
 export async function POST(request: NextRequest) {
   const data = await request.formData();
   let namespace = data.get("namespace") as string;
@@ -46,9 +59,7 @@ export async function POST(request: NextRequest) {
   const loader = new PDFLoader(fileSource, {
     splitPages: true,
   });
-  //console.log("filesource", fileSource, file.name);
   const docs = await loader.load();
-  //console.log(docs.length);
 
   const betaTester = await db.betatesters.findFirst({
     where: {
@@ -65,7 +76,17 @@ export async function POST(request: NextRequest) {
         { status: 429 }
       );
     }
+  } else {
+    if (requestCount >= 31) {
+      return NextResponse.json(
+        {
+          error: `You have exceeded the nuber of documents you can upload in a Week. Weekly limit ${30}`,
+        },
+        { status: 429 }
+      );
+    }
   }
+
   if (docs.length >= 31) {
     return NextResponse.json(
       {
@@ -74,19 +95,7 @@ export async function POST(request: NextRequest) {
       { status: 419 }
     );
   }
-  if (requestCount >= 30) {
-    return NextResponse.json(
-      {
-        error: `You have exceeded the nuber of documents you can upload in a Week. Weekly limit ${30}`,
-      },
-      { status: 429 }
-    );
-  }
 
-  const index = new Index({
-    url: process.env.UPSTASH_VECTOR_REST_URL,
-    token: process.env.UPSTASH_VECTOR_REST_TOKEN,
-  });
   let uploadId: string = namespace;
 
   try {
@@ -100,6 +109,7 @@ export async function POST(request: NextRequest) {
         where: { userId: userId, private: false, isDeleted: false },
         orderBy: { timeStarted: "desc" },
       });
+
       if (
         (!betaTester && (Uploads.length >= 1 || Shares.length >= 1)) ||
         (betaTester && (Uploads.length >= 3 || Shares.length >= 3))
@@ -111,6 +121,7 @@ export async function POST(request: NextRequest) {
           { status: 429 }
         );
       }
+
       const Upload = await db.upload.create({
         data: {
           id: uuid(),
@@ -121,9 +132,10 @@ export async function POST(request: NextRequest) {
           isDeleted: false,
         },
       });
+
       uploadId = Upload.id;
       namespace = uploadId;
-    } else {
+    } /*else {
       const Upload = await db.upload.findFirst({
         where: { id: namespace, name: "ERASED" },
       });
@@ -137,14 +149,11 @@ export async function POST(request: NextRequest) {
           },
         });
       }
-    }
+    } */
   } catch (err) {
     throw new Error("Upload Could not be created");
   }
   try {
-    function filterStringsOnly(topics) {
-      return topics.filter((item) => typeof item === "string");
-    }
     let topics = await updateUpstash(index, namespace, docs, baseName);
     const foundUpload = await db.upload.findFirst({
       where: {
@@ -152,7 +161,8 @@ export async function POST(request: NextRequest) {
       },
     });
     const existingTopics: string[] = JSON.parse(foundUpload.options as string);
-    console.log("topics at upsert", topics, existingTopics);
+    //console.log("topics at upsert", topics, existingTopics);
+
     topics = topics.concat(existingTopics);
     const filteredTopics = filterStringsOnly(topics);
 
@@ -168,6 +178,7 @@ export async function POST(request: NextRequest) {
     console.log("error: ", err);
     throw new Error("Upstash Could be Updated");
   }
+
   try {
     await redis.set(`upsert_rate_limit:${userId}`, requestCount + 1, {
       ex: EXPIRATION_TIME,
@@ -178,6 +189,9 @@ export async function POST(request: NextRequest) {
   }
 }
 
+/*
+ * Endpoint to delete a chat room including Redis Cache
+ */
 export async function DELETE(request: Request) {
   const { upload, type } = await request.json();
   const session = await auth();
@@ -186,17 +200,17 @@ export async function DELETE(request: Request) {
   }
   try {
     const sessionId = upload + "_" + session.user.id;
+
     const Upload = await db.upload.findFirst({
       where: { id: upload },
     });
+
     if (session.user.id !== Upload.userId) {
       return NextResponse.json({ error: "Not allowed" }, { status: 403 });
     }
-    const index = new Index({
-      url: process.env.UPSTASH_VECTOR_REST_URL,
-      token: process.env.UPSTASH_VECTOR_REST_TOKEN,
-    });
-    await deleteUpstash(index, upload, sessionId, 1);
+
+    await deleteUpstash(index, upload, sessionId);
+
     if (type === "delete") {
       await db.upload.update({
         where: {
@@ -206,7 +220,7 @@ export async function DELETE(request: Request) {
           isDeleted: true,
         },
       });
-    } else {
+    } /* else {
       await db.upload.update({
         where: {
           id: upload,
@@ -215,7 +229,7 @@ export async function DELETE(request: Request) {
           name: "ERASED",
         },
       });
-    }
+    }*/
     return NextResponse.json({ userId: session.user.id });
   } catch (error) {
     return NextResponse.json({ error: error.message }, { status: 500 });

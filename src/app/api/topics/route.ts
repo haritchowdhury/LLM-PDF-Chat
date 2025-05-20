@@ -8,15 +8,18 @@ import { auth } from "@/lib/auth";
 export const runtime = "nodejs";
 export const maxDuration = 60;
 
+const index = new Index({
+  url: process.env.UPSTASH_VECTOR_REST_URL,
+  token: process.env.UPSTASH_VECTOR_REST_TOKEN,
+});
+
+/*
 export async function POST(request: NextRequest) {
   const body = await request.json();
   const { upload } = body;
   console.log(upload);
   const namespace = upload;
-  const index = new Index({
-    url: process.env.UPSTASH_VECTOR_REST_URL,
-    token: process.env.UPSTASH_VECTOR_REST_TOKEN,
-  });
+
   const session = await auth();
   const id: string = session?.user.id;
   const userExists = await db.user.findUnique({
@@ -121,7 +124,7 @@ export async function POST(request: NextRequest) {
       }
     );
   }
-}
+} */
 
 export async function GET(request: NextRequest) {
   const session = await auth();

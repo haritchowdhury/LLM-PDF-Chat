@@ -8,7 +8,7 @@ import { v4 as uuid } from "uuid";
 import { SparseVector } from "@upstash/vector";
 import { qaChain } from "@/lib/qaChain";
 import { strict_output } from "@/lib/groqTopicSetter";
-
+import { deleteChatHistory } from "@/lib/redisChat";
 interface Metadata {
   content: string;
 }
@@ -18,6 +18,11 @@ interface Vector {
   // sparseVector: SparseVector; // Ensures compatibility
   metadata: Metadata;
 }
+
+const redis = new Redis({
+  url: process.env.UPSTASH_REDIS_REST_URL,
+  token: process.env.UPSTASH_REDIS_REST_TOKEN,
+});
 
 export const updateUpstash = async (
   index: Index,
@@ -166,23 +171,10 @@ export const queryUpstash = async (
 export const deleteUpstash = async (
   index: Index,
   namespace: string,
-  sessionId: string,
-  taskId: number
+  sessionId: string
 ) => {
-  const redis = new Redis({
-    url: process.env.UPSTASH_REDIS_REST_URL,
-    token: process.env.UPSTASH_REDIS_REST_TOKEN,
-  });
-  if (taskId == 1) {
-    const responseReset = await index.reset({ namespace: namespace });
-    console.log(responseReset);
-    const history = await redis.keys(`${sessionId}*`);
-    for (const key of history) {
-      await redis.del(key);
-    }
-  }
-  const context = await redis.keys(`${namespace}*`);
-  for (const key of context) {
-    await redis.del(key);
-  }
+  const responseReset = await index.reset({ namespace: namespace });
+  console.log(responseReset);
+  await deleteChatHistory(sessionId);
+  const history = await redis.keys(`${sessionId}*`);
 };
