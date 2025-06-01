@@ -10,6 +10,7 @@ import ShareLinkModel from "@/components/ShareLink";
 import { headers } from "next/headers";
 import LandingPage from "@/components/LandingPage";
 import HomePage from "@/components/HomePage";
+import Landing from "@/components/LandingPage/Landing";
 
 const Home = async () => {
   const session = await auth();
@@ -30,7 +31,8 @@ const Home = async () => {
       />
     );
   } else {
-    return <HomePage />;
+    //return <HomePage />;
+    return <Landing />;
   }
 };
 

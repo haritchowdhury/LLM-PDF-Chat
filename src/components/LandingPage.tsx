@@ -32,14 +32,14 @@ const LandingPage = ({ id, platformlink, shares }: Props) => {
   }, []);
 
   const HeroSection = () => (
-    <section className="pt-20 pb-16 bg-gradient-to-b from-indigo-900 to-gray-900 text-white">
+    <section className="pt-20 pb-16 bg-gradient-to-br from-blue-50 to-green-50 text-black">
       <div className="container mx-auto px-6 py-8">
         <div className="flex flex-col md:flex-row items-center gap-8 justify-between">
           <div className="text-left md:w-1/2">
-            <h1 className="text-4xl md:text-5xl font-bold mb-6 leading-tight bg-clip-text text-transparent bg-gradient-to-r from-blue-300 to-purple-300">
+            <h1 className="text-4xl md:text-5xl font-bold mb-6 leading-tight bg-clip-text text-transparent bg-gradient-to-r from-blue-900 to-blue-500">
               Skim Fast! Automate Retention
             </h1>
-            <p className="text-xl mb-8 text-gray-200 max-w-lg">
+            <p className="text-xl mb-8 text-gray-900 max-w-lg">
               Chat with your documents, discover key insights, and reinforce
               learning with AI-generated quizzes.
             </p>
@@ -67,20 +67,6 @@ const LandingPage = ({ id, platformlink, shares }: Props) => {
               </Link>
             </div>
           </div>
-          {/*  <div className="md:w-1/2">
-            <div className="relative">
-              <div className="absolute -inset-1 rounded-lg bg-gradient-to-r from-purple-400 to-blue-500 opacity-75 blur"></div>
-              <div className="relative bg-gray-800 p-8 rounded-lg shadow-xl">
-                <Image
-                  src="/aiversety.png"
-                  alt="Aiversity Logo"
-                  width={300}
-                  height={300}
-                  className="mx-auto rounded-lg"
-                />
-              </div>
-            </div>
-          </div> */}
         </div>
       </div>
     </section>
@@ -150,15 +136,15 @@ const LandingPage = ({ id, platformlink, shares }: Props) => {
   );
 
   return (
-    <div className="bg-gradient-to-b from-gray-900 to-gray-800 min-h-screen">
-      <HeroSection />
+    <div className="bg-gradient-to-b from-gray-200 to-white min-h-screen">
+      {/* <HeroSection /> */}
 
-      <section className="container mx-auto px-6 py-12">
+      <section className="container mx-auto px-6 py-12 pt-20">
         <div className="flex flex-col items-center mb-12">
-          <h2 className="text-3xl font-bold text-white mb-4">
+          <h2 className="text-3xl font-bold text-gray-800 mb-4">
             Explore Published Articles
           </h2>
-          <p className="text-xl text-gray-300 max-w-2xl text-center">
+          <p className="text-xl text-gray-700 max-w-2xl text-center">
             Browse through our collection of documents and start enhancing your
             learning experience.
           </p>
@@ -175,7 +161,7 @@ const LandingPage = ({ id, platformlink, shares }: Props) => {
             ))
           ) : (
             <div className="col-span-3 text-center py-16">
-              <p className="text-xl text-gray-400 mb-6">
+              <p className="text-xl text-gray-600 mb-6">
                 No articles published yet.
               </p>
               <Link

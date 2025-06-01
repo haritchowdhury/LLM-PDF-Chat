@@ -7,80 +7,83 @@ import { executeAction } from "@/lib/executeAction";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import ErrorToast from "@/components/ErrorToast";
-import Image from "next/image";
-import { Card /*CardContent, CardTitle*/ } from "@/components/ui/card";
 
-const Page = async () => {
+const Page = async ({
+  searchParams,
+}: {
+  searchParams: { callbackUrl?: string };
+}) => {
   const session = await auth();
   if (session) redirect("/");
+  const params = await searchParams;
+  const callbackUrl = params.callbackUrl || "/";
   return (
-    <main className="flex relative items-center justify-center min-h-screen bg-gradient-to-b from-indigo-900 to-gray-900 text-white">
-      <Card
-        className="flex flex-col gap-4 text-white bg-gradient-to-b from-indigo-900 to-gray-900 text-whit border-none p-12 
-                      h-[90vh] overflow-y-auto w-full max-w-md sm:max-w-4xl lg:max-w-4xl mt-4 sm:mt-8"
-      >
-        <div className="w-full max-w-sm mx-auto space-y-6">
-          <h1 className="text-white text-2xl font-bold text-center mb-6">
-            Log In to your account
-          </h1>
-          <ErrorToast />
-          <div className="text-black">
-            <GithubSignIn />
-
-            <div className="relative">
-              <div className="absolute inset-0 flex items-center">
-                <span className="w-full border-t" />
-              </div>
-              <div className="relative flex justify-center text-sm">
-                <span className="bg-background px-2 text-muted-foreground  text-black mt-2">
-                  Or continue with email
-                </span>
-              </div>
-            </div>
-            <br />
-            <form
-              className="space-y-4"
-              action={async (formData) => {
-                "use server";
-                await executeAction({
-                  actionFn: async () => {
-                    try {
-                      await signIn("credentials", formData);
-                    } catch {
-                      redirect("/sign-in?error=1");
-                    }
-                  },
-                });
-              }}
-            >
-              <Input
-                name="email"
-                placeholder="Email"
-                type="email"
-                required
-                autoComplete="email"
-              />
-              <Input
-                name="password"
-                placeholder="Password"
-                type="password"
-                required
-                autoComplete="current-password"
-              />
-              <Button className="w-full" type="submit">
-                Sign In
-              </Button>
-            </form>
+    <main className="flex relative items-center justify-center min-h-screen bg-gradient-to-br from-blue-50 to-green-50 text-white">
+      <div className="w-full max-w-sm mx-auto space-y-6">
+        <h1 className="text-black text-2xl font-bold text-center mb-6">
+          Log In to your account
+        </h1>
+        <ErrorToast />
+        <div className="text-black">
+          <GithubSignIn />
+        </div>
+        <div className="relative">
+          <div className="absolute inset-0 flex items-center">
+            <span className="w-full border-t" />
           </div>
-          <div className="text-center">
-            <Button asChild variant="link">
-              <Link className="text-white" href="/sign-up">
-                Don&apos;t have an account? Sign up
-              </Link>
-            </Button>
+          <div className="relative flex justify-center text-sm">
+            <span className="bg-gradient-to-br from-blue-50 to-green-50 px-2 text-muted-foreground  text-black mt-2">
+              Or continue with email
+            </span>
           </div>
         </div>
-      </Card>
+
+        <form
+          className="space-y-4 text-gray-900"
+          action={async (formData) => {
+            "use server";
+            await executeAction({
+              actionFn: async () => {
+                try {
+                  formData.append("callbackUrl", callbackUrl);
+
+                  await signIn("credentials", formData);
+                } catch {
+                  redirect(
+                    `/sign-in?error=1&callbackUrl=${encodeURIComponent(callbackUrl)}`
+                  );
+                }
+              },
+            });
+          }}
+        >
+          <Input
+            name="email"
+            placeholder="Email"
+            type="email"
+            required
+            autoComplete="email"
+          />
+          <Input
+            name="password"
+            placeholder="Password"
+            type="password"
+            required
+            autoComplete="current-password"
+          />
+          <Button className="w-full" type="submit">
+            Sign In
+          </Button>
+        </form>
+
+        <div className="text-center">
+          <Button asChild variant="link">
+            <Link className="text-black" href="/sign-up">
+              Don&apos;t have an account? Sign up
+            </Link>
+          </Button>
+        </div>
+      </div>
     </main>
   );
 };

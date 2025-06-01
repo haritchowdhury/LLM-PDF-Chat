@@ -7,6 +7,8 @@ import { useToast } from "@/hooks/use-toast";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useRouter } from "next/navigation";
 import { Eraser, Trash2 } from "lucide-react";
+import { buttonVariants } from "@/components/ui/button";
+
 type Upload = {
   upload: string;
 };
@@ -77,6 +79,12 @@ const Delete = ({ upload }: Upload) => {
           onClick={() => {
             form.setValue("upload", upload);
           }}
+          className={buttonVariants({
+            variant: "outline",
+            // size: "lg",
+            className:
+              "bg-gradient-to-b from-indigo-200 border-gray-300 text-gray-800 hover:bg-gray-800 my-2",
+          })}
         >
           <Trash2 />
         </Button>

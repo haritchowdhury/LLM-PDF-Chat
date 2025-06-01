@@ -22,6 +22,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
       },
       authorize: async (credentials) => {
         const validatedCredentials = schema.parse(credentials);
+        console.log("credentials received at sign-in", validatedCredentials);
 
         const user = await db.user.findFirst({
           where: {
@@ -44,6 +45,38 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         token.credentials = true;
       }
       return token;
+    },
+    async redirect({ url, baseUrl }) {
+      console.log("Redirect callback - url:", url, "baseUrl:", baseUrl);
+      try {
+        const parsedUrl = new URL(url, baseUrl);
+        const callbackUrl = parsedUrl.searchParams.get("callbackUrl");
+
+        if (callbackUrl) {
+          console.log("Found callbackUrl in query params:", callbackUrl);
+          if (callbackUrl.startsWith("/")) {
+            const finalUrl = `${baseUrl}${callbackUrl}`;
+            console.log("Redirecting to extracted callbackUrl:", finalUrl);
+            return finalUrl;
+          } else if (new URL(callbackUrl, baseUrl).origin === baseUrl) {
+            console.log("Redirecting to absolute callbackUrl:", callbackUrl);
+            return callbackUrl;
+          }
+        }
+      } catch (error) {
+        console.error("Error parsing URL in redirect callback:", error);
+      }
+
+      if (url.startsWith("/")) {
+        console.log("Redirecting to relative path:", `${baseUrl}${url}`);
+        return `${baseUrl}${url}`;
+      } else if (new URL(url).origin === baseUrl) {
+        console.log("Redirecting to same origin:", url);
+        return url;
+      }
+
+      console.log("Defaulting to baseUrl:", baseUrl);
+      return baseUrl;
     },
   },
   jwt: {

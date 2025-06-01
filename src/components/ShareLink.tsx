@@ -116,9 +116,9 @@ const ShareLinkModal = ({ link }: Link) => {
           <Share className="h-4 w-4" />
         </Button>
       </DialogTrigger>
-      <DialogContent className="sm:max-w-lg w-full p-0 bg-black border border-gray-800 rounded-lg overflow-hidden">
-        <div className="bg-gradient-to-r from-gray-900 to-black p-4 border-b border-gray-800">
-          <DialogTitle className="text-lg font-medium flex items-center gap-2 text-white">
+      <DialogContent className="sm:max-w-lg w-full p-0 bg-gradient-to-br from-blue-50 to-green-50 border border-gray-800 rounded-lg overflow-hidden">
+        <div className="bg-gradient-to-br from-blue-50 to-green-50 p-4 border-b border-gray-800">
+          <DialogTitle className="text-lg font-medium flex items-center gap-2 bg-gradient-to-br from-blue-50 to-green-50">
             <Share className="h-5 w-5 text-blue-400" />
             Share this content
           </DialogTitle>
@@ -138,7 +138,7 @@ const ShareLinkModal = ({ link }: Link) => {
                     variant="outline"
                     size="icon"
                     onClick={() => handleSocialShare(platform.key)}
-                    className={`w-12 h-12 rounded-full bg-gray-900 border-gray-800 ${platform.color} transition-all duration-200`}
+                    className={`w-12 h-12 rounded-full bg-gray-900 text-white border-gray-800 ${platform.color} transition-all duration-200`}
                   >
                     {platform.icon}
                   </Button>
@@ -170,11 +170,11 @@ const ShareLinkModal = ({ link }: Link) => {
                 className={`h-10 px-3 rounded-md bg-gray-800 border-gray-700 hover:bg-gray-700 transition-all duration-200 flex-shrink-0 ${copiedAnimation ? "bg-green-900 text-green-400" : ""}`}
               >
                 {copiedAnimation ? (
-                  <span className="text-xs font-medium flex items-center">
+                  <span className="text-xs font-medium flex items-center text-white">
                     <Copy className="h-4 w-4 mr-1" /> Copied!
                   </span>
                 ) : (
-                  <span className="flex items-center">
+                  <span className="flex items-center text-white">
                     <Copy className="h-4 w-4 mr-1" /> Copy
                   </span>
                 )}
@@ -182,7 +182,7 @@ const ShareLinkModal = ({ link }: Link) => {
               <Button
                 variant="outline"
                 onClick={() => window.open(link, "_blank")}
-                className="h-10 px-3 rounded-md bg-gray-800 border-gray-700 hover:bg-gray-700 flex-shrink-0"
+                className="h-10 px-3 rounded-md bg-gray-800 border-gray-700 hover:bg-gray-700 flex-shrink-0 text-white"
               >
                 <span className="flex items-center">
                   <ExternalLink className="h-4 w-4 mr-1" /> Open

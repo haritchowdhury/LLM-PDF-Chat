@@ -40,7 +40,7 @@ const ResultsCard = ({ accuracy }: Props) => {
     <Card
       className={`border-none overflow-hidden bg-gradient-to-r ${result.bgGradient} rounded-lg`}
     >
-      <CardContent className="p-6 bg-gradient-to-b from-indigo-900 to-gray-900">
+      <CardContent className="p-6 bg-gradient-to-b from-white to-gray-700">
         <div className="flex items-center">
           <div className="mr-6">
             <div className="p-3 rounded-full bg-gray-900/60 flex items-center justify-center">

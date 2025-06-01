@@ -168,6 +168,77 @@ export const queryUpstash = async (
   return quizContentArray.join("");
 };
 
+export const updateUpstashWithUrl = async (
+  index: Index,
+  namespace: string,
+  text: string,
+  url: string
+) => {
+  let extractedTopics: string[] = [];
+  let topics: string[] = [];
+  /* const promiseList = docs.map(async (doc, counter) => { */
+  //const text = doc["pageContent"];
+  const textSplitter = new RecursiveCharacterTextSplitter({
+    chunkSize: 2000,
+    chunkOverlap: 200,
+  });
+  const chunks = await textSplitter.createDocuments([text]);
+
+  const embeddingsArrays =
+    await new HuggingFaceInferenceEmbeddings().embedDocuments(
+      chunks.map((chunk) => chunk.pageContent.replace(/\n/g, " "))
+    );
+
+  const batchSize = 500;
+  let batch = [];
+  let pageContent = "";
+  const batchPromises = chunks.map(async (chunk, idx) => {
+    const sourceName = `Url: ${url}`;
+
+    const vector = {
+      id: uuid(),
+      vector: embeddingsArrays[idx],
+      metadata: {
+        content: chunk.pageContent,
+        source: sourceName,
+        fileName: url,
+        pageNumber: 0,
+      },
+    };
+
+    pageContent += chunk.pageContent + " ";
+    batch.push(vector);
+
+    if (batch.length === batchSize || idx === chunks.length - 1) {
+      const response = await index.upsert(batch, { namespace: namespace });
+      console.log(`response: ${JSON.stringify(response)}`);
+      topics = [];
+      topics = await strict_output(
+        `You are an Expert AI Instructor who can identify the theme of the summary and figure out the most important chapers
+        from the summary that will be useful for preparing the paper for exam,  you are to return the important chapters that most 
+        thoroughly capture the import aspects of the summary. The length of each topic must
+        not exceed 4 words. Store all options in a JSON array of the following structure:`,
+
+        `You are to generate main topics that thorougly capture the main subjects of the summary`,
+        pageContent
+      );
+      //console.log("upstash topics", topics);
+      extractedTopics = extractedTopics.concat(topics);
+      //console.log("upstash topics", topics, extractedTopics);
+
+      batch = [];
+      pageContent = "";
+    }
+  });
+
+  await Promise.all(batchPromises);
+  /* }); */
+
+  // await Promise.all(promiseList);
+  //console.log("extracted at upstash", extractedTopics);
+  return Array.from(new Set(extractedTopics));
+};
+
 export const deleteUpstash = async (
   index: Index,
   namespace: string,

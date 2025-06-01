@@ -19,6 +19,7 @@ import { useToast } from "@/hooks/use-toast";
 import { CommunityTopicCreationButton } from "@/components/Quiz/CommunityTopicCreation";
 import axios, { AxiosError } from "axios";
 import { motion } from "framer-motion";
+import { buttonVariants } from "@/components/ui/button";
 
 type Props = {
   topic: string;
@@ -67,7 +68,7 @@ const CommunityQuizForm = ({ topic: topicParam, id: uploadId }: Props) => {
         const res = await fetch(`/api/communityTopics?upload=${uploadId}`).then(
           (res) => res.json()
         );
-        setTopics(JSON.parse(res.topics));
+        setTopics(JSON.parse(res?.topics) || []);
         setCompleted(res.completed);
       } catch (error) {
         console.error("Error fetching topics:", error);
@@ -87,6 +88,40 @@ const CommunityQuizForm = ({ topic: topicParam, id: uploadId }: Props) => {
       form.setValue("id", uploadId);
     }
   }, [uploadId]);
+  /*useEffect(() => {
+    const fetchTopics = async () => {
+      try {
+        const res = await fetch(`/api/communityTopics?upload=${uploadId}`).then(
+          (res) => res.json()
+        );
+
+        // Fix: Better handling of the topics parsing
+        const topicsData = res?.topics;
+        if (topicsData && topicsData !== "") {
+          try {
+            const parsedTopics = JSON.parse(topicsData);
+            setTopics(Array.isArray(parsedTopics) ? parsedTopics : []);
+          } catch (parseError) {
+            console.error("Error parsing topics JSON:", parseError);
+            console.log("Raw topics data:", topicsData); // This will help debug
+            setTopics([]);
+          }
+        } else {
+          setTopics([]);
+        }
+
+        setCompleted(res.completed);
+      } catch (error) {
+        console.error("Error fetching topics:", error);
+        setTopics([]); // Set empty array on error
+      }
+      setTopicsCreated(true);
+    };
+
+    fetchTopics();
+    const interval = setInterval(fetchTopics, 5000);
+    return () => clearInterval(interval);
+  }, [uploadId]); // Also added uploadId as dependency since you're using it */
 
   const onSubmit = async (data: Input) => {
     console.log("submitting data", data);
@@ -126,7 +161,7 @@ const CommunityQuizForm = ({ topic: topicParam, id: uploadId }: Props) => {
   form.watch();
 
   return showLoader ? (
-    <div className="flex gap-2 items-center justify-center bg-gray-900 rounded p-2 my-2 w-full">
+    <div className="flex gap-2 items-center justify-center bg-gradient-to-br from-blue-50 to-green-50 rounded p-2 my-2 w-full">
       <small className="text-xs">Creating Quiz</small>
       <motion.div className="w-4 h-4 border-2 border-gray-300 border-t-blue-500 rounded-full animate-spin" />
     </div>
@@ -178,7 +213,12 @@ const CommunityQuizForm = ({ topic: topicParam, id: uploadId }: Props) => {
               disabled={status === "pending"}
               type="submit"
               size="sm"
-              className="text-xs h-8"
+              className={buttonVariants({
+                variant: "outline",
+                size: "sm",
+                className:
+                  "bg-gradient-to-b from-indigo-200  border-gray-300 text-gray-800 hover:bg-gray-800",
+              })}
             >
               Create Quiz
             </Button>
@@ -192,11 +232,9 @@ const CommunityQuizForm = ({ topic: topicParam, id: uploadId }: Props) => {
         </div>
       )}
 
-      {!(topics?.length > 0) && topicsCreated && (
-        <div className="py-1">
-          <CommunityTopicCreationButton upload={uploadId} />
-        </div>
-      )}
+      <div className="py-1">
+        <CommunityTopicCreationButton upload={uploadId} />
+      </div>
 
       {topics?.length > 0 && (
         <div className="flex flex-col gap-1 p-1 w-full">

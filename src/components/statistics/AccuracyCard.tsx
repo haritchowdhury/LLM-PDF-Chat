@@ -9,8 +9,8 @@ const AccuracyCard = ({ accuracy }: Props) => {
   accuracy = Math.round(accuracy * 100) / 100;
 
   return (
-    <Card className="border border-gray-800 bg-gray-900 text-white rounded-lg overflow-hidden">
-      <CardHeader className="pb-2 border-b border-gray-800">
+    <Card className="border border-gray-200 bg-gradient-to-b from-white to-gray-700 text-gray-800 rounded-lg overflow-hidden">
+      <CardHeader className="pb-2 border-b border-gray-200">
         <div className="flex items-center justify-between">
           <CardTitle className="text-base font-medium">Accuracy</CardTitle>
           <Target className="w-5 h-5 text-blue-400" />

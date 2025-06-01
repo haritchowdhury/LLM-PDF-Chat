@@ -9,9 +9,9 @@ type Props = {
 };
 function LeftSideBar({ namespace, isPersonal }: Props) {
   return (
-    <div className="hidden md:flex flex-col w-64 flex-shrink-0 border-r border-gray-800 bg-gray-900 h-full overflow-hidden">
-      <CardHeader className="px-4 py-3 border-b border-gray-800 min-h-fit">
-        <CardTitle className="text-lg font-medium text-gray-200 flex items-center gap-2">
+    <div className="hidden md:flex flex-col w-64 flex-shrink-0 border-r border-gray-200 bg-gradient-to-br from-blue-50 to-green-50 h-full overflow-hidden">
+      <CardHeader className="px-4 py-3 border-b border-gray-200 min-h-fit">
+        <CardTitle className="text-lg font-medium text-gray-800 flex items-center gap-2">
           <MessageSquare size={18} className="text-gray-400" />
           Quiz Options
         </CardTitle>

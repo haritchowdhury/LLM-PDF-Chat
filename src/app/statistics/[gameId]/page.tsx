@@ -70,7 +70,7 @@ const Statistics = async ({ params }: { params: Params }) => {
   }
 
   return (
-    <main className="min-h-screen bg-black text-white p-4 md:p-8 lg:p-12">
+    <main className="min-h-screen bg-gradient-to-br from-blue-50 to-green-50 text-white p-4 md:p-8 lg:p-12">
       <div className="max-w-5xl mx-auto pt-16">
         <div className="mb-8 flex flex-col space-y-6">
           <div className="flex justify-between items-center">
@@ -78,8 +78,9 @@ const Statistics = async ({ params }: { params: Params }) => {
               href={`/chat/${upload.id}`}
               className={buttonVariants({
                 variant: "outline",
+                //size: "lg",
                 className:
-                  "bg-gray-900 border-gray-700  hover:border-gray-600 text-white",
+                  "bg-gradient-to-b from-indigo-200 border-gray-300 text-gray-800 hover:bg-gray-800 my-2",
               })}
             >
               <ArrowLeft className="mr-2 h-4 w-4" />
@@ -111,8 +112,8 @@ const Statistics = async ({ params }: { params: Params }) => {
             />
           </div>
 
-          <div className="bg-gray-900 rounded-lg overflow-hidden border border-gray-800">
-            <h2 className="px-4 py-3 text-lg font-semibold border-b border-gray-800">
+          <div className="bg-gradient-to-b from-white to-gray-700 rounded-lg overflow-hidden border border-gray-200">
+            <h2 className="px-4 py-3 text-lg font-semibold border-b border-gray-200 text-gray-800">
               Questions Review
             </h2>
             <div className="p-2">

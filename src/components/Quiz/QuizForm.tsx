@@ -20,6 +20,7 @@ import { Card } from "@/components/ui/card";
 import { TopicCreationButton } from "@/components/Quiz/TopicCreation";
 import axios, { AxiosError } from "axios";
 import { motion } from "framer-motion";
+import { buttonVariants } from "@/components/ui/button";
 
 type Props = {
   topic: string;
@@ -174,7 +175,12 @@ const QuizForm = ({ topic: topicParam, id: uploadId }: Props) => {
               disabled={status === "pending"}
               type="submit"
               size="sm"
-              className="text-xs h-8"
+              className={buttonVariants({
+                variant: "outline",
+                size: "sm",
+                className:
+                  "bg-gradient-to-b from-indigo-200  border-gray-300 text-gray-800 hover:bg-gray-800",
+              })}
             >
               Create Quiz
             </Button>

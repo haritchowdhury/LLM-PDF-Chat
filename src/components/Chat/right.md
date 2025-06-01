@@ -3,32 +3,31 @@ import { FileText, GamepadIcon, Clock, User } from "lucide-react";
 import Link from "next/link";
 
 type Prompts = {
-  workspaces?: PrismaUpload[];
-  games?: Game[];
+workspaces?: PrismaUpload[];
+games?: Game[];
 };
 
 function RightSideBar({ workspaces, games }: Prompts) {
-  console.log(workspaces, games, "received at client");
+console.log(workspaces, games, "received at client");
+// Format date for display
+const formatDate = (date: Date) => {
+return new Date(date).toLocaleDateString("en-US", {
+month: "short",
+day: "numeric",
+year: "numeric",
+});
+};
 
-  // Format date for display
-  const formatDate = (date: Date) => {
-    return new Date(date).toLocaleDateString("en-US", {
-      month: "short",
-      day: "numeric",
-      year: "numeric",
-    });
-  };
-
-  return (
-    <div className="flex flex-col w-full md:w-64 flex-shrink-0 md:border-l md:border-gray-200 bg-gradient-to-br from-blue-50 to-green-50 h-full overflow-hidden">
-      {/* Top Section - Uploads */}
-      <div className="flex flex-col flex-1 md:h-1/2 overflow-hidden">
-        <div className="p-3 border-b border-gray-200 flex items-center justify-between">
-          <h3 className="text-sm font-medium text-gray-800">Your Documents</h3>
-          <span className="text-xs text-gray-800 bg-gray-200 px-2 py-1 rounded-full">
-            {workspaces?.length || 0}
-          </span>
-        </div>
+return (
+<div className="hidden md:flex flex-col w-64 flex-shrink-0 border-l border-gray-800 bg-gray-900 h-full overflow-hidden">
+{/_ Top Section - Uploads _/}
+<div className="flex flex-col h-1/2 overflow-hidden">
+<div className="p-3 border-b border-gray-800 flex items-center justify-between">
+<h3 className="text-sm font-medium text-gray-300">Your Documents</h3>
+<span className="text-xs text-gray-500">
+{workspaces?.length || 0}
+</span>
+</div>
 
         <div className="flex-grow overflow-y-auto custom-scrollbar">
           {workspaces && workspaces.length > 0 ? (
@@ -37,14 +36,14 @@ function RightSideBar({ workspaces, games }: Prompts) {
                 <Link
                   href={`/chat/${workspace.id}`}
                   key={workspace.id}
-                  className="flex items-start p-3 md:p-2 hover:bg-gray-800 rounded-md group transition-colors border-b md:border-b-0 border-gray-800 last:border-b-0"
+                  className="flex items-start p-2 hover:bg-gray-800 rounded-md group transition-colors"
                 >
                   <FileText className="w-4 h-4 mt-0.5 text-gray-500 group-hover:text-blue-400 flex-shrink-0" />
-                  <div className="ml-3 md:ml-2 flex-grow min-w-0">
-                    <p className="text-sm text-gray-800 truncate group-hover:text-blue-400 font-medium">
+                  <div className="ml-2 flex-grow min-w-0">
+                    <p className="text-sm text-gray-300 truncate group-hover:text-blue-400">
                       {workspace.name}
                     </p>
-                    <p className="text-xs text-gray-500 mt-1">
+                    <p className="text-xs text-gray-500">
                       {workspace.timeStarted
                         ? formatDate(workspace.timeStarted)
                         : "Date unavailable"}
@@ -66,14 +65,12 @@ function RightSideBar({ workspaces, games }: Prompts) {
       </div>
 
       {/* Bottom Section - Games */}
-      <div className="flex flex-col flex-1 md:h-1/2 border-t border-gray-200">
-        <div className="p-3 border-b border-gray-200 flex items-center justify-between">
-          <h3 className="text-sm font-medium text-gray-800">
+      <div className="flex flex-col h-1/2 border-t border-gray-800">
+        <div className="p-3 border-b border-gray-800 flex items-center justify-between">
+          <h3 className="text-sm font-medium text-gray-300">
             Workspace Quizzes
           </h3>
-          <span className="text-xs text-gray-800 bg-gray-200 px-2 py-1 rounded-full">
-            {games?.length || 0}
-          </span>
+          <span className="text-xs text-gray-500">{games?.length || 0}</span>
         </div>
 
         <div className="flex-grow overflow-y-auto custom-scrollbar">
@@ -83,14 +80,14 @@ function RightSideBar({ workspaces, games }: Prompts) {
                 <Link
                   href={`/statistics/${game.id}`}
                   key={game.id}
-                  className="flex items-start p-3 md:p-2 hover:bg-gray-800 rounded-md group transition-colors border-b md:border-b-0 border-gray-800 last:border-b-0"
+                  className="flex items-start p-2 hover:bg-gray-800 rounded-md group transition-colors"
                 >
-                  <GamepadIcon className="w-4 h-4 mt-0.5 text-gray-500 group-hover:text-green-400 flex-shrink-0" />
-                  <div className="ml-3 md:ml-2 flex-grow min-w-0">
-                    <p className="text-sm text-gray-800 truncate group-hover:text-green-400 font-medium">
+                  <GamepadIcon className="w-4 h-4 mt-0.5 text-gray-500 flex-shrink-0" />
+                  <div className="ml-2 flex-grow min-w-0">
+                    <p className="text-sm text-gray-300 truncate">
                       {game.topic || "Untitled Game"}
                     </p>
-                    <div className="flex items-center text-xs text-gray-500 mt-1">
+                    <div className="flex items-center text-xs text-gray-500">
                       <Clock className="w-3 h-3 mr-1" />
                       <span>{formatDate(game.timeStarted)}</span>
                     </div>
@@ -110,7 +107,8 @@ function RightSideBar({ workspaces, games }: Prompts) {
         </div>
       </div>
     </div>
-  );
+
+);
 }
 
 export default RightSideBar;

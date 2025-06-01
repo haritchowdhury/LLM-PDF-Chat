@@ -7,9 +7,9 @@ import Link from "next/link";
 const Footer = () => {
   return (
     <footer
-      className="bg-black gap-4  text-white flex justify-center border-t border-gray-800"
+      className="bg-white gap-4  text-white flex justify-center border-t border-gray-200"
       style={{
-        position: "fixed",
+        position: "relative",
         bottom: 0,
         left: 0,
         width: "100%",
@@ -23,7 +23,7 @@ const Footer = () => {
         </Link>
       </small>
       <Link href="https://x.com/Ainiversity">
-        <FaXTwitter className="text-xl" />
+        <FaXTwitter className="text-xl text-gray-900" />
       </Link>
     </footer>
   );

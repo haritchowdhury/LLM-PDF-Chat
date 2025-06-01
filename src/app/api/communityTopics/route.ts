@@ -39,27 +39,41 @@ export async function POST(request: NextRequest) {
   const communityQuiz = await db.communityquiz.findFirst({
     where: { uploadId: lastUpload.id, userId: id },
   });
-  if (communityQuiz) {
+  /* if (communityQuiz) {
     return NextResponse.json(
       { error: "Quiz already created." },
       {
         status: 500,
       }
     );
-  }
+  }*/
 
   try {
     try {
-      const communityQuiz = await db.communityquiz.create({
-        data: {
-          id: uuid(),
-          timeStarted: new Date(),
-          userId: session?.user.id,
-          uploadId: lastUpload.id,
-          options: lastUpload?.options,
-          isCompleted: JSON.stringify([]),
-        },
-      });
+      if (!communityQuiz) {
+        await db.communityquiz.create({
+          data: {
+            id: uuid(),
+            timeStarted: new Date(),
+            userId: session?.user.id,
+            uploadId: lastUpload.id,
+            options: lastUpload?.options,
+            isCompleted: JSON.stringify([]),
+          },
+        });
+      } else {
+        await db.communityquiz.update({
+          where: {
+            id: communityQuiz.id,
+            userId: session?.user.id,
+            uploadId: lastUpload.id,
+          },
+          data: {
+            options: lastUpload?.options,
+            isCompleted: communityQuiz.isCompleted,
+          },
+        });
+      }
     } catch (err) {
       console.log(err);
       return NextResponse.json(
@@ -87,6 +101,7 @@ export async function POST(request: NextRequest) {
     );
   }
 }
+
 export async function GET(request: NextRequest) {
   const session = await auth();
   const { searchParams } = request.nextUrl;
@@ -110,8 +125,26 @@ export async function GET(request: NextRequest) {
         private: false,
       },
     });
+    let communityQuiz = await db.communityquiz.findFirst({
+      where: {
+        uploadId: lastUpload.id,
+        userId: id,
+      },
+    });
 
-    const communityQuiz = await db.communityquiz.findFirst({
+    await db.communityquiz.update({
+      where: {
+        id: communityQuiz.id,
+        userId: session?.user.id,
+        uploadId: lastUpload.id,
+      },
+      data: {
+        options: lastUpload?.options,
+        // isCompleted: communityQuiz.isCompleted,
+      },
+    });
+
+    communityQuiz = await db.communityquiz.findFirst({
       where: {
         uploadId: lastUpload.id,
         userId: id,
@@ -131,7 +164,7 @@ export async function GET(request: NextRequest) {
     console.log("no topics");
     return NextResponse.json(
       {
-        topics: [],
+        topics: JSON.stringify([]),
         completed: [],
       },
       {

@@ -23,9 +23,9 @@ const QuestionsList = ({ questions }: Props) => {
           End of quiz results • {questions.length} questions
         </TableCaption>
         <TableHeader>
-          <TableRow className="border-gray-800 bg-black/50">
+          <TableRow className="border-gray-200 white">
             <TableHead className="w-14 text-gray-400">#</TableHead>
-            <TableHead className="text-gray-400">
+            <TableHead className="text-gray-800">
               Question & Correct Answer
             </TableHead>
             <TableHead className="text-gray-400">Your Answer</TableHead>

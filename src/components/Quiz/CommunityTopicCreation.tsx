@@ -9,6 +9,7 @@ import axios, { AxiosError } from "axios";
 import { Input } from "@/components/ui/input";
 import { z } from "zod";
 import { motion } from "framer-motion";
+import { buttonVariants } from "@/components/ui/button";
 
 const schema = z.object({});
 type Input = z.infer<typeof schema>;
@@ -55,7 +56,7 @@ const CommunityTopicCreationButton = ({ upload }: Upload) => {
   form.watch();
 
   return (
-    <Card className="border-none bg-gray-900 text-white">
+    <Card className="border-none bg-gradient-to-br from-blue-50 to-green-50 text-white">
       {!created ? (
         <CardDescription className="mb-0">
           {" "}
@@ -66,8 +67,17 @@ const CommunityTopicCreationButton = ({ upload }: Upload) => {
           className="flex w-full pt-1 items-center justify-center"
           onSubmit={form.handleSubmit(onSubmit)}
         >
-          <Button disabled={status === "pending"} type="submit">
-            Generate Topics
+          <Button
+            disabled={status === "pending"}
+            type="submit"
+            className={buttonVariants({
+              variant: "outline",
+              //size: "lg",
+              className:
+                "bg-gradient-to-b from-indigo-200 border-gray-300 text-gray-800 hover:bg-gray-800 my-2",
+            })}
+          >
+            Sync Topics with creator
           </Button>
         </form>
       )}

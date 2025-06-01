@@ -60,12 +60,12 @@ const Profile = async ({ params }: { params: Params }) => {
   const isOwnProfile = user?.id === session?.user.id;
 
   return (
-    <main className="flex relative justify-center bg-black text-white min-h-screen overflow-hidden">
+    <main className="flex relative justify-center bg-gradient-to-br from-blue-50 to-green-50 text-white min-h-screen overflow-hidden">
       <div className="w-full max-w-6xl px-4 py-20 flex flex-col">
         {/* Profile Header */}
         {user && (
-          <Card className="bg-gray-900 border border-gray-800 mb-6 overflow-hidden">
-            <CardHeader className="pb-4 border-b border-gray-800">
+          <Card className="bg-white border-none mb-6 overflow-hidden">
+            <CardHeader className="pb-4 border-none">
               <div className="flex flex-col sm:flex-row justify-between items-center gap-4">
                 <div className="flex items-center gap-3">
                   <div className="p-2 rounded-full bg-gray-800">
@@ -92,12 +92,12 @@ const Profile = async ({ params }: { params: Params }) => {
         {isOwnProfile && user ? (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6 flex-grow">
             {/* Publications Section */}
-            <Card className="bg-gray-900 border border-gray-800 h-full">
-              <CardHeader className="pb-3 border-b border-gray-800">
+            <Card className="bg-white border-none h-full">
+              <CardHeader className="pb-3 border-b border-gray-200">
                 <div className="flex justify-between items-center">
                   <div className="flex items-center gap-2">
                     <BookOpen size={18} className="text-gray-400" />
-                    <CardTitle className="text-lg font-medium text-gray-200">
+                    <CardTitle className="text-lg font-medium text-gray-800">
                       Publications
                     </CardTitle>
                   </div>
@@ -109,7 +109,7 @@ const Profile = async ({ params }: { params: Params }) => {
                     <Share namespace={"undefined"} />
                   ) : null}
                 </div>
-                <CardDescription className="text-gray-400 text-sm">
+                <CardDescription className="text-gray-600 text-sm">
                   Share articles with friends and earn when milestones are
                   unlocked
                 </CardDescription>
@@ -136,7 +136,12 @@ const Profile = async ({ params }: { params: Params }) => {
                         <div className="flex gap-1">
                           <Link
                             href={`/chat/${share.id}`}
-                            className={`${buttonVariants({ size: "sm" })} px-2 py-1`}
+                            className={buttonVariants({
+                              variant: "outline",
+                              // size: "lg",
+                              className:
+                                "bg-gradient-to-b from-indigo-200 border-gray-300 text-gray-800 hover:bg-gray-800 my-2",
+                            })}
                           >
                             <MessageSquareText size={14} className="mr-1" />
                             Open
@@ -150,7 +155,7 @@ const Profile = async ({ params }: { params: Params }) => {
                   </div>
                 )}
               </CardContent>
-              <CardFooter className="pt-2 border-t border-gray-800">
+              <CardFooter className="pt-2 border-t border-gray-200">
                 {betaTester
                   ? shares.length >= 3 && (
                       <div className="text-red-500 text-xs w-full text-center">
@@ -166,12 +171,12 @@ const Profile = async ({ params }: { params: Params }) => {
             </Card>
 
             {/* Workspaces Section */}
-            <Card className="bg-gray-900 border border-gray-800 h-full">
-              <CardHeader className="pb-3 border-b border-gray-800">
+            <Card className="bg-white border-none h-full">
+              <CardHeader className="pb-3 border-b border-gray-200">
                 <div className="flex justify-between items-center">
                   <div className="flex items-center gap-2">
                     <Briefcase size={18} className="text-gray-400" />
-                    <CardTitle className="text-lg font-medium text-gray-200">
+                    <CardTitle className="text-lg font-medium text-gray-800">
                       Workspaces
                     </CardTitle>
                   </div>
@@ -179,7 +184,12 @@ const Profile = async ({ params }: { params: Params }) => {
                     Uploads.length < 3 ? (
                       <Link
                         href={`/chat/undefined`}
-                        className={`${buttonVariants({ size: "sm" })} px-2 py-1`}
+                        className={buttonVariants({
+                          variant: "outline",
+                          // size: "lg",
+                          className:
+                            "bg-gradient-to-b from-indigo-200 border-gray-300 text-gray-800 hover:bg-gray-800 my-2",
+                        })}
                       >
                         <PlusCircle size={14} className="mr-1" />
                         New
@@ -188,14 +198,19 @@ const Profile = async ({ params }: { params: Params }) => {
                   ) : Uploads.length < 1 ? (
                     <Link
                       href={`/chat/undefined`}
-                      className={`${buttonVariants({ size: "sm" })} px-2 py-1`}
+                      className={buttonVariants({
+                        variant: "outline",
+                        //size: "lg",
+                        className:
+                          "bg-gradient-to-b from-indigo-200 border-gray-300 text-gray-800 hover:bg-gray-800 my-2",
+                      })}
                     >
                       <PlusCircle size={14} className="mr-1" />
                       New
                     </Link>
                   ) : null}
                 </div>
-                <CardDescription className="text-gray-400 text-sm">
+                <CardDescription className="text-gray-600 text-sm">
                   Start a private workspace for your content
                 </CardDescription>
               </CardHeader>
@@ -221,7 +236,12 @@ const Profile = async ({ params }: { params: Params }) => {
                         <div className="flex gap-1">
                           <Link
                             href={`/chat/${upload.id}`}
-                            className={`${buttonVariants({ size: "sm" })} px-2 py-1`}
+                            className={buttonVariants({
+                              variant: "outline",
+                              // size: "lg",
+                              className:
+                                "bg-gradient-to-b from-indigo-200 border-gray-300 text-gray-800 hover:bg-gray-800 my-2",
+                            })}
                           >
                             <MessageSquareText size={14} className="mr-1" />
                             Open
@@ -233,7 +253,7 @@ const Profile = async ({ params }: { params: Params }) => {
                   </div>
                 )}
               </CardContent>
-              <CardFooter className="pt-2 border-t border-gray-800">
+              <CardFooter className="pt-2 border-t border-gray-200">
                 {betaTester
                   ? Uploads.length >= 3 && (
                       <div className="text-red-500 text-xs w-full text-center">
@@ -272,7 +292,12 @@ const Profile = async ({ params }: { params: Params }) => {
                   <div className="flex gap-1">
                     <Link
                       href={`/chat/${share.id}`}
-                      className={`${buttonVariants({ size: "sm" })} px-2 py-1`}
+                      className={buttonVariants({
+                        variant: "outline",
+                        //size: "lg",
+                        className:
+                          "bg-gradient-to-b from-indigo-200 border-gray-300 text-gray-800 hover:bg-gray-800 my-2",
+                      })}
                     >
                       <MessageSquareText size={14} className="mr-1" />
                       Open
@@ -287,15 +312,15 @@ const Profile = async ({ params }: { params: Params }) => {
 
         {/* Quizzes Section */}
         {isOwnProfile && user && (
-          <Card className="bg-gray-900 border border-gray-800">
-            <CardHeader className="pb-3 border-b border-gray-800">
+          <Card className="bg-white border-none">
+            <CardHeader className="pb-3 border-b border-gray-200">
               <div className="flex items-center gap-2">
                 <Boxes size={18} className="text-gray-400" />
-                <CardTitle className="text-lg font-medium text-gray-200">
+                <CardTitle className="text-lg font-medium text-gray-800">
                   Quizzes
                 </CardTitle>
               </div>
-              <CardDescription className="text-gray-400 text-sm">
+              <CardDescription className="text-gray-600 text-sm">
                 Track your quiz performance and results
               </CardDescription>
             </CardHeader>

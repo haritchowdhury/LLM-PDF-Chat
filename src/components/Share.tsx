@@ -110,7 +110,7 @@ const Share = ({ namespace }: User) => {
 
             {/* Input Section */}
             {!showLoader && (
-              <CardContent className="p-2  flex-shrink-0 border-none bg-gray-900">
+              <CardContent className="p-2  flex-shrink-0 border-none bg-white">
                 <div className="flex w-full flex-row items-center justify-center">
                   <TooltipProvider>
                     <Tooltip>
@@ -122,7 +122,14 @@ const Share = ({ namespace }: User) => {
                           tmp?.click();
                         }}
                       >
-                        <div className={buttonVariants()}>
+                        <div
+                          className={buttonVariants({
+                            variant: "outline",
+                            //size: "lg",
+                            className:
+                              "bg-gradient-to-b from-indigo-200 border-gray-300 text-gray-800 hover:bg-gray-800 my-2",
+                          })}
+                        >
                           {" "}
                           <div className="flex flex-row gap-2">
                             <Upload className="size-[20px]" /> Publish

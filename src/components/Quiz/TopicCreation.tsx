@@ -55,7 +55,7 @@ const TopicCreationButton = ({ upload }: Upload) => {
   form.watch();
 
   return (
-    <Card className="border-none bg-gray-900 text-white">
+    <Card className="border-none bg-gradient-to-br from-blue-50 to-green-50 text-white">
       {!created ? (
         <CardDescription className="mb-0">
           {" "}

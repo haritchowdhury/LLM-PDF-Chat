@@ -3,7 +3,7 @@
 import React, { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Input } from "@/components/ui/input";
-import { Upload, Send } from "lucide-react";
+import { Upload, Send, Menu, X, Users, FileText } from "lucide-react";
 import {
   Tooltip,
   TooltipContent,
@@ -11,7 +11,7 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { Card, CardContent } from "@/components/ui/card";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import { MarkdownRenderer } from "@/components/MarkDown";
 import { useToast } from "@/hooks/use-toast";
 import clsx from "clsx";
@@ -19,7 +19,10 @@ import { Button } from "@/components/ui/button";
 import LeftSideBar from "@/components/Chat/LeftSideBar";
 import RightSideBar from "@/components/Chat/RightSideBar";
 import { Upload as PrismaUpload, Game } from "@prisma/client";
-import LinkSubmitDialog from "@/components/UpsertLink";
+import LinkSubmitDialog from "@/components/Chat/UpsertLink";
+import QuizForm from "@/components/Quiz/QuizForm";
+import CommunityQuizForm from "@/components/Quiz/CommunityQuizForm";
+
 // Define message types
 type Message = {
   role: "user" | "assistant";
@@ -37,7 +40,7 @@ type ChatProps = {
 };
 
 /**
- * Unified Chat Component that handles both personal and community interactions
+ * Responsive Chat Component with collapsible sidebars
  */
 const Chat = ({
   userId,
@@ -57,6 +60,10 @@ const Chat = ({
   const [isLoading, setIsLoading] = useState(true);
   const [isProcessing, setIsProcessing] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
+
+  // Mobile sidebar states
+  const [leftSidebarOpen, setLeftSidebarOpen] = useState(false);
+  const [rightSidebarOpen, setRightSidebarOpen] = useState(false);
 
   // Refs for DOM interaction
   const messagesEndRef = useRef<HTMLDivElement | null>(null);
@@ -104,6 +111,19 @@ const Chat = ({
       }, 100);
     }
   }, [isLoading, messages, isProcessing]);
+
+  // Close mobile sidebars when clicking outside or on mobile
+  useEffect(() => {
+    const handleResize = () => {
+      if (window.innerWidth >= 768) {
+        setLeftSidebarOpen(false);
+        setRightSidebarOpen(false);
+      }
+    };
+
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
 
   /**
    * Handle file uploads for RAG processing
@@ -158,9 +178,7 @@ const Chat = ({
       toast({
         variant: "destructive",
         description:
-          error instanceof Error
-            ? error.message
-            : "Something went wrong! Currently we support text only PDFs.",
+          error instanceof Error ? error.message : "Something went wrong! ",
         duration: 2000,
       });
     } finally {
@@ -245,20 +263,110 @@ const Chat = ({
   // Show appropriate loading states
   if (isLoading || isUploading) {
     return (
-      <div className="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 flex gap-4 flex-row bg-gray-900 rounded p-4">
-        <motion.div className="w-5 h-5 border-4 border-gray-300 border-t-blue-500 rounded-full animate-spin" />
+      <div className="fixed inset-0 flex items-center justify-center bg-gradient-to-br from-blue-50 to-green-50">
+        <div className="flex gap-4 flex-row bg-white rounded p-4">
+          <motion.div className="w-5 h-5 border-4 border-gray-300 border-t-blue-500 rounded-full animate-spin" />
+          <span className="text-gray-800">
+            {isUploading ? "Uploading..." : "Loading..."}
+          </span>
+        </div>
       </div>
     );
   }
 
   return (
-    <div className="w-full h-[calc(100vh-4rem)] flex items-stretch">
-      {/* Left Sidebar */}
-      <LeftSideBar namespace={namespace} isPersonal={isPersonal} />
+    <div className="w-full h-[calc(100vh-4rem)] flex relative">
+      {/* Mobile Header with Sidebar Toggles */}
+      <div className="md:hidden absolute top-0 left-0 right-0 z-30 bg-gray-900 border-b border-gray-800 px-4 py-2 flex items-center justify-between">
+        <Button
+          variant="ghost"
+          size="sm"
+          onClick={() => setLeftSidebarOpen(!leftSidebarOpen)}
+          className="text-gray-300 hover:text-white hover:bg-gray-800"
+        >
+          <Menu className="h-4 w-4 mr-2" />
+          Quiz
+        </Button>
 
-      {/* Main Chat Area - Fixed Width */}
-      <div className="flex-grow flex flex-col h-full relative max-w-[calc(100%-128px)] md:max-w-[calc(100%-512px)]">
-        <Card className="w-full h-full rounded-none shadow-none bg-black border-none flex flex-col overflow-hidden">
+        <div className="text-sm text-gray-400 font-medium">
+          {namespace === "undefined" ? "New Chat" : "Document Chat"}
+        </div>
+
+        <Button
+          variant="ghost"
+          size="sm"
+          onClick={() => setRightSidebarOpen(!rightSidebarOpen)}
+          className="text-gray-300 hover:text-white hover:bg-gray-800"
+        >
+          <FileText className="h-4 w-4 mr-2" />
+          Files
+        </Button>
+      </div>
+
+      {/* Left Sidebar - Desktop always visible, Mobile overlay */}
+      <div className="hidden md:flex">
+        <LeftSideBar namespace={namespace} isPersonal={isPersonal} />
+      </div>
+
+      {/* Mobile Left Sidebar Overlay */}
+      <AnimatePresence>
+        {leftSidebarOpen && (
+          <>
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="md:hidden fixed inset-0 bg-black bg-opacity-50 z-40"
+              onClick={() => setLeftSidebarOpen(false)}
+            />
+            <motion.div
+              initial={{ x: -256 }}
+              animate={{ x: 0 }}
+              exit={{ x: -256 }}
+              transition={{ type: "spring", damping: 30, stiffness: 300 }}
+              className="md:hidden fixed left-0 top-0 bottom-0 z-50 w-64"
+            >
+              <div className="h-full bg-gray-900 border-r border-gray-800 flex flex-col">
+                <div className="p-4 border-b border-gray-800 flex items-center justify-between flex-shrink-0">
+                  <h2 className="text-lg font-medium text-gray-200 flex items-center gap-2">
+                    <Menu className="h-4 w-4" />
+                    Quiz Options
+                  </h2>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => setLeftSidebarOpen(false)}
+                    className="text-gray-400 hover:text-white"
+                  >
+                    <X className="h-4 w-4" />
+                  </Button>
+                </div>
+                <div className="flex-grow overflow-y-auto p-4">
+                  {namespace !== "undefined" && (
+                    <div className="mb-4">
+                      {/* Import and render quiz components directly */}
+                      {isPersonal ? (
+                        <QuizForm topic="" id={namespace} />
+                      ) : (
+                        <CommunityQuizForm topic="" id={namespace} />
+                      )}
+                    </div>
+                  )}
+                  {namespace === "undefined" && (
+                    <div className="text-center text-gray-400 text-sm">
+                      Upload a document first to access quiz options
+                    </div>
+                  )}
+                </div>
+              </div>
+            </motion.div>
+          </>
+        )}
+      </AnimatePresence>
+
+      {/* Main Chat Area - Responsive */}
+      <div className="flex-1 flex flex-col h-full pt-12 md:pt-0">
+        <Card className="w-full h-full rounded-none shadow-none bg-gradient-to-br from-blue-50 to-green-50 border-none flex flex-col overflow-hidden">
           {/* Hidden file input */}
           <input
             ref={fileInputRef}
@@ -269,12 +377,12 @@ const Chat = ({
             onChange={handleFileUpload}
           />
 
-          {/* Messages Display Area - Fixed with proper overflow */}
+          {/* Messages Display Area */}
           <CardContent className="flex-grow overflow-hidden flex flex-col p-0">
             <div className="h-full w-full overflow-y-auto custom-scrollbar flex flex-col p-4 pb-16">
               {/* Empty state messages */}
               {!messages.length && (
-                <div className="p-4 rounded-lg bg-gray-800 text-gray-300 text-center text-sm">
+                <div className="p-4 rounded-lg bg-gradient-to-br from-blue-50 to-green-50 text-gray-800 text-center text-sm mx-auto max-w-md">
                   {!isPersonal
                     ? "Ask something about this content"
                     : namespace === "undefined"
@@ -283,15 +391,15 @@ const Chat = ({
                 </div>
               )}
 
-              {/* Message list with width constraint */}
+              {/* Message list - Responsive widths */}
               {messages.map((message, idx) => (
                 <div
                   key={idx}
                   className={clsx(
-                    "font-sans-semibold text-sm p-4 rounded-lg text-justify mt-2 mb-2",
+                    "font-sans-semibold text-sm p-3 md:p-4 rounded-lg text-justify mt-2 mb-2",
                     message.role === "user"
-                      ? "text-white bg-blue-600 self-end ml-auto max-w-[80%]"
-                      : "text-gray-100 bg-gray-800 self-start mr-auto max-w-[80%] break-words"
+                      ? "text-white bg-blue-600 self-end ml-auto max-w-[85%] md:max-w-[80%]"
+                      : "text-gray-100 bg-gray-800 self-start mr-auto max-w-[85%] md:max-w-[80%] break-words"
                   )}
                 >
                   <div className="w-full overflow-hidden break-words">
@@ -326,16 +434,19 @@ const Chat = ({
             </div>
           </CardContent>
 
-          {/* Input Area - Fixed to bottom */}
-          <div className="p-3 bg-gray-900 border-t border-gray-800 sticky bottom-0 z-10">
+          {/* Input Area - Responsive */}
+          <div className="p-3 md:p-4 bg-gradient-to-br from-blue-50 to-green-50 border-t border-gray-200 sticky bottom-0 z-10">
             <form
               onSubmit={handleSubmit}
               className="flex w-full flex-row items-center gap-2"
             >
               {/* Upload button */}
               {isPersonal && (
-                <>
-                  {/*  <LinkSubmitDialog upload={namespace} /> */}
+                <div className="flex gap-1 md:gap-2">
+                  <LinkSubmitDialog
+                    upload={namespace}
+                    isPersonal={isPersonal}
+                  />
                   <TooltipProvider>
                     <Tooltip>
                       <TooltipTrigger asChild>
@@ -354,14 +465,14 @@ const Chat = ({
                       </TooltipContent>
                     </Tooltip>
                   </TooltipProvider>
-                </>
+                </div>
               )}
 
-              {/* Text input */}
+              {/* Text input - Responsive */}
               <Input
                 value={input}
                 disabled={isProcessing}
-                className="bg-gray-800 text-gray-100 border-gray-700 focus:border-gray-600 focus:ring-gray-600"
+                className="bg-white text-gray-800 border-gray-700 focus:border-gray-200 focus:ring-gray-400 text-sm md:text-base"
                 onChange={(e) => setInput(e.target.value)}
                 placeholder="Ask something..."
                 onKeyDown={handleKeyDown}
@@ -371,7 +482,8 @@ const Chat = ({
               <Button
                 type="submit"
                 disabled={isProcessing || !input.trim()}
-                className="bg-blue-600 hover:bg-blue-700 text-white"
+                className="bg-blue-600 hover:bg-blue-700 text-white flex-shrink-0"
+                size="icon"
               >
                 <Send className="h-4 w-4" />
               </Button>
@@ -380,8 +492,49 @@ const Chat = ({
         </Card>
       </div>
 
-      {/* Right Sidebar */}
-      <RightSideBar workspaces={workspaces} games={games} />
+      {/* Right Sidebar - Desktop always visible, Mobile overlay */}
+      <div className="hidden md:flex">
+        <RightSideBar workspaces={workspaces} games={games} />
+      </div>
+
+      {/* Mobile Right Sidebar Overlay */}
+      <AnimatePresence>
+        {rightSidebarOpen && (
+          <>
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="md:hidden fixed inset-0 bg-black bg-opacity-50 z-40"
+              onClick={() => setRightSidebarOpen(false)}
+            />
+            <motion.div
+              initial={{ x: 256 }}
+              animate={{ x: 0 }}
+              exit={{ x: 256 }}
+              transition={{ type: "spring", damping: 30, stiffness: 300 }}
+              className="md:hidden fixed right-0 top-0 bottom-0 z-50 w-64"
+            >
+              <div className="h-full bg-gray-900 border-l border-gray-800">
+                <div className="p-4 border-b border-gray-800 flex items-center justify-between">
+                  <h2 className="text-lg font-medium text-gray-200">
+                    Your Files
+                  </h2>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => setRightSidebarOpen(false)}
+                    className="text-gray-400 hover:text-white"
+                  >
+                    <X className="h-4 w-4" />
+                  </Button>
+                </div>
+                <RightSideBar workspaces={workspaces} games={games} />
+              </div>
+            </motion.div>
+          </>
+        )}
+      </AnimatePresence>
     </div>
   );
 };

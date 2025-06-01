@@ -8,7 +8,11 @@ type Params = Promise<{ uploadId: any }>;
 
 const ChatPage = async ({ params }: { params: Params }) => {
   const session = await auth();
-  if (!session) redirect("/sign-in");
+  if (!session) {
+    const { uploadId } = await params;
+    redirect(`/sign-in?callbackUrl=${encodeURIComponent(`/chat/${uploadId}`)}`);
+  }
+
   const email = String(session.user?.email);
   const id = String(session.user.id);
 
@@ -28,6 +32,9 @@ const ChatPage = async ({ params }: { params: Params }) => {
     });
     personal = lastUpload.private;
     publisher = lastUpload.userId;
+
+    console.log("Upload Id", lastUpload);
+
     if (!lastUpload) {
       redirect("/sign-in");
     }
@@ -37,28 +44,7 @@ const ChatPage = async ({ params }: { params: Params }) => {
     if (lastUpload.userId !== id) {
       personal = false;
     }
-  } /*else {
-    const betaTester = await db.betatesters.findFirst({
-      where: {
-        email: session?.user.email,
-      },
-    });
-
-    const Uploads = await db.upload.findMany({
-      where: { userId: session?.user.id, private: true, isDeleted: false },
-      orderBy: { timeStarted: "desc" },
-    });
-
-    if (betaTester) {
-      if (Uploads.length >= 3) {
-        redirect(`/profile/${session?.user.id}`);
-      }
-    } else {
-      if (Uploads.length >= 1) {
-        redirect(`/profile/${session?.user.id}`);
-      }
-    }
-  } */
+  }
 
   let Uploads: Upload[];
   if (personal) {
@@ -77,10 +63,10 @@ const ChatPage = async ({ params }: { params: Params }) => {
     where: { userId: session?.user.id, uploadId: uploadId },
     orderBy: { timeStarted: "desc" },
   });
-  console.log(personal, Uploads, Games);
+  //console.log(personal, Uploads, Games);
   return (
     <>
-      <main className="flex relative items-center justify-center min-h-screen bg-black pb-16 pt-16">
+      <main className="flex relative items-center justify-center min-h-screen bg-black pt-16 overflow-y-auto">
         <Chat
           sessionId={chatSession}
           namespace={space}

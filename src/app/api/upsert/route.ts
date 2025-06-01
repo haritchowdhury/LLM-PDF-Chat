@@ -110,7 +110,7 @@ export async function POST(request: NextRequest) {
         orderBy: { timeStarted: "desc" },
       });
 
-      if (
+      /*  if (
         (!betaTester && (Uploads.length >= 1 || Shares.length >= 1)) ||
         (betaTester && (Uploads.length >= 3 || Shares.length >= 3))
       ) {
@@ -120,7 +120,7 @@ export async function POST(request: NextRequest) {
           },
           { status: 429 }
         );
-      }
+      } */
 
       const Upload = await db.upload.create({
         data: {
