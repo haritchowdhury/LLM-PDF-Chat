@@ -11,7 +11,7 @@ import ErrorToast from "@/components/ErrorToast";
 const Page = async ({
   searchParams,
 }: {
-  searchParams: { callbackUrl?: string };
+  searchParams: Promise<{ callbackUrl?: string }>;
 }) => {
   const session = await auth();
   if (session) redirect("/");
@@ -27,7 +27,7 @@ const Page = async ({
         <div className="text-black">
           <GithubSignIn />
         </div>
-        <div className="relative">
+        {/*   <div className="relative">
           <div className="absolute inset-0 flex items-center">
             <span className="w-full border-t" />
           </div>
@@ -82,7 +82,7 @@ const Page = async ({
               Don&apos;t have an account? Sign up
             </Link>
           </Button>
-        </div>
+        </div> */}
       </div>
     </main>
   );

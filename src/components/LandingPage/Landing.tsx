@@ -20,11 +20,11 @@ const Landing = () => {
             <div>
               <h5 className="text-lg font-semibold mb-4">aiversety</h5>
               <p className="text-gray-400">
-                Transforming content into engaging quizzes for better learning
-                outcomes.
+                Transforming content into eengaging activities for better
+                learning outcomes.
               </p>
             </div>
-            <div>
+            {/*  <div>
               <h6 className="font-semibold mb-4">Product</h6>
               <ul className="space-y-2 text-gray-400">
                 <li>
@@ -83,10 +83,10 @@ const Landing = () => {
                   </a>
                 </li>
               </ul>
-            </div>
+            </div> */}
           </div>
           <div className="border-t border-gray-800 mt-8 pt-8 text-center text-gray-400">
-            <p>&copy; 2024 QuizCraft. All rights reserved.</p>
+            <p>&copy; 2025 aiversety</p>
           </div>
         </div>
       </footer>

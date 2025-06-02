@@ -112,7 +112,7 @@ const Statistics = async ({ params }: { params: Params }) => {
             />
           </div>
 
-          <div className="bg-gradient-to-b from-white to-gray-700 rounded-lg overflow-hidden border border-gray-200">
+          <div className="bg-white rounded-lg overflow-hidden border border-gray-200">
             <h2 className="px-4 py-3 text-lg font-semibold border-b border-gray-200 text-gray-800">
               Questions Review
             </h2>

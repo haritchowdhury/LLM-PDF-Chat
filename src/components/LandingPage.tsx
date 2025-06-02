@@ -83,27 +83,27 @@ const LandingPage = ({ id, platformlink, shares }: Props) => {
       : "Recent";
 
     return (
-      <article className="rounded-xl overflow-hidden shadow-lg transition-all hover:shadow-xl hover:translate-y-[-4px] bg-gray-800 border border-gray-700">
+      <article className="rounded-xl overflow-hidden shadow-lg transition-all hover:shadow-xl hover:translate-y-[-4px] bg-white border border-gray-200">
         <div className="p-6">
-          <div className="flex items-center gap-2 text-gray-400 text-sm mb-3">
+          <div className="flex items-center gap-2 text-gray-500 text-sm mb-3">
             <Calendar className="h-4 w-4" />
             <span>{formattedDate}</span>
           </div>
           <Link href={`/chat/${article.id}`} className="block group">
-            <h3 className="text-xl font-bold mb-3 text-white group-hover:text-blue-300 transition-colors">
+            <h3 className="text-xl font-bold mb-3 text-gray-800 group-hover:text-blue-300 transition-colors">
               {article.name.length > 40
                 ? `${article.name.slice(0, 40)}...`
                 : article.name}
             </h3>
-            <p className="text-gray-300 text-sm mb-4 line-clamp-2">
+            <p className="text-gray-600 text-sm mb-4 line-clamp-2">
               {article.description ||
                 "Chat with this document to explore its contents and test your knowledge."}
             </p>
           </Link>
-          <div className="flex items-center justify-between mt-2 pt-3 border-t border-gray-700">
+          <div className="flex items-center justify-between mt-2 pt-3 border-t border-gray-200">
             <Link
               href={`/profile/${article.userId}`}
-              className="flex items-center text-sm text-gray-300 hover:text-blue-300"
+              className="flex items-center text-sm text-gray-500 hover:text-blue-300"
             >
               <User className="h-4 w-4 mr-1" />
               <span>View profile</span>
@@ -116,19 +116,19 @@ const LandingPage = ({ id, platformlink, shares }: Props) => {
   };
 
   const SkeletonCard = () => (
-    <div className="rounded-xl overflow-hidden shadow-lg bg-gray-800 border border-gray-700">
+    <div className="rounded-xl overflow-hidden shadow-lg bg-gray-100 border border-gray-200">
       <div className="p-6">
         <div className="flex items-center gap-2 mb-3">
-          <div className="h-4 w-4 bg-gray-600 rounded animate-pulse" />
-          <div className="h-4 w-24 bg-gray-600 rounded animate-pulse" />
+          <div className="h-4 w-4 bg-white rounded animate-pulse" />
+          <div className="h-4 w-24 bg-white rounded animate-pulse" />
         </div>
-        <div className="h-7 bg-gray-600 rounded animate-pulse mb-3" />
-        <div className="h-4 bg-gray-600 rounded animate-pulse mb-2 w-full" />
-        <div className="h-4 bg-gray-600 rounded animate-pulse mb-4 w-3/4" />
-        <div className="pt-3 border-t border-gray-700 mt-2">
+        <div className="h-7 bg-white rounded animate-pulse mb-3" />
+        <div className="h-4 bg-white rounded animate-pulse mb-2 w-full" />
+        <div className="h-4 bg-white rounded animate-pulse mb-4 w-3/4" />
+        <div className="pt-3 border-t border-gray-200 mt-2">
           <div className="flex justify-between">
-            <div className="h-4 w-24 bg-gray-600 rounded animate-pulse" />
-            <div className="h-4 w-16 bg-gray-600 rounded animate-pulse" />
+            <div className="h-4 w-24 bg-white rounded animate-pulse" />
+            <div className="h-4 w-16 bg-white rounded animate-pulse" />
           </div>
         </div>
       </div>

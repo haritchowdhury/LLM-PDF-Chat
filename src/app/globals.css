@@ -103,15 +103,15 @@ body {
   }
 
   ::-webkit-scrollbar-track {
-    background: #111; /* Dark background */
+    background: #f1f1f1; /* Light gray background */
   }
 
   ::-webkit-scrollbar-thumb {
-    background: #000; /* Black scrollbar */
+    background: #c1c1c1; /* Light gray scrollbar */
     border-radius: 4px;
   }
 
   ::-webkit-scrollbar-thumb:hover {
-    background: #222; /* Slightly lighter on hover */
+    background: #a8a8a8; /* Slightly darker on hover */
   }
 }

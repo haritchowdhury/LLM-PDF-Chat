@@ -3,12 +3,11 @@ import { HuggingFaceInferenceEmbeddings } from "@langchain/community/embeddings/
 import { Redis } from "@upstash/redis";
 import { Index } from "@upstash/vector";
 import { Document } from "langchain/document";
-import { summarizer } from "@/lib/groqSummarizer";
 import { v4 as uuid } from "uuid";
-import { SparseVector } from "@upstash/vector";
 import { qaChain } from "@/lib/qaChain";
 import { strict_output } from "@/lib/groqTopicSetter";
 import { deleteChatHistory } from "@/lib/redisChat";
+
 interface Metadata {
   content: string;
 }
@@ -34,6 +33,7 @@ export const updateUpstash = async (
   let topics: string[] = [];
   const promiseList = docs.map(async (doc, counter) => {
     const text = doc["pageContent"];
+    console.log("page content text length:", text.length);
     const textSplitter = new RecursiveCharacterTextSplitter({
       chunkSize: 2000,
       chunkOverlap: 200,
@@ -171,71 +171,71 @@ export const queryUpstash = async (
 export const updateUpstashWithUrl = async (
   index: Index,
   namespace: string,
-  text: string,
+  text: string[],
   url: string
 ) => {
   let extractedTopics: string[] = [];
   let topics: string[] = [];
-  /* const promiseList = docs.map(async (doc, counter) => { */
-  //const text = doc["pageContent"];
-  const textSplitter = new RecursiveCharacterTextSplitter({
-    chunkSize: 2000,
-    chunkOverlap: 200,
-  });
-  const chunks = await textSplitter.createDocuments([text]);
 
-  const embeddingsArrays =
-    await new HuggingFaceInferenceEmbeddings().embedDocuments(
-      chunks.map((chunk) => chunk.pageContent.replace(/\n/g, " "))
-    );
+  for (let i = 0; i < text.length; i++) {
+    const currentText = text[i];
 
-  const batchSize = 500;
-  let batch = [];
-  let pageContent = "";
-  const batchPromises = chunks.map(async (chunk, idx) => {
-    const sourceName = `Url: ${url}`;
+    const textSplitter = new RecursiveCharacterTextSplitter({
+      chunkSize: 2000,
+      chunkOverlap: 200,
+    });
+    const chunks = await textSplitter.createDocuments([currentText]);
 
-    const vector = {
-      id: uuid(),
-      vector: embeddingsArrays[idx],
-      metadata: {
-        content: chunk.pageContent,
-        source: sourceName,
-        fileName: url,
-        pageNumber: 0,
-      },
-    };
+    const embeddingsArrays =
+      await new HuggingFaceInferenceEmbeddings().embedDocuments(
+        chunks.map((chunk) => chunk.pageContent.replace(/\n/g, " "))
+      );
 
-    pageContent += chunk.pageContent + " ";
-    batch.push(vector);
+    const batchSize = 500;
+    let batch = [];
+    let pageContent = "";
+    const batchPromises = chunks.map(async (chunk, idx) => {
+      const sourceName = `Url: ${url}`;
 
-    if (batch.length === batchSize || idx === chunks.length - 1) {
-      const response = await index.upsert(batch, { namespace: namespace });
-      console.log(`response: ${JSON.stringify(response)}`);
-      topics = [];
-      topics = await strict_output(
-        `You are an Expert AI Instructor who can identify the theme of the summary and figure out the most important chapers
+      const vector = {
+        id: uuid(),
+        vector: embeddingsArrays[idx],
+        metadata: {
+          content: chunk.pageContent,
+          source: sourceName,
+          fileName: url,
+          pageNumber: 0,
+        },
+      };
+
+      pageContent += chunk.pageContent + " ";
+      batch.push(vector);
+
+      if (batch.length === batchSize || idx === chunks.length - 1) {
+        const response = await index.upsert(batch, { namespace: namespace });
+        console.log(`response: ${JSON.stringify(response)}`);
+        topics = [];
+        topics = await strict_output(
+          `You are an Expert AI Instructor who can identify the theme of the summary and figure out the most important chapers
         from the summary that will be useful for preparing the paper for exam,  you are to return the important chapters that most 
         thoroughly capture the import aspects of the summary. The length of each topic must
         not exceed 4 words. Store all options in a JSON array of the following structure:`,
 
-        `You are to generate main topics that thorougly capture the main subjects of the summary`,
-        pageContent
-      );
-      //console.log("upstash topics", topics);
-      extractedTopics = extractedTopics.concat(topics);
-      //console.log("upstash topics", topics, extractedTopics);
+          `You are to generate main topics that thorougly capture the main subjects of the summary`,
+          pageContent
+        );
+        //console.log("upstash topics", topics);
+        extractedTopics = extractedTopics.concat(topics);
+        //console.log("upstash topics", topics, extractedTopics);
 
-      batch = [];
-      pageContent = "";
-    }
-  });
+        batch = [];
+        pageContent = "";
+      }
+    });
 
-  await Promise.all(batchPromises);
-  /* }); */
+    await Promise.all(batchPromises);
+  }
 
-  // await Promise.all(promiseList);
-  //console.log("extracted at upstash", extractedTopics);
   return Array.from(new Set(extractedTopics));
 };
 

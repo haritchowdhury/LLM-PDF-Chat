@@ -72,6 +72,7 @@ const ChatPage = async ({ params }: { params: Params }) => {
           namespace={space}
           isPersonal={personal}
           userId={session?.user.id}
+          publisher={publisher}
           workspaces={Uploads}
           games={Games}
         />

@@ -16,13 +16,13 @@ const Features = () => {
       icon: "📊",
       title: "Progress Tracking",
       description:
-        "Monitor student performance with detailed analytics and identify areas that need more attention.",
+        "Monitor your performance with detailed analytics and identify areas that need more attention.",
     },
     {
       icon: "🎨",
-      title: "Customizable Format",
+      title: "Topic Identification",
       description:
-        "Choose from multiple choice, true/false, or open-ended questions. Adjust difficulty levels as needed.",
+        "Find important topics from any content you upload, to figure out the areas of interest in your content.",
     },
     {
       icon: "📱",

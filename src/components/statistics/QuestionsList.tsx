@@ -45,7 +45,7 @@ const QuestionsList = ({ questions }: Props) => {
                   {(index + 1).toString().padStart(2, "0")}
                 </TableCell>
                 <TableCell>
-                  <div className="mb-2">{question}</div>
+                  <div className="mb-2 text-gray-800">{question}</div>
                   <div className="text-sm font-semibold px-2 py-1 bg-gray-800 inline-block rounded">
                     {answer}
                   </div>

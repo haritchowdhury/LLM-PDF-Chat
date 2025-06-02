@@ -66,7 +66,7 @@ export async function POST(request: NextRequest) {
       email: session?.user.email,
     },
   });
-
+  /*
   if (!betaTester) {
     if (requestCount >= MAX_REQUESTS_PER_WEEK) {
       return NextResponse.json(
@@ -94,7 +94,7 @@ export async function POST(request: NextRequest) {
       },
       { status: 419 }
     );
-  }
+  } */
 
   let uploadId: string = namespace;
 

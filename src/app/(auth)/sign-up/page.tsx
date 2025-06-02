@@ -9,6 +9,7 @@ import { Card /*CardContent, CardTitle*/ } from "@/components/ui/card";
 import ErrorToast from "@/components/ErrorToast";
 
 const Page = async () => {
+  redirect("/sign-in");
   const session = await auth();
   if (session) redirect("/");
 

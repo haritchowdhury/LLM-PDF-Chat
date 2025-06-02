@@ -37,7 +37,7 @@ function RightSideBar({ workspaces, games }: Prompts) {
                 <Link
                   href={`/chat/${workspace.id}`}
                   key={workspace.id}
-                  className="flex items-start p-3 md:p-2 hover:bg-gray-800 rounded-md group transition-colors border-b md:border-b-0 border-gray-800 last:border-b-0"
+                  className="flex items-start p-3 md:p-2 hover:bg-gray-800 rounded-md group transition-colors border-b md:border-b-0 border-gray-300 last:border-b-0"
                 >
                   <FileText className="w-4 h-4 mt-0.5 text-gray-500 group-hover:text-blue-400 flex-shrink-0" />
                   <div className="ml-3 md:ml-2 flex-grow min-w-0">

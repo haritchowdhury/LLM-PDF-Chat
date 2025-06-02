@@ -16,6 +16,7 @@ import {
   FaFacebookF,
   FaLinkedinIn,
 } from "react-icons/fa6";
+import { buttonVariants } from "@/components/ui/button";
 
 type Link = {
   link: string;
@@ -113,7 +114,16 @@ const ShareLinkModal = ({ link }: Link) => {
           size="icon"
           className="bg-gray-900 border-gray-700 hover:bg-gray-800 hover:border-gray-600 text-white"
         >
-          <Share className="h-4 w-4" />
+          <div
+            className={buttonVariants({
+              variant: "outline",
+              // size: "lg",
+              className:
+                "bg-gradient-to-b from-indigo-200 border-gray-300 text-gray-800 hover:bg-gray-800 my-2",
+            })}
+          >
+            <Share />
+          </div>
         </Button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-lg w-full p-0 bg-gradient-to-br from-blue-50 to-green-50 border border-gray-800 rounded-lg overflow-hidden">

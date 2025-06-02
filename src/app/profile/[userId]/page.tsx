@@ -78,7 +78,7 @@ const Profile = async ({ params }: { params: Params }) => {
                         userId={user.id}
                       />
                     ) : (
-                      <CardTitle className="text-xl font-bold text-gray-200">
+                      <CardTitle className="text-xl font-bold text-gray-800">
                         {user.name}
                       </CardTitle>
                     )}
@@ -125,15 +125,15 @@ const Profile = async ({ params }: { params: Params }) => {
                     {shares.map((share) => (
                       <div
                         key={share.id}
-                        className="flex items-center justify-between p-2 rounded-md bg-gray-800 hover:bg-gray-700 transition-colors"
+                        className="group flex items-center justify-between p-2 rounded-md bg-white border border-gray-200 hover:bg-gray-700 transition-colors"
                       >
                         <div
-                          className="overflow-hidden text-ellipsis whitespace-nowrap max-w-[70%] text-gray-200"
+                          className="overflow-hidden text-ellipsis whitespace-nowrap max-w-[70%] text-gray-800 group-hover:!text-white"
                           title={share.name}
                         >
                           {share.name}
                         </div>
-                        <div className="flex gap-1">
+                        <div className="flex gap-4 items-center">
                           <Link
                             href={`/chat/${share.id}`}
                             className={buttonVariants({
@@ -225,15 +225,15 @@ const Profile = async ({ params }: { params: Params }) => {
                     {Uploads.map((upload) => (
                       <div
                         key={upload.id}
-                        className="flex items-center justify-between p-2 rounded-md bg-gray-800 hover:bg-gray-700 transition-colors"
+                        className="group flex items-center justify-between p-2 rounded-md bg-white border border-gray-200 hover:bg-gray-700 transition-colors"
                       >
                         <div
-                          className="overflow-hidden text-ellipsis whitespace-nowrap max-w-[70%] text-gray-200"
+                          className="overflow-hidden text-ellipsis whitespace-nowrap max-w-[70%] text-gray-800 group-hover:!text-white"
                           title={upload.name}
                         >
                           {upload.name}
                         </div>
-                        <div className="flex gap-1">
+                        <div className="flex gap-1 items-center">
                           <Link
                             href={`/chat/${upload.id}`}
                             className={buttonVariants({
@@ -269,43 +269,72 @@ const Profile = async ({ params }: { params: Params }) => {
             </Card>
           </div>
         ) : (
-          <div className="gap-16">
-            <CardHeader className="pb-3 border-b border-gray-800 rounded border-black">
-              <div className="flex justify-between items-center">
-                <div className="flex items-center gap-2 p-4 bg-gray-600 rounded">
-                  Articles Published by the Author
+          <div className="space-y-6">
+            <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
+              <div className="bg-gradient-to-r from-gray-50 to-gray-100 px-6 py-4 border-b border-gray-200">
+                <div className="flex items-center gap-3">
+                  <div className="w-2 h-2 bg-indigo-500 rounded-full"></div>
+                  <h3 className="text-lg font-semibold text-gray-800">
+                    Articles Published by the Author
+                  </h3>
+                  <span className="ml-auto text-sm text-gray-500 bg-white px-2 py-1 rounded-full">
+                    {shares.length} articles
+                  </span>
                 </div>
               </div>
-            </CardHeader>
-            <div className="grid grid-cols-1 gap-2">
-              {shares.map((share) => (
-                <div
-                  key={share.id}
-                  className="flex items-center justify-between p-2 rounded-md bg-gray-800 hover:bg-gray-700 transition-colors"
-                >
-                  <div
-                    className="overflow-hidden text-ellipsis whitespace-nowrap max-w-[70%] text-gray-200"
-                    title={share.name}
-                  >
-                    {share.name}
-                  </div>
-                  <div className="flex gap-1">
-                    <Link
-                      href={`/chat/${share.id}`}
-                      className={buttonVariants({
-                        variant: "outline",
-                        //size: "lg",
-                        className:
-                          "bg-gradient-to-b from-indigo-200 border-gray-300 text-gray-800 hover:bg-gray-800 my-2",
-                      })}
+
+              <div className="p-4">
+                <div className="space-y-2">
+                  {shares.map((share, index) => (
+                    <div
+                      key={share.id}
+                      className="group flex items-center justify-between p-4 rounded-lg bg-gray-50 border border-gray-100 hover:bg-indigo-50 hover:border-indigo-200 transition-all duration-200 hover:shadow-sm"
                     >
-                      <MessageSquareText size={14} className="mr-1" />
-                      Open
-                    </Link>
-                    <ShareLinkModel link={`${platformlink}${share.id}`} />
-                  </div>
+                      <div className="flex items-center gap-3 flex-1 min-w-0">
+                        <div className="w-8 h-8 bg-gradient-to-br from-indigo-100 to-indigo-200 rounded-full flex items-center justify-center text-indigo-600 font-medium text-sm">
+                          {index + 1}
+                        </div>
+                        <div
+                          className="overflow-hidden text-ellipsis whitespace-nowrap flex-1 text-gray-700 group-hover:text-indigo-800 font-medium"
+                          title={share.name}
+                        >
+                          {share.name}
+                        </div>
+                      </div>
+
+                      <div className="flex items-center gap-2 ml-4">
+                        <Link
+                          href={`/chat/${share.id}`}
+                          className={buttonVariants({
+                            variant: "outline",
+                            size: "sm",
+                            className:
+                              "bg-white border-gray-300 text-gray-700 hover:bg-indigo-600 hover:text-white hover:border-indigo-600 transition-all duration-200",
+                          })}
+                        >
+                          <MessageSquareText size={14} className="mr-2" />
+                          Open
+                        </Link>
+                        <ShareLinkModel link={`${platformlink}${share.id}`} />
+                      </div>
+                    </div>
+                  ))}
                 </div>
-              ))}
+
+                {shares.length === 0 && (
+                  <div className="text-center py-12 text-gray-500">
+                    <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                      <MessageSquareText size={24} className="text-gray-400" />
+                    </div>
+                    <p className="text-lg font-medium mb-2">
+                      No articles published yet
+                    </p>
+                    <p className="text-sm">
+                      Articles will appear here once they are published.
+                    </p>
+                  </div>
+                )}
+              </div>
             </div>
           </div>
         )}
@@ -336,10 +365,10 @@ const Profile = async ({ params }: { params: Params }) => {
                     <Link
                       key={game.id}
                       href={`/statistics/${game.id}`}
-                      className="flex items-center justify-between p-3 rounded-md bg-gray-800 hover:bg-gray-700 transition-colors"
+                      className="group flex items-center justify-between p-2 rounded-md bg-white border border-gray-200 hover:bg-gray-700 transition-colors"
                     >
                       <div
-                        className="overflow-hidden text-ellipsis whitespace-nowrap max-w-[70%] text-gray-200"
+                        className="overflow-hidden text-ellipsis whitespace-nowrap max-w-[70%] text-gray-800 group-hover:!text-white"
                         title={game.topic}
                       >
                         {game.topic}

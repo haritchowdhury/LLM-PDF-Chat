@@ -32,6 +32,7 @@ type Message = {
 
 type ChatProps = {
   userId: string;
+  publisher: string;
   sessionId?: string;
   namespace?: string;
   isPersonal?: boolean;
@@ -44,6 +45,7 @@ type ChatProps = {
  */
 const Chat = ({
   userId,
+  publisher,
   sessionId,
   namespace,
   isPersonal,
@@ -159,7 +161,10 @@ const Chat = ({
       const data = await response.json();
 
       if (data.error) {
-        throw new Error(data.error);
+        toast({
+          description: data.error,
+          duration: 2000,
+        });
       } else if (data.message) {
         toast({
           description: "Added the PDF to AI's knowledge successfully",
@@ -277,18 +282,18 @@ const Chat = ({
   return (
     <div className="w-full h-[calc(100vh-4rem)] flex relative">
       {/* Mobile Header with Sidebar Toggles */}
-      <div className="md:hidden absolute top-0 left-0 right-0 z-30 bg-gray-900 border-b border-gray-800 px-4 py-2 flex items-center justify-between">
+      <div className="md:hidden absolute top-0 left-0 right-0 z-30 bg-gradient-to-br from-blue-50 to-green-50 border-b border-gray-400 px-4 py-2 flex items-center justify-between">
         <Button
           variant="ghost"
           size="sm"
           onClick={() => setLeftSidebarOpen(!leftSidebarOpen)}
-          className="text-gray-300 hover:text-white hover:bg-gray-800"
+          className="text-gray-800 hover:text-white hover:bg-gray-800"
         >
           <Menu className="h-4 w-4 mr-2" />
           Quiz
         </Button>
 
-        <div className="text-sm text-gray-400 font-medium">
+        <div className="text-sm text-gray-800 font-medium">
           {namespace === "undefined" ? "New Chat" : "Document Chat"}
         </div>
 
@@ -296,7 +301,7 @@ const Chat = ({
           variant="ghost"
           size="sm"
           onClick={() => setRightSidebarOpen(!rightSidebarOpen)}
-          className="text-gray-300 hover:text-white hover:bg-gray-800"
+          className="text-gray-800 hover:text-white hover:bg-gray-800"
         >
           <FileText className="h-4 w-4 mr-2" />
           Files
@@ -326,9 +331,9 @@ const Chat = ({
               transition={{ type: "spring", damping: 30, stiffness: 300 }}
               className="md:hidden fixed left-0 top-0 bottom-0 z-50 w-64"
             >
-              <div className="h-full bg-gray-900 border-r border-gray-800 flex flex-col">
-                <div className="p-4 border-b border-gray-800 flex items-center justify-between flex-shrink-0">
-                  <h2 className="text-lg font-medium text-gray-200 flex items-center gap-2">
+              <div className="h-full bg-gradient-to-br from-blue-50 to-green-50 border-r border-gray-800 flex flex-col">
+                <div className="p-4 border-b border-gray-200 flex items-center justify-between flex-shrink-0">
+                  <h2 className="text-lg font-medium text-gray-800 flex items-center gap-2">
                     <Menu className="h-4 w-4" />
                     Quiz Options
                   </h2>
@@ -398,8 +403,8 @@ const Chat = ({
                   className={clsx(
                     "font-sans-semibold text-sm p-3 md:p-4 rounded-lg text-justify mt-2 mb-2",
                     message.role === "user"
-                      ? "text-white bg-blue-600 self-end ml-auto max-w-[85%] md:max-w-[80%]"
-                      : "text-gray-100 bg-gray-800 self-start mr-auto max-w-[85%] md:max-w-[80%] break-words"
+                      ? "text-white bg-blue-400 self-end ml-auto max-w-[85%] md:max-w-[80%]"
+                      : "text-gray-800 bg-gray-400 self-start mr-auto max-w-[85%] md:max-w-[80%] break-words"
                   )}
                 >
                   <div className="w-full overflow-hidden break-words">
@@ -441,7 +446,7 @@ const Chat = ({
               className="flex w-full flex-row items-center gap-2"
             >
               {/* Upload button */}
-              {isPersonal && (
+              {(isPersonal || userId === publisher) && (
                 <div className="flex gap-1 md:gap-2">
                   <LinkSubmitDialog
                     upload={namespace}
@@ -515,9 +520,9 @@ const Chat = ({
               transition={{ type: "spring", damping: 30, stiffness: 300 }}
               className="md:hidden fixed right-0 top-0 bottom-0 z-50 w-64"
             >
-              <div className="h-full bg-gray-900 border-l border-gray-800">
-                <div className="p-4 border-b border-gray-800 flex items-center justify-between">
-                  <h2 className="text-lg font-medium text-gray-200">
+              <div className="h-full bg-gradient-to-br from-blue-50 to-green-50 border-l border-gray-200">
+                <div className="p-4 border-b border-gray-200 flex items-center justify-between">
+                  <h2 className="text-lg font-medium text-gray-800">
                     Your Files
                   </h2>
                   <Button

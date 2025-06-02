@@ -38,9 +38,9 @@ const ResultsCard = ({ accuracy }: Props) => {
 
   return (
     <Card
-      className={`border-none overflow-hidden bg-gradient-to-r ${result.bgGradient} rounded-lg`}
+      className={`border border-gray-200 overflow-hidden bg-gradient-to-r ${result.bgGradient} rounded-lg`}
     >
-      <CardContent className="p-6 bg-gradient-to-b from-white to-gray-700">
+      <CardContent className="p-6 bg-white">
         <div className="flex items-center">
           <div className="mr-6">
             <div className="p-3 rounded-full bg-gray-900/60 flex items-center justify-center">
@@ -52,7 +52,7 @@ const ResultsCard = ({ accuracy }: Props) => {
             <h2 className={`text-3xl font-bold ${result.color}`}>
               {result.title}
             </h2>
-            <p className="text-sm opacity-70 mt-1 text-white">
+            <p className="text-sm opacity-70 mt-1 text-gray-800">
               {result.subtitle}
             </p>
           </div>
