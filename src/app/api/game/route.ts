@@ -96,9 +96,7 @@ export async function POST(request: NextRequest) {
     );
   }
   console.log("from questions api:", data);
-  await redis.set(`game_rate_limit:${userId}`, requestCount + 1, {
-    ex: EXPIRATION_TIME,
-  });
+
   if (type === "mcq") {
     type mcqQuestion = {
       question: string;
@@ -128,5 +126,8 @@ export async function POST(request: NextRequest) {
     });
   }
 
+  await redis.set(`game_rate_limit:${userId}`, requestCount + 1, {
+    ex: EXPIRATION_TIME,
+  });
   return NextResponse.json({ gameId: game.id }, { status: 200 });
 }

@@ -7,6 +7,7 @@ import { executeAction } from "@/lib/executeAction";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import ErrorToast from "@/components/ErrorToast";
+import { GoogleSignIn } from "@/components/google.sign-in";
 
 const Page = async ({
   searchParams,
@@ -26,6 +27,9 @@ const Page = async ({
         <ErrorToast />
         <div className="text-black">
           <GithubSignIn />
+        </div>
+        <div className="text-black">
+          <GoogleSignIn />
         </div>
         {/*   <div className="relative">
           <div className="absolute inset-0 flex items-center">

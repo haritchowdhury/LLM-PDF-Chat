@@ -133,11 +133,6 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Increment rate limit counter
-    await redis.set(`chat_rate_limit:${userId}`, requestCount + 1, {
-      ex: EXPIRATION_TIME,
-    });
-
     // Save user question to chat history
     await saveMessage(effectiveSessionId, {
       role: "user",
@@ -179,6 +174,10 @@ export async function POST(request: NextRequest) {
       sources: sources,
     });
 
+    // Increment rate limit counter
+    await redis.set(`chat_rate_limit:${userId}`, requestCount + 1, {
+      ex: EXPIRATION_TIME,
+    });
     // Return formatted response
     return NextResponse.json(
       { content: responseContent, sources: sources },

@@ -1,11 +1,12 @@
 "use client";
 import { useState } from "react";
-import { UserRoundPen } from "lucide-react";
+import { UserRoundPen, Check, X } from "lucide-react";
 
 type Props = {
   initialUsername: string;
   userId: string;
 };
+
 const EditableUsername = ({ initialUsername, userId }: Props) => {
   const [username, setUsername] = useState(initialUsername || "John Doe");
   const [isEditing, setIsEditing] = useState(false);
@@ -65,43 +66,67 @@ const EditableUsername = ({ initialUsername, userId }: Props) => {
   };
 
   return (
-    <div className="px-2 max-w-md ml-0 bg-gray-400 text-gray-200 bg-gray-700 rounded-lg shadow">
+    <div className="w-full max-w-md bg-gray-700 text-gray-200 rounded-lg shadow p-3">
       {isEditing ? (
-        <div className="space-y-2">
-          <div className="flex items-center space-x-2 p-1">
+        <div className="space-y-3">
+          {/* Input field - full width on mobile */}
+          <div className="w-full">
             <input
               type="text"
               value={tempUsername}
               onChange={handleChange}
-              className="flex-1 px-3 py-2 text-black border border-gray-300 bg-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full px-3 py-2 text-black border border-gray-300 bg-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
               autoFocus
               disabled={isLoading}
+              placeholder="Enter username"
             />
+          </div>
+
+          {/* Buttons - responsive layout */}
+          <div className="flex flex-col sm:flex-row gap-2 sm:gap-3">
             <button
               onClick={handleSave}
-              className={`px-3 py-2 ${isLoading ? "bg-gray-400" : "bg-green-500 hover:bg-gray-800"} text-black rounded-md focus:outline-none focus:ring-2 focus:ring-green-500`}
+              className={`flex-1 flex items-center justify-center gap-2 px-3 py-2 text-sm rounded-md focus:outline-none focus:ring-2 transition-colors ${
+                isLoading
+                  ? "bg-gray-400 cursor-not-allowed"
+                  : "bg-green-500 hover:bg-green-600 text-white focus:ring-green-500"
+              }`}
               disabled={isLoading}
             >
-              {isLoading ? "Saving..." : "Save"}
+              <Check className="h-4 w-4" />
+              <span className="hidden sm:inline">
+                {isLoading ? "Saving..." : "Save"}
+              </span>
             </button>
+
             <button
               onClick={handleCancel}
-              className="px-3 py-2 bg-gray-300 text-gray-700 rounded-md hover:bg-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-500"
+              className="flex-1 flex items-center justify-center gap-2 px-3 py-2 text-sm bg-gray-500 text-white rounded-md hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-gray-500 transition-colors"
               disabled={isLoading}
             >
-              Cancel
+              <X className="h-4 w-4" />
+              <span className="hidden sm:inline">Cancel</span>
             </button>
           </div>
-          {error && <p className="text-red-500 text-sm">{error}</p>}
+
+          {/* Error message */}
+          {error && (
+            <p className="text-red-400 text-sm bg-red-900/20 px-2 py-1 rounded border border-red-500/30">
+              {error}
+            </p>
+          )}
         </div>
       ) : (
-        <div className="flex items-center justify-between gap-2 px-2">
-          <h2 className="text-xl font-medium text-white">{username}</h2>
+        <div className="flex items-center justify-between gap-2">
+          <h2 className="text-lg sm:text-xl font-medium text-white truncate flex-1 min-w-0">
+            {username}
+          </h2>
           <button
             onClick={handleEditClick}
-            className="p-2 text-gray-400 rounded-full hover:bg-blue-100 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="flex-shrink-0 p-2 text-gray-400 rounded-full hover:bg-gray-600 hover:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors"
+            aria-label="Edit username"
           >
-            <UserRoundPen />
+            <UserRoundPen className="h-5 w-5" />
           </button>
         </div>
       )}
