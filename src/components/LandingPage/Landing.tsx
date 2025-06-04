@@ -18,7 +18,7 @@ const Landing = () => {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
             <div>
-              <h5 className="text-lg font-semibold mb-4">aiversety</h5>
+              <h5 className="text-lg font-semibold mb-4">Aiversety</h5>
               <p className="text-gray-400">
                 Transforming content into eengaging activities for better
                 learning outcomes.
