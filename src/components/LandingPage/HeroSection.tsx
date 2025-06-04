@@ -4,13 +4,13 @@ const HeroSection = () => {
     <div className="bg-gradient-to-br from-blue-50 to-green-50 py-16">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
         <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-6">
-          Become the
-          <span className="text-blue-600"> Favorite Teacher</span>
+          Turn Study Materials Into
+          <span className="text-blue-600"> Interactive Quizzes</span>
         </h2>
         <p className="text-xl text-gray-600 mb-8 max-w-3xl mx-auto">
-          Help students learn better with AI-generated quizzes, chatbots, and
-          topics from any URL or PDF. Perfect for teachers creating assessments
-          and parents supporting homework.
+          Help students learn better with AI-generated quizzes, chatbots from
+          any URL or PDF. Perfect for teachers creating assessments and parents
+          supporting homework.
         </p>
         <div className="flex flex-col sm:flex-row gap-4 justify-center">
           <Link

@@ -185,9 +185,6 @@ const SampleQuiz = () => {
         <p className="text-lg text-gray-600 mb-6">
           Here's a sample quiz generated from a biology textbook chapter
         </p>
-        <p className="text-sm text-gray-500">
-          Use keyboard shortcuts: 1-4 to select answers, Enter to submit
-        </p>
       </div>
 
       <div className="w-full max-w-4xl mx-auto">
@@ -281,9 +278,9 @@ const SampleQuiz = () => {
                 "Incorrect!"
               )
             ) : (
-              <>
+              <div className="font-semibold flex items-center">
                 Next <ChevronRight className="w-4 h-4 ml-2" />
-              </>
+              </div>
             )}
           </Button>
         </div>

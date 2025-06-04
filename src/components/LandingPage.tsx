@@ -31,47 +31,6 @@ const LandingPage = ({ id, platformlink, shares }: Props) => {
     }, 1500);
   }, []);
 
-  const HeroSection = () => (
-    <section className="pt-20 pb-16 bg-gradient-to-br from-blue-50 to-green-50 text-black">
-      <div className="container mx-auto px-6 py-8">
-        <div className="flex flex-col md:flex-row items-center gap-8 justify-between">
-          <div className="text-left md:w-1/2">
-            <h1 className="text-4xl md:text-5xl font-bold mb-6 leading-tight bg-clip-text text-transparent bg-gradient-to-r from-blue-900 to-blue-500">
-              Skim Fast! Automate Retention
-            </h1>
-            <p className="text-xl mb-8 text-gray-900 max-w-lg">
-              Chat with your documents, discover key insights, and reinforce
-              learning with AI-generated quizzes.
-            </p>
-            <div className="flex flex-wrap gap-4">
-              <Link
-                href={`/chat/undefined`}
-                className={buttonVariants({
-                  variant: "default",
-                  size: "lg",
-                  className: "bg-indigo-600 hover:bg-indigo-700 text-white",
-                })}
-              >
-                Start chatting <MessageSquareText className="ml-2 h-5 w-5" />
-              </Link>
-              <Link
-                href={`/profile/${id}`}
-                className={buttonVariants({
-                  variant: "outline",
-                  size: "lg",
-                  className:
-                    "bg-gradient-to-b from-indigo-200  border-gray-300 text-gray-800 hover:bg-gray-800",
-                })}
-              >
-                View profile <CircleUserRound className="ml-2 h-5 w-5" />
-              </Link>
-            </div>
-          </div>
-        </div>
-      </div>
-    </section>
-  );
-
   const ArticleCard = ({ article }) => {
     // Format date if available
     const formattedDate = article.timeStarted
@@ -84,18 +43,16 @@ const LandingPage = ({ id, platformlink, shares }: Props) => {
 
     return (
       <article className="rounded-xl overflow-hidden shadow-lg transition-all hover:shadow-xl hover:translate-y-[-4px] bg-white border border-gray-200">
-        <div className="p-6">
+        <div className="p-4 sm:p-6">
           <div className="flex items-center gap-2 text-gray-500 text-sm mb-3">
             <Calendar className="h-4 w-4" />
             <span>{formattedDate}</span>
           </div>
           <Link href={`/chat/${article.id}`} className="block group">
-            <h3 className="text-xl font-bold mb-3 text-gray-800 group-hover:text-blue-300 transition-colors">
-              {article.name.length > 40
-                ? `${article.name.slice(0, 40)}...`
-                : article.name}
+            <h3 className="text-lg sm:text-xl font-bold mb-3 text-gray-800 group-hover:text-blue-300 transition-colors line-clamp-2 break-words leading-tight">
+              {article.name}
             </h3>
-            <p className="text-gray-600 text-sm mb-4 line-clamp-2">
+            <p className="text-gray-600 text-sm mb-4 line-clamp-2 break-words">
               {article.description ||
                 "Chat with this document to explore its contents and test your knowledge."}
             </p>
@@ -106,7 +63,8 @@ const LandingPage = ({ id, platformlink, shares }: Props) => {
               className="flex items-center text-sm text-gray-500 hover:text-blue-300"
             >
               <User className="h-4 w-4 mr-1" />
-              <span>View profile</span>
+              <span className="hidden sm:inline">View profile</span>
+              <span className="sm:hidden">Profile</span>
             </Link>
             <ShareLinkModel link={`${platformlink}${article.id}`} />
           </div>

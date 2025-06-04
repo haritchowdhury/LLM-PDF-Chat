@@ -11,12 +11,7 @@ const SignOut = () => {
   return (
     <div className="flex justify-center">
       <Button
-        className={buttonVariants({
-          variant: "outline",
-          // /size: "lg",
-          className:
-            "bg-gradient-to-b from-indigo-200  border-gray-300 text-gray-800 hover:bg-gray-800",
-        })}
+        className="flex gap-2 items-center bg-blue-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-blue-700 transition-colors"
         onClick={handleSignOut}
       >
         Sign Out
