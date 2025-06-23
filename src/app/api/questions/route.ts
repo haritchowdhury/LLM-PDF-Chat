@@ -16,9 +16,10 @@ export async function POST(request: NextRequest) {
     token: process.env.UPSTASH_VECTOR_REST_TOKEN,
   });
   try {
-    const { amount, topic, type, namespace } = getQuestionsSchema.parse(body);
+    const { amount, topic, type, namespace, userId } =
+      getQuestionsSchema.parse(body);
     console.log("quesionAPI", amount, topic, type, namespace);
-    const questionData = await queryUpstash(index, namespace, topic);
+    const questionData = await queryUpstash(index, namespace, topic, userId);
     console.log("questiondata", questionData);
     console.log(amount, topic, type);
     let questions: any;

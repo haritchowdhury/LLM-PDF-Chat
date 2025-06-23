@@ -38,6 +38,7 @@ type ChatProps = {
   isPersonal?: boolean;
   workspaces?: PrismaUpload[];
   games?: Game[];
+  upload?: PrismaUpload;
 };
 
 /**
@@ -51,6 +52,7 @@ const Chat = ({
   isPersonal,
   workspaces,
   games,
+  upload,
 }: ChatProps) => {
   // Router and toast utilities
   const router = useRouter();
@@ -310,7 +312,12 @@ const Chat = ({
 
       {/* Left Sidebar - Desktop always visible, Mobile overlay */}
       <div className="hidden md:flex">
-        <LeftSideBar namespace={namespace} isPersonal={isPersonal} />
+        <LeftSideBar
+          namespace={namespace}
+          isPersonal={isPersonal}
+          upload={upload}
+          currentUserId={userId}
+        />
       </div>
 
       {/* Mobile Left Sidebar Overlay */}

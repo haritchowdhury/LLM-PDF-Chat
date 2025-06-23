@@ -82,6 +82,7 @@ export async function POST(request: NextRequest) {
     topic,
     type,
     namespace,
+    userId,
   });
   let parsedData: any;
   try {

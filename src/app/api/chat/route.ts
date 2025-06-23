@@ -145,7 +145,8 @@ export async function POST(request: NextRequest) {
       index,
       effectiveNamespace,
       //effectiveSessionId,
-      user_prompt
+      user_prompt,
+      userId
     );
 
     // Extract response content and sources

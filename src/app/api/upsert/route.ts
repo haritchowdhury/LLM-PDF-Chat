@@ -22,6 +22,15 @@ function filterStringsOnly(topics) {
   return topics.filter((item) => typeof item === "string");
 }
 
+function withTimeout<T>(promise: Promise<T>, timeoutMs: number): Promise<T> {
+  return Promise.race([
+    promise,
+    new Promise<T>((_, reject) =>
+      setTimeout(() => reject(new Error("TIMEOUT")), timeoutMs)
+    ),
+  ]);
+}
+
 /*
  * Endpoint to create a chat room
  */
@@ -29,6 +38,9 @@ export async function POST(request: NextRequest) {
   const data = await request.formData();
   let namespace = data.get("namespace") as string;
   let personal = data.get("private") as string;
+
+  let receivedNamespace = namespace;
+  let uploadId: string;
 
   const file = data.get("file") as File;
   const baseName = file.name.replace(/\.[^/.]+$/, "");
@@ -64,7 +76,7 @@ export async function POST(request: NextRequest) {
     return validationResult.error;
   }
 
-  let uploadId: string = namespace;
+  uploadId = namespace;
 
   try {
     if (namespace === "undefined") {
@@ -87,7 +99,10 @@ export async function POST(request: NextRequest) {
   }
 
   try {
-    let topics = await updateUpstash(index, namespace, docs, baseName);
+    let topics = await withTimeout(
+      updateUpstash(index, namespace, docs, baseName, userId),
+      45000
+    );
     const foundUpload = await db.upload.findFirst({
       where: {
         id: uploadId,
@@ -107,6 +122,23 @@ export async function POST(request: NextRequest) {
       },
     });
   } catch (err) {
+    if (err.message === "TIMEOUT") {
+      if ((receivedNamespace = "undefined")) {
+        await db.upload.delete({
+          where: {
+            id: uploadId,
+          },
+        });
+      }
+      return NextResponse.json(
+        {
+          error:
+            "Request timed out. The webpage is taking too long to process. Please try again or use a different URL.",
+          code: "TIMEOUT_ERROR",
+        },
+        { status: 408 } // 408 Request Timeout
+      );
+    }
     console.log("error: ", err);
     throw new Error("Upstash Could be Updated");
   }

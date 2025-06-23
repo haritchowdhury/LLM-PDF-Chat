@@ -68,9 +68,9 @@ const Profile = async ({ params }: { params: Params }) => {
             <CardHeader className="pb-4 border-none">
               <div className="flex flex-col sm:flex-row justify-between items-center gap-4">
                 <div className="flex items-center gap-3">
-                  <div className="p-2 rounded-full bg-gray-800">
+                  {/* <div className="p-2 rounded-full bg-gray-800">
                     <User size={28} className="text-gray-400" />
-                  </div>
+                  </div> */}
                   <div>
                     {isOwnProfile ? (
                       <EditableUsername
@@ -94,20 +94,23 @@ const Profile = async ({ params }: { params: Params }) => {
             {/* Publications Section */}
             <Card className="bg-white border-none h-full">
               <CardHeader className="pb-3 border-b border-gray-200">
+                <h1 className="text-xl">Classrooms created by me</h1>
+
                 <div className="flex justify-between items-center">
                   <div className="flex items-center gap-2">
                     <BookOpen size={18} className="text-gray-400" />
                     <CardTitle className="text-lg font-medium text-gray-800">
-                      Publications
+                      Public
                     </CardTitle>
                   </div>
-                  {betaTester ? (
+                  <Share namespace={"undefined"} />
+                  {/*  {betaTester ? (
                     shares.length < 3 ? (
                       <Share namespace={"undefined"} />
                     ) : null
                   ) : shares.length < 1 ? (
                     <Share namespace={"undefined"} />
-                  ) : null}
+                  ) : null} */}
                 </div>
                 <CardDescription className="text-gray-600 text-sm">
                   Share articles with friends and earn when milestones are
@@ -155,7 +158,7 @@ const Profile = async ({ params }: { params: Params }) => {
                   </div>
                 )}
               </CardContent>
-              <CardFooter className="pt-2 border-t border-gray-200">
+              {/*   <CardFooter className="pt-2 border-t border-gray-200">
                 {betaTester
                   ? shares.length >= 3 && (
                       <div className="text-red-500 text-xs w-full text-center">
@@ -167,7 +170,7 @@ const Profile = async ({ params }: { params: Params }) => {
                         You have reached maximum numbers of Publications (1)
                       </div>
                     )}
-              </CardFooter>
+              </CardFooter> */}
             </Card>
 
             {/* Workspaces Section */}
@@ -177,10 +180,22 @@ const Profile = async ({ params }: { params: Params }) => {
                   <div className="flex items-center gap-2">
                     <Briefcase size={18} className="text-gray-400" />
                     <CardTitle className="text-lg font-medium text-gray-800">
-                      Workspaces
+                      Private
                     </CardTitle>
                   </div>
-                  {betaTester ? (
+                  <Link
+                    href={`/chat/undefined`}
+                    className={buttonVariants({
+                      variant: "outline",
+                      // size: "lg",
+                      className:
+                        "bg-gradient-to-b from-indigo-200 border-gray-300 text-gray-800 hover:bg-gray-800 my-2",
+                    })}
+                  >
+                    <PlusCircle size={14} className="mr-1" />
+                    New
+                  </Link>
+                  {/*  {betaTester ? (
                     Uploads.length < 3 ? (
                       <Link
                         href={`/chat/undefined`}
@@ -208,7 +223,7 @@ const Profile = async ({ params }: { params: Params }) => {
                       <PlusCircle size={14} className="mr-1" />
                       New
                     </Link>
-                  ) : null}
+                  ) : null} */}
                 </div>
                 <CardDescription className="text-gray-600 text-sm">
                   Start a private workspace for your content
@@ -253,7 +268,7 @@ const Profile = async ({ params }: { params: Params }) => {
                   </div>
                 )}
               </CardContent>
-              <CardFooter className="pt-2 border-t border-gray-200">
+              {/* <CardFooter className="pt-2 border-t border-gray-200">
                 {betaTester
                   ? Uploads.length >= 3 && (
                       <div className="text-red-500 text-xs w-full text-center">
@@ -265,7 +280,7 @@ const Profile = async ({ params }: { params: Params }) => {
                         You have reached maximum numbers of Workspaces (1)
                       </div>
                     )}
-              </CardFooter>
+              </CardFooter> */}
             </Card>
           </div>
         ) : (

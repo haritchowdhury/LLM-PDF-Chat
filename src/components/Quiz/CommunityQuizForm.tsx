@@ -238,7 +238,7 @@ const CommunityQuizForm = ({ topic: topicParam, id: uploadId }: Props) => {
 
       {topics?.length > 0 && (
         <div className="flex flex-col gap-1 p-1 w-full">
-          <p className="text-xs text-gray-400 font-medium">Community Topics:</p>
+          <p className="text-xs text-gray-400 font-medium">Topics:</p>
           <div className="flex flex-wrap gap-1">
             {topics.map((topic, idx) => {
               const milestones: string[] =

@@ -77,7 +77,7 @@ const CommunityTopicCreationButton = ({ upload }: Upload) => {
                 "bg-gradient-to-b from-indigo-200 border-gray-300 text-gray-800 hover:bg-gray-800 my-2",
             })}
           >
-            Sync Topics with creator
+            Generate Topics
           </Button>
         </form>
       )}

@@ -1,5 +1,5 @@
 import { Upload as PrismaUpload, Game } from "@prisma/client";
-import { FileText, GamepadIcon, Clock, User } from "lucide-react";
+import { FileText, ListTodo, Clock, User } from "lucide-react";
 import Link from "next/link";
 
 type Prompts = {
@@ -69,7 +69,7 @@ function RightSideBar({ workspaces, games }: Prompts) {
       <div className="flex flex-col flex-1 md:h-1/2 border-t border-gray-200">
         <div className="p-3 border-b border-gray-200 flex items-center justify-between">
           <h3 className="text-sm font-medium text-gray-800">
-            Workspace Quizzes
+            Previous Quizzes
           </h3>
           <span className="text-xs text-gray-800 bg-gray-200 px-2 py-1 rounded-full">
             {games?.length || 0}
@@ -85,7 +85,7 @@ function RightSideBar({ workspaces, games }: Prompts) {
                   key={game.id}
                   className="flex items-start p-3 md:p-2 hover:bg-gray-800 rounded-md group transition-colors border-b md:border-b-0 border-gray-800 last:border-b-0"
                 >
-                  <GamepadIcon className="w-4 h-4 mt-0.5 text-gray-500 group-hover:text-green-400 flex-shrink-0" />
+                  <ListTodo className="w-4 h-4 mt-0.5 text-gray-500 group-hover:text-green-400 flex-shrink-0" />
                   <div className="ml-3 md:ml-2 flex-grow min-w-0">
                     <p className="text-sm text-gray-800 truncate group-hover:text-green-400 font-medium">
                       {game.topic || "Untitled Game"}
@@ -100,11 +100,11 @@ function RightSideBar({ workspaces, games }: Prompts) {
             </div>
           ) : (
             <div className="flex flex-col items-center justify-center h-full p-4 text-center">
-              <GamepadIcon className="w-8 h-8 text-gray-600 mb-2" />
-              <p className="text-gray-400 text-sm">No games found</p>
-              <p className="text-gray-500 text-xs mt-1">
+              <ListTodo className="w-8 h-8 text-gray-600 mb-2" />
+              <p className="text-gray-400 text-sm">No Quizzes found</p>
+              {/*<p className="text-gray-500 text-xs mt-1">
                 Start a new game to practice
-              </p>
+              </p>*/}
             </div>
           )}
         </div>

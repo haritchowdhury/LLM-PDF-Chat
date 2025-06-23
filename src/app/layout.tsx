@@ -6,6 +6,7 @@ import { Toaster } from "@/components/ui/toaster";
 import Providers from "@/components/providers";
 import { Header } from "@/components/header";
 import { Footer } from "@/components/footer";
+
 const geistSans = Geist({
   variable: "--font-geist-sans",
   subsets: ["latin"],
@@ -26,7 +27,7 @@ type LayoutProps = {
   children: ReactNode;
 };
 
-const Layout = ({ children }: LayoutProps) => {
+const Layout = async ({ children }: LayoutProps) => {
   return (
     <html
       lang="en"

@@ -14,10 +14,17 @@ import ShareLinkModel from "@/components/ShareLink";
 import { Upload } from "@prisma/client";
 import Image from "next/image";
 
+type UploadWithUser = Upload & {
+  user: {
+    id: string;
+    name: string | null;
+  };
+};
+
 type Props = {
   id: string;
   platformlink: string;
-  shares: Upload[];
+  shares: UploadWithUser[];
 };
 
 const LandingPage = ({ id, platformlink, shares }: Props) => {
@@ -52,10 +59,10 @@ const LandingPage = ({ id, platformlink, shares }: Props) => {
             <h3 className="text-lg sm:text-xl font-bold mb-3 text-gray-800 group-hover:text-blue-300 transition-colors line-clamp-2 break-words leading-tight">
               {article.name}
             </h3>
-            <p className="text-gray-600 text-sm mb-4 line-clamp-2 break-words">
+            {/* <p className="text-gray-600 text-sm mb-4 line-clamp-2 break-words">
               {article.description ||
                 "Chat with this document to explore its contents and test your knowledge."}
-            </p>
+            </p>*/}
           </Link>
           <div className="flex items-center justify-between mt-2 pt-3 border-t border-gray-200">
             <Link
@@ -63,8 +70,12 @@ const LandingPage = ({ id, platformlink, shares }: Props) => {
               className="flex items-center text-sm text-gray-500 hover:text-blue-300"
             >
               <User className="h-4 w-4 mr-1" />
-              <span className="hidden sm:inline">View profile</span>
-              <span className="sm:hidden">Profile</span>
+              <span className="hidden sm:inline">
+                {article.user.name || "Anonymous User"}
+              </span>
+              <span className="sm:hidden">
+                {article.user.name?.split(" ")[0] || "Anonymous"}
+              </span>
             </Link>
             <ShareLinkModel link={`${platformlink}${article.id}`} />
           </div>
@@ -100,11 +111,10 @@ const LandingPage = ({ id, platformlink, shares }: Props) => {
       <section className="container mx-auto px-6 py-12 pt-20">
         <div className="flex flex-col items-center mb-12">
           <h2 className="text-3xl font-bold text-gray-800 mb-4">
-            Explore Published Articles
+            Explore Public Classrooms
           </h2>
           <p className="text-xl text-gray-700 max-w-2xl text-center">
-            Browse through our collection of documents and start enhancing your
-            learning experience.
+            Explore Public Classrooms created by other teachers like you.
           </p>
         </div>
 

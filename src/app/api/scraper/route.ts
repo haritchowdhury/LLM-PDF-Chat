@@ -41,13 +41,26 @@ const index = new Index({
   token: process.env.UPSTASH_VECTOR_REST_TOKEN,
 });
 
+function withTimeout<T>(promise: Promise<T>, timeoutMs: number): Promise<T> {
+  return Promise.race([
+    promise,
+    new Promise<T>((_, reject) =>
+      setTimeout(() => reject(new Error("TIMEOUT")), timeoutMs)
+    ),
+  ]);
+}
+
 export async function POST(request: NextRequest) {
   const body = await request.json();
   const session = await auth();
   const userId = String(session.user.id);
+  let receivedNamespace: string;
+  let uploadId: string;
 
   try {
     let { url, namespace, sharable } = urlSchema.parse(body);
+
+    receivedNamespace = namespace;
 
     // Use the validation service
     const validationResult = await uploadValidator.validateAll({
@@ -67,7 +80,7 @@ export async function POST(request: NextRequest) {
       return validationResult.error;
     }
 
-    let uploadId: string = namespace;
+    uploadId = namespace;
     if (namespace === "undefined") {
       const Upload = await db.upload.create({
         data: {
@@ -84,10 +97,18 @@ export async function POST(request: NextRequest) {
       namespace = uploadId;
     }
 
-    const scrappedText = await scrapeWebpage(url);
+    const scrappedText = await withTimeout(
+      scrapeWebpage(url),
+      45000 // 45 seconds timeout
+    );
+
+    // const scrappedText = await scrapeWebpage(url);
     const textChunks = chunkText(scrappedText, 7000);
 
-    let topics = await updateUpstashWithUrl(index, namespace, textChunks, url);
+    let topics = await withTimeout(
+      updateUpstashWithUrl(index, namespace, textChunks, url, userId),
+      45000
+    );
     const foundUpload = await db.upload.findFirst({
       where: {
         id: uploadId,
@@ -113,6 +134,23 @@ export async function POST(request: NextRequest) {
   } catch (error) {
     console.log(error);
     // Check if it's a Zod validation error
+    if (error.message === "TIMEOUT") {
+      if ((receivedNamespace = "undefined")) {
+        await db.upload.delete({
+          where: {
+            id: uploadId,
+          },
+        });
+      }
+      return NextResponse.json(
+        {
+          error:
+            "Request timed out. The webpage is taking too long to process. Please try again or use a different URL.",
+          code: "TIMEOUT_ERROR",
+        },
+        { status: 408 } // 408 Request Timeout
+      );
+    }
     if (error instanceof ZodError) {
       return NextResponse.json(
         {

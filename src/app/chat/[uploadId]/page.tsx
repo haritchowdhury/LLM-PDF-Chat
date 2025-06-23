@@ -23,9 +23,10 @@ const ChatPage = async ({ params }: { params: Params }) => {
 
   let personal = true;
   let publisher: string;
+  let lastUpload: Upload;
 
   if (uploadId !== "undefined") {
-    const lastUpload = await db.upload.findFirst({
+    lastUpload = await db.upload.findFirst({
       where: {
         id: uploadId,
       },
@@ -63,6 +64,7 @@ const ChatPage = async ({ params }: { params: Params }) => {
     where: { userId: session?.user.id, uploadId: uploadId },
     orderBy: { timeStarted: "desc" },
   });
+  console.log("current upload: ", lastUpload);
   //console.log(personal, Uploads, Games);
   return (
     <>
@@ -75,6 +77,7 @@ const ChatPage = async ({ params }: { params: Params }) => {
           publisher={publisher}
           workspaces={Uploads}
           games={Games}
+          upload={lastUpload}
         />
       </main>
     </>

@@ -73,6 +73,12 @@ export default function ProcessContent({ session }) {
         const data = await response.json();
 
         if (!response.ok) {
+          router.push("/");
+          toast({
+            variant: "destructive",
+            description: "Something went wrong",
+            duration: 2000,
+          });
           throw new Error(data.error || "Failed to process content");
         }
 
