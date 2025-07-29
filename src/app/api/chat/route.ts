@@ -85,7 +85,8 @@ export async function POST(request: NextRequest) {
 
     // Validate namespace exists
     const namespaceList = await index.listNamespaces();
-    if (!namespaceList.includes(effectiveNamespace)) {
+    console.log(namespaceList);
+    if (!namespaceList.includes(session?.user?.id)) {
       return NextResponse.json(
         {
           content:

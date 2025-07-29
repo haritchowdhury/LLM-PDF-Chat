@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useToast } from "@/hooks/use-toast";
 import { useSession } from "next-auth/react";
+import { motion, AnimatePresence } from "framer-motion";
 
 export default function ProcessContent({ session }) {
   const [isProcessing, setIsProcessing] = useState(true);
@@ -112,13 +113,19 @@ export default function ProcessContent({ session }) {
 
     processContent();
   }, [router, toast, session]);
-
+  /*
   return (
     <div className="min-h-screen flex items-center justify-center">
       <div className="text-center">
         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
         <p className="text-gray-700">Processing your content...</p>
       </div>
+    </div>
+  ); */
+  return (
+    <div className="fixed inset-0 flex items-center justify-center bg-gradient-to-br from-blue-50 to-green-50 gap-4">
+      <motion.div className="w-5 h-5 border-4 border-gray-300 border-t-blue-500 rounded-full animate-spin" />
+      <span className="text-gray-800">Processing your content...</span>
     </div>
   );
 }

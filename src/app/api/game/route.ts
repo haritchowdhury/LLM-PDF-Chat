@@ -107,6 +107,7 @@ export async function POST(request: NextRequest) {
       option3: string;
       option4: string;
     };
+    console.log("parsed data", parsedData);
     const manyData = parsedData.map((question: mcqQuestion) => {
       const options = [
         question.option1,
