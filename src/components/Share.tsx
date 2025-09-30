@@ -9,7 +9,6 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-import { Card, CardHeader, CardContent, CardTitle } from "@/components/ui/card";
 import { motion } from "framer-motion";
 import { buttonVariants } from "@/components/ui/button";
 
@@ -32,9 +31,7 @@ const Share = ({ namespace }: User) => {
         </div>
       ) : (
         <div /*className="w-full h-full flex items-center justify-center p-4"*/>
-          <Card
-            className="border-none" /*className="w-full max-w-2xl mx-auto shadow-lg bg-black border-none flex flex-col h-[calc(100vh-8rem)] max-h-[800px]"*/
-          >
+          <div>
             <input
               type="file"
               id="fileInput"
@@ -110,41 +107,38 @@ const Share = ({ namespace }: User) => {
 
             {/* Input Section */}
             {!showLoader && (
-              <CardContent className="p-2  flex-shrink-0 border-none bg-white">
-                <div className="flex w-full flex-row items-center justify-center">
-                  <TooltipProvider>
-                    <Tooltip>
-                      <TooltipTrigger
-                        onClick={() => {
-                          const tmp = document.querySelector(
-                            `[id="fileInput"]`
-                          ) as HTMLInputElement;
-                          tmp?.click();
-                        }}
+              <div className="flex w-full flex-row items-center justify-center">
+                <TooltipProvider>
+                  <Tooltip>
+                    <TooltipTrigger
+                      onClick={() => {
+                        const tmp = document.querySelector(
+                          `[id="fileInput"]`
+                        ) as HTMLInputElement;
+                        tmp?.click();
+                      }}
+                    >
+                      <div
+                        className={buttonVariants({
+                          variant: "outline",
+                          //size: "lg",
+                          className:
+                            "bg-gradient-to-b from-indigo-200 border-gray-300 text-gray-800 hover:bg-gray-800",
+                        })}
                       >
-                        <div
-                          className={buttonVariants({
-                            variant: "outline",
-                            //size: "lg",
-                            className:
-                              "bg-gradient-to-b from-indigo-200 border-gray-300 text-gray-800 hover:bg-gray-800 my-2",
-                          })}
-                        >
-                          {" "}
-                          <div className="flex flex-row gap-2">
-                            <Upload className="size-[20px]" /> Publish
-                          </div>
+                        <div className="flex flex-row gap-2">
+                          <Upload className="size-[20px]" /> Publish
                         </div>
-                      </TooltipTrigger>
-                      <TooltipContent>
-                        <span>Upload Document</span>
-                      </TooltipContent>
-                    </Tooltip>
-                  </TooltipProvider>
-                </div>
-              </CardContent>
+                      </div>
+                    </TooltipTrigger>
+                    <TooltipContent>
+                      <span>Upload Document</span>
+                    </TooltipContent>
+                  </Tooltip>
+                </TooltipProvider>
+              </div>
             )}
-          </Card>
+          </div>
         </div>
       )}
     </>

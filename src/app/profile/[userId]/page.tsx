@@ -2,6 +2,7 @@ import { auth } from "@/lib/auth";
 import { redirect } from "next/navigation";
 import db from "@/lib/db/db";
 import Link from "next/link";
+import Image from "next/image";
 import { buttonVariants } from "@/components/ui/button";
 import {
   MessageSquareText,
@@ -25,6 +26,7 @@ import Delete from "@/components/Delete";
 import { headers } from "next/headers";
 import EditableUsername from "@/components/EditableUsername";
 import ShareLinkModel from "@/components/ShareLink";
+import RoomsDisplay from "@/components/RoomsDisplay";
 
 type Params = Promise<{ userId: any }>;
 
@@ -61,16 +63,25 @@ const Profile = async ({ params }: { params: Params }) => {
 
   return (
     <main className="flex relative justify-center bg-gradient-to-br from-blue-50 to-green-50 text-white min-h-screen overflow-hidden">
-      <div className="w-full max-w-6xl px-4 py-20 flex flex-col">
-        {/* Profile Header */}
+      <div className="w-full max-w-7xl px-4 py-20 flex flex-col">
+        {/* Enhanced Profile Header */}
         {user && (
-          <Card className="bg-white border-none mb-6 overflow-hidden">
-            <CardHeader className="pb-4 border-none">
-              <div className="flex flex-col sm:flex-row justify-between items-center gap-4">
-                <div className="flex items-center gap-3">
-                  {/* <div className="p-2 rounded-full bg-gray-800">
-                    <User size={28} className="text-gray-400" />
-                  </div> */}
+          <Card className="bg-white border-none mb-8 overflow-hidden shadow-lg">
+            <CardHeader className="pb-6 border-none bg-gradient-to-r from-indigo-50 via-blue-50 to-green-50">
+              <div className="flex flex-col sm:flex-row justify-between items-center gap-6">
+                <div className="flex items-center gap-4">
+                  <div className="relative w-20 h-20 rounded-full bg-gradient-to-br from-indigo-100 to-blue-200 ring-4 ring-white shadow-md overflow-hidden flex items-center justify-center">
+                    {user.image ? (
+                      <Image
+                        src={user.image}
+                        alt={user.name || "User avatar"}
+                        fill
+                        className="object-cover"
+                      />
+                    ) : (
+                      <User size={32} className="text-indigo-600" />
+                    )}
+                  </div>
                   <div>
                     {isOwnProfile ? (
                       <EditableUsername
@@ -78,323 +89,143 @@ const Profile = async ({ params }: { params: Params }) => {
                         userId={user.id}
                       />
                     ) : (
-                      <CardTitle className="text-xl font-bold text-gray-800">
+                      <CardTitle className="text-2xl font-bold text-gray-800">
                         {user.name}
                       </CardTitle>
                     )}
                   </div>
                 </div>
+                {isOwnProfile && (
+                  <div className="flex gap-6 bg-white px-6 py-3 rounded-lg shadow-sm">
+                    <div className="text-center">
+                      <div className="text-2xl font-bold text-indigo-600">
+                        {shares.length}
+                      </div>
+                      <div className="text-xs text-gray-500 uppercase tracking-wide">
+                        Public
+                      </div>
+                    </div>
+                    <div className="border-l border-gray-200"></div>
+                    <div className="text-center">
+                      <div className="text-2xl font-bold text-blue-600">
+                        {Uploads.length}
+                      </div>
+                      <div className="text-xs text-gray-500 uppercase tracking-wide">
+                        Private
+                      </div>
+                    </div>
+                    <div className="border-l border-gray-200"></div>
+                    <div className="text-center">
+                      <div className="text-2xl font-bold text-green-600">
+                        {games.length}
+                      </div>
+                      <div className="text-xs text-gray-500 uppercase tracking-wide">
+                        Quizzes
+                      </div>
+                    </div>
+                  </div>
+                )}
               </div>
             </CardHeader>
           </Card>
         )}
 
         {isOwnProfile && user ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6 flex-grow">
-            {/* Publications Section */}
-            <Card className="bg-white border-none h-full">
-              <CardHeader className="pb-3 border-b border-gray-200">
-                <h1 className="text-xl">Classrooms created by me</h1>
-
-                <div className="flex justify-between items-center">
-                  <div className="flex items-center gap-2">
-                    <BookOpen size={18} className="text-gray-400" />
-                    <CardTitle className="text-lg font-medium text-gray-800">
-                      Public
-                    </CardTitle>
-                  </div>
-                  <Share namespace={"undefined"} />
-                  {/*  {betaTester ? (
-                    shares.length < 3 ? (
-                      <Share namespace={"undefined"} />
-                    ) : null
-                  ) : shares.length < 1 ? (
-                    <Share namespace={"undefined"} />
-                  ) : null} */}
-                </div>
-                <CardDescription className="text-gray-600 text-sm">
-                  Share articles with friends and earn when milestones are
-                  unlocked
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="pt-4 max-h-[40vh] overflow-y-auto">
-                {!shares.length ? (
-                  <div className="flex flex-col items-center justify-center py-8 text-gray-500">
-                    <Share2 size={40} className="mb-2 opacity-50" />
-                    <p className="text-sm">No publications yet</p>
-                  </div>
-                ) : (
-                  <div className="grid grid-cols-1 gap-2">
-                    {shares.map((share) => (
-                      <div
-                        key={share.id}
-                        className="group flex items-center justify-between p-2 rounded-md bg-white border border-gray-200 hover:bg-gray-700 transition-colors"
-                      >
-                        <div
-                          className="overflow-hidden text-ellipsis whitespace-nowrap max-w-[70%] text-gray-800 group-hover:!text-white"
-                          title={share.name}
-                        >
-                          {share.name}
-                        </div>
-                        <div className="flex gap-4 items-center">
-                          <Link
-                            href={`/chat/${share.id}`}
-                            className={buttonVariants({
-                              variant: "outline",
-                              // size: "lg",
-                              className:
-                                "bg-gradient-to-b from-indigo-200 border-gray-300 text-gray-800 hover:bg-gray-800 my-2",
-                            })}
-                          >
-                            <MessageSquareText size={14} className="mr-1" />
-                            Open
-                          </Link>
-                          <ShareLinkModel link={`${platformlink}${share.id}`} />
-
-                          <Delete upload={share.id as string} />
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                )}
-              </CardContent>
-              {/*   <CardFooter className="pt-2 border-t border-gray-200">
-                {betaTester
-                  ? shares.length >= 3 && (
-                      <div className="text-red-500 text-xs w-full text-center">
-                        You have reached maximum numbers of Publications (3)
-                      </div>
-                    )
-                  : shares.length >= 1 && (
-                      <div className="text-red-500 text-xs w-full text-center">
-                        You have reached maximum numbers of Publications (1)
-                      </div>
-                    )}
-              </CardFooter> */}
-            </Card>
-
-            {/* Workspaces Section */}
-            <Card className="bg-white border-none h-full">
-              <CardHeader className="pb-3 border-b border-gray-200">
-                <div className="flex justify-between items-center">
-                  <div className="flex items-center gap-2">
-                    <Briefcase size={18} className="text-gray-400" />
-                    <CardTitle className="text-lg font-medium text-gray-800">
-                      Private
-                    </CardTitle>
-                  </div>
-                  <Link
-                    href={`/chat/undefined`}
-                    className={buttonVariants({
-                      variant: "outline",
-                      // size: "lg",
-                      className:
-                        "bg-gradient-to-b from-indigo-200 border-gray-300 text-gray-800 hover:bg-gray-800 my-2",
-                    })}
-                  >
-                    <PlusCircle size={14} className="mr-1" />
-                    New
-                  </Link>
-                  {/*  {betaTester ? (
-                    Uploads.length < 3 ? (
-                      <Link
-                        href={`/chat/undefined`}
-                        className={buttonVariants({
-                          variant: "outline",
-                          // size: "lg",
-                          className:
-                            "bg-gradient-to-b from-indigo-200 border-gray-300 text-gray-800 hover:bg-gray-800 my-2",
-                        })}
-                      >
-                        <PlusCircle size={14} className="mr-1" />
-                        New
-                      </Link>
-                    ) : null
-                  ) : Uploads.length < 1 ? (
-                    <Link
-                      href={`/chat/undefined`}
-                      className={buttonVariants({
-                        variant: "outline",
-                        //size: "lg",
-                        className:
-                          "bg-gradient-to-b from-indigo-200 border-gray-300 text-gray-800 hover:bg-gray-800 my-2",
-                      })}
-                    >
-                      <PlusCircle size={14} className="mr-1" />
-                      New
-                    </Link>
-                  ) : null} */}
-                </div>
-                <CardDescription className="text-gray-600 text-sm">
-                  Start a private workspace for your content
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="pt-4 max-h-[40vh] overflow-y-auto">
-                {!Uploads.length ? (
-                  <div className="flex flex-col items-center justify-center py-8 text-gray-500">
-                    <Briefcase size={40} className="mb-2 opacity-50" />
-                    <p className="text-sm">No workspaces yet</p>
-                  </div>
-                ) : (
-                  <div className="grid grid-cols-1 gap-2">
-                    {Uploads.map((upload) => (
-                      <div
-                        key={upload.id}
-                        className="group flex items-center justify-between p-2 rounded-md bg-white border border-gray-200 hover:bg-gray-700 transition-colors"
-                      >
-                        <div
-                          className="overflow-hidden text-ellipsis whitespace-nowrap max-w-[70%] text-gray-800 group-hover:!text-white"
-                          title={upload.name}
-                        >
-                          {upload.name}
-                        </div>
-                        <div className="flex gap-1 items-center">
-                          <Link
-                            href={`/chat/${upload.id}`}
-                            className={buttonVariants({
-                              variant: "outline",
-                              // size: "lg",
-                              className:
-                                "bg-gradient-to-b from-indigo-200 border-gray-300 text-gray-800 hover:bg-gray-800 my-2",
-                            })}
-                          >
-                            <MessageSquareText size={14} className="mr-1" />
-                            Open
-                          </Link>
-                          <Delete upload={upload.id as string} />
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                )}
-              </CardContent>
-              {/* <CardFooter className="pt-2 border-t border-gray-200">
-                {betaTester
-                  ? Uploads.length >= 3 && (
-                      <div className="text-red-500 text-xs w-full text-center">
-                        You have reached maximum numbers of Workspaces (3)
-                      </div>
-                    )
-                  : Uploads.length >= 1 && (
-                      <div className="text-red-500 text-xs w-full text-center">
-                        You have reached maximum numbers of Workspaces (1)
-                      </div>
-                    )}
-              </CardFooter> */}
-            </Card>
-          </div>
+          <RoomsDisplay
+            shares={shares}
+            uploads={Uploads}
+            games={games}
+            platformlink={platformlink}
+          />
         ) : (
           <div className="space-y-6">
-            <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
-              <div className="bg-gradient-to-r from-gray-50 to-gray-100 px-6 py-4 border-b border-gray-200">
-                <div className="flex items-center gap-3">
-                  <div className="w-2 h-2 bg-indigo-500 rounded-full"></div>
-                  <h3 className="text-lg font-semibold text-gray-800">
-                    Articles Published by the Author
-                  </h3>
-                  <span className="ml-auto text-sm text-gray-500 bg-white px-2 py-1 rounded-full">
-                    {shares.length} articles
-                  </span>
-                </div>
-              </div>
-
-              <div className="p-4">
-                <div className="space-y-2">
-                  {shares.map((share, index) => (
-                    <div
-                      key={share.id}
-                      className="group flex items-center justify-between p-4 rounded-lg bg-gray-50 border border-gray-100 hover:bg-indigo-50 hover:border-indigo-200 transition-all duration-200 hover:shadow-sm"
-                    >
-                      <div className="flex items-center gap-3 flex-1 min-w-0">
-                        <div className="w-8 h-8 bg-gradient-to-br from-indigo-100 to-indigo-200 rounded-full flex items-center justify-center text-indigo-600 font-medium text-sm">
-                          {index + 1}
-                        </div>
-                        <div
-                          className="overflow-hidden text-ellipsis whitespace-nowrap flex-1 text-gray-700 group-hover:text-indigo-800 font-medium"
-                          title={share.name}
-                        >
-                          {share.name}
-                        </div>
+            <div>
+              <h2 className="text-2xl font-bold text-gray-800 mb-6">
+                Published Classrooms
+              </h2>
+              <Card className="bg-white border-none shadow-lg overflow-hidden">
+                <CardHeader className="pb-4 bg-gradient-to-r from-indigo-50 via-blue-50 to-green-50">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-3">
+                      <div className="p-2 rounded-lg bg-gradient-to-br from-indigo-100 to-indigo-200">
+                        <BookOpen size={20} className="text-indigo-600" />
                       </div>
-
-                      <div className="flex items-center gap-2 ml-4">
-                        <Link
-                          href={`/chat/${share.id}`}
-                          className={buttonVariants({
-                            variant: "outline",
-                            size: "sm",
-                            className:
-                              "bg-white border-gray-300 text-gray-700 hover:bg-indigo-600 hover:text-white hover:border-indigo-600 transition-all duration-200",
-                          })}
-                        >
-                          <MessageSquareText size={14} className="mr-2" />
-                          Open
-                        </Link>
-                        <ShareLinkModel link={`${platformlink}${share.id}`} />
+                      <div>
+                        <CardTitle className="text-xl font-semibold text-gray-800">
+                          Articles by {user?.name}
+                        </CardTitle>
+                        <CardDescription className="text-gray-600 text-sm mt-1">
+                          Explore public classrooms shared by this author
+                        </CardDescription>
                       </div>
                     </div>
-                  ))}
-                </div>
-
-                {shares.length === 0 && (
-                  <div className="text-center py-12 text-gray-500">
-                    <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                      <MessageSquareText size={24} className="text-gray-400" />
+                    <div className="flex items-center gap-2 bg-white px-4 py-2 rounded-full shadow-sm">
+                      <BookOpen size={16} className="text-indigo-600" />
+                      <span className="text-sm font-semibold text-gray-700">
+                        {shares.length}{" "}
+                        {shares.length === 1 ? "article" : "articles"}
+                      </span>
                     </div>
-                    <p className="text-lg font-medium mb-2">
-                      No articles published yet
-                    </p>
-                    <p className="text-sm">
-                      Articles will appear here once they are published.
-                    </p>
                   </div>
-                )}
-              </div>
+                </CardHeader>
+
+                <CardContent className="p-6">
+                  {shares.length === 0 ? (
+                    <div className="text-center py-16 text-gray-500">
+                      <div className="p-5 rounded-full bg-indigo-50 inline-flex items-center justify-center mb-4">
+                        <BookOpen size={36} className="text-indigo-300" />
+                      </div>
+                      <p className="text-lg font-semibold text-gray-700 mb-2">
+                        No articles published yet
+                      </p>
+                      <p className="text-sm text-gray-500">
+                        This author hasn't published any classrooms yet.
+                      </p>
+                    </div>
+                  ) : (
+                    <div className="space-y-3">
+                      {shares.map((share, index) => (
+                        <div
+                          key={share.id}
+                          className="group flex items-center justify-between p-5 rounded-xl bg-gradient-to-r from-gray-50 to-indigo-50 border border-gray-200 hover:border-indigo-300 hover:shadow-lg transition-all duration-300"
+                        >
+                          <div className="flex items-center gap-4 flex-1 min-w-0">
+                            <div className="w-10 h-10 bg-gradient-to-br from-indigo-100 to-indigo-200 rounded-full flex items-center justify-center text-indigo-700 font-bold text-sm shadow-sm">
+                              {index + 1}
+                            </div>
+                            <div
+                              className="overflow-hidden text-ellipsis whitespace-nowrap flex-1 text-gray-800 group-hover:text-indigo-800 font-semibold text-base"
+                              title={share.name}
+                            >
+                              {share.name}
+                            </div>
+                          </div>
+
+                          <div className="flex items-center gap-2 ml-4">
+                            <Link
+                              href={`/chat/${share.id}`}
+                              className={buttonVariants({
+                                variant: "outline",
+                                size: "sm",
+                                className:
+                                  "bg-white border-indigo-200 text-indigo-700 hover:bg-indigo-600 hover:text-white hover:border-indigo-600 transition-all duration-200 shadow-sm",
+                              })}
+                            >
+                              <MessageSquareText size={14} className="mr-2" />
+                              Open
+                            </Link>
+                            <ShareLinkModel
+                              link={`${platformlink}${share.id}`}
+                            />
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
             </div>
           </div>
-        )}
-
-        {/* Quizzes Section */}
-        {isOwnProfile && user && (
-          <Card className="bg-white border-none">
-            <CardHeader className="pb-3 border-b border-gray-200">
-              <div className="flex items-center gap-2">
-                <Boxes size={18} className="text-gray-400" />
-                <CardTitle className="text-lg font-medium text-gray-800">
-                  Quizzes
-                </CardTitle>
-              </div>
-              <CardDescription className="text-gray-600 text-sm">
-                Track your quiz performance and results
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="pt-4 max-h-[50vh] overflow-y-auto">
-              {!games.length ? (
-                <div className="flex flex-col items-center justify-center py-8 text-gray-500">
-                  <Boxes size={40} className="mb-2 opacity-50" />
-                  <p className="text-sm">No quizzes taken yet</p>
-                </div>
-              ) : (
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2">
-                  {games.map((game) => (
-                    <Link
-                      key={game.id}
-                      href={`/statistics/${game.id}`}
-                      className="group flex items-center justify-between p-2 rounded-md bg-white border border-gray-200 hover:bg-gray-700 transition-colors"
-                    >
-                      <div
-                        className="overflow-hidden text-ellipsis whitespace-nowrap max-w-[70%] text-gray-800 group-hover:!text-white"
-                        title={game.topic}
-                      >
-                        {game.topic}
-                      </div>
-                      <Boxes size={16} className="text-gray-400" />
-                    </Link>
-                  ))}
-                </div>
-              )}
-            </CardContent>
-          </Card>
         )}
       </div>
     </main>
