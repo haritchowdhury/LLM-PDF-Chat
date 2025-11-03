@@ -34,26 +34,41 @@ export async function POST(request: NextRequest) {
     let questions: any;
     if (type === "mcq") {
       questions = await strict_output(
-        `You are a helpful AI that is able to generate mcq questions 
-        and answers, the length of each answer should not be more than 
-        15 words, store all answers and questions and options in a JSON 
-        array of the following structure:
-        {
-         "question": "string",
-         "answer": "string",
-         "option1": "string",
-         "option2": "string",
-         "option3": "string",
-         "option4": "string"
-         }`,
+        `You are a helpful AI that is able to generate mcq questions
+        and answers, the length of each answer should not be more than
+        15 words.
+
+        IMPORTANT: You MUST return a JSON array. Even if generating one question, return it as an array with one element.
+
+        The structure should be an array like this:
+        [
+          {
+           "question": "string",
+           "answer": "string",
+           "option1": "string",
+           "option2": "string",
+           "option3": "string",
+           "option4": "string"
+          }
+        ]`,
         new Array(amount).fill(
-          `You are to generate a random hard mcq question about ${topic}. 
+          `You are to generate a random hard mcq question about ${topic}.
           The question should be strictly relevant to the topic and the answer should be clear, there should not be any ambiguity among the options for the question.`
         ),
         questionData
       );
+
+      // Ensure questions is always an array
+      if (!Array.isArray(questions)) {
+        if (questions && typeof questions === 'object') {
+          questions = [questions];
+        } else {
+          questions = [];
+        }
+      }
     }
-    //console.log(JSON.stringify(questions));
+    console.log("Generated questions:", JSON.stringify(questions));
+    console.log("Is array?", Array.isArray(questions));
     return NextResponse.json(
       {
         questions: questions,

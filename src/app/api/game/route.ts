@@ -50,7 +50,7 @@ export async function POST(request: NextRequest) {
   const body = await request.json();
   const { topic, amount, id } = quizCreationSchema.parse(body);
   const namespace = id;
-  const type = "mcq";
+  const type = "mcq" as const;
   const headersList = await headers();
   const host = await headersList.get("host");
   const game = await db.game.create({
@@ -87,6 +87,13 @@ export async function POST(request: NextRequest) {
   let parsedData: any;
   try {
     parsedData = data.questions;
+    if (!Array.isArray(parsedData)) {
+      console.error("parsedData is not an array:", parsedData);
+      return NextResponse.json(
+        { error: "Invalid response format from questions API." },
+        { status: 500 }
+      );
+    }
   } catch (err) {
     console.log(err);
     return NextResponse.json(
@@ -120,7 +127,7 @@ export async function POST(request: NextRequest) {
         answer: question.answer,
         options: JSON.stringify(options),
         gameId: game.id,
-        questionType: "mcq",
+        questionType: "mcq" as const,
       };
     });
     await db.question.createMany({

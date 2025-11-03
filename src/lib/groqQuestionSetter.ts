@@ -42,17 +42,20 @@ export async function strict_output(
 
     const chain = partialedPrompt.pipe(groq).pipe(parser);
     const res: any = await chain.invoke({ query: user_prompt });
-    return res;
 
-    /* const list_output: boolean = Array.isArray(res);
-
-    if (list_output) {
+    // Ensure the result is always an array
+    if (Array.isArray(res)) {
       return res;
+    } else if (res && typeof res === 'object') {
+      // If it's a single object, wrap it in an array
+      console.warn('strict_output received a single object instead of an array, wrapping it');
+      return [res];
     } else {
-      return "Not Found" as any;
+      console.error('strict_output received invalid data:', res);
+      return [];
     }
-    console.log("parsed output", res); */
   } catch (error) {
-    return "Not Found" as any;
+    console.error('Error in strict_output:', error);
+    return [];
   }
 }
