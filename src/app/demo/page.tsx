@@ -5,7 +5,7 @@ const DemoPage = () => {
     <div className="pt-8">
       {" "}
       <VideoPlayer
-        videoId="dQw4w9WgXcQ"
+        videoId="FaCfcMYJTPs"
         title="Watch Our Demo"
         description="Learn how to transform your study materials into interactive quizzes with our AI-powered platform"
       />
