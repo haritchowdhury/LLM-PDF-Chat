@@ -19,9 +19,12 @@ const HeroSection = () => {
           >
             Get Started Free
           </Link>
-          <button className="border border-gray-300 text-gray-700 px-8 py-3 rounded-lg font-semibold hover:bg-gray-50 transition-colors">
+          <Link
+            href="/demo"
+            className="border border-gray-300 text-gray-700 px-8 py-3 rounded-lg font-semibold hover:bg-gray-50 transition-colors"
+          >
             Watch Demo
-          </button>
+          </Link>
         </div>
       </div>
     </div>
