@@ -4,15 +4,7 @@ import db from "@/lib/db/db";
 import Link from "next/link";
 import Image from "next/image";
 import { buttonVariants } from "@/components/ui/button";
-import {
-  MessageSquareText,
-  Boxes,
-  PlusCircle,
-  User,
-  BookOpen,
-  Briefcase,
-  Share2,
-} from "lucide-react";
+import { MessageSquareText, User, BookOpen } from "lucide-react";
 import {
   Card,
   CardContent,
@@ -21,8 +13,6 @@ import {
   CardFooter,
   CardDescription,
 } from "@/components/ui/card";
-import Share from "@/components/Share";
-import Delete from "@/components/Delete";
 import { headers } from "next/headers";
 import EditableUsername from "@/components/EditableUsername";
 import ShareLinkModel from "@/components/ShareLink";

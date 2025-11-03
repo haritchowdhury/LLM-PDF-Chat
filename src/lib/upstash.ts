@@ -1,5 +1,5 @@
 import { RecursiveCharacterTextSplitter } from "@langchain/textsplitters";
-import { HuggingFaceInferenceEmbeddings } from "@langchain/community/embeddings/hf";
+import { OpenAIEmbeddings } from "@langchain/openai";
 import { Redis } from "@upstash/redis";
 import { Index } from "@upstash/vector";
 import { Document } from "langchain/document";
@@ -47,11 +47,18 @@ export const updateUpstash = async (
     });
 
     const chunks = await textSplitter.createDocuments([text]);
+    console.log(`Created ${chunks.length} chunks, starting embeddings...`);
 
-    const embeddingsArrays =
-      await new HuggingFaceInferenceEmbeddings().embedDocuments(
-        chunks.map((chunk) => chunk.pageContent.replace(/\n/g, " "))
-      );
+    const embedder = new OpenAIEmbeddings({
+      openAIApiKey: process.env.OPENAI_API_KEY,
+      modelName: "text-embedding-3-small",
+      dimensions: 768, // Match Upstash index dimension
+    });
+
+    const embeddingsArrays = await embedder.embedDocuments(
+      chunks.map((chunk) => chunk.pageContent.replace(/\n/g, " "))
+    );
+    console.log("Embeddings generated successfully");
 
     // Create all vectors for this document (no shared state, no race condition)
     const vectors = chunks.map((chunk, idx) => {
@@ -130,8 +137,12 @@ export const queryUpstashAndLLM = async (
   const chatHistoryKey = sessionId || namespace; // Use sessionId if provided, otherwise namespace
   const chatHistory = await getChatHistory(chatHistoryKey, 10); // Get last 10 messages
 
-  const embeddingsArrays =
-    await new HuggingFaceInferenceEmbeddings().embedDocuments([question]);
+  const embedder = new OpenAIEmbeddings({
+    openAIApiKey: process.env.OPENAI_API_KEY,
+    modelName: "text-embedding-3-small",
+    dimensions: 768, // Match Upstash index dimension
+  });
+  const embeddingsArrays = await embedder.embedDocuments([question]);
   const effectiveNameSPace = isPersonal ? userId : uploaderId;
   const queryResponse: any[] = await index.query(
     {
@@ -212,8 +223,12 @@ export const queryUpstash = async (
 ) => {
   const effectiveNameSPace = isPersonal ? userId : uploaderId;
 
-  const embeddingsArrays =
-    await new HuggingFaceInferenceEmbeddings().embedDocuments([topic]);
+  const embedder = new OpenAIEmbeddings({
+    openAIApiKey: process.env.OPENAI_API_KEY,
+    modelName: "text-embedding-3-small",
+    dimensions: 768, // Match Upstash index dimension
+  });
+  const embeddingsArrays = await embedder.embedDocuments([topic]);
 
   const queryResponse: any[] = await index.query(
     {
@@ -247,16 +262,28 @@ export const updateUpstashWithUrl = async (
   userId: string
 ) => {
   const textPromises = text.map(async (currentText, textIndex) => {
+    console.log(
+      `Processing text chunk ${textIndex}, length: ${currentText.length}`
+    );
     const textSplitter = new RecursiveCharacterTextSplitter({
       chunkSize: 2000,
       chunkOverlap: 200,
     });
+    console.log("Creating document chunks from URL text...");
     const chunks = await textSplitter.createDocuments([currentText]);
+    console.log(`Created ${chunks.length} chunks from URL text`);
 
-    const embeddingsArrays =
-      await new HuggingFaceInferenceEmbeddings().embedDocuments(
-        chunks.map((chunk) => chunk.pageContent.replace(/\n/g, " "))
-      );
+    console.log("Generating embeddings for URL content...");
+    const embedder = new OpenAIEmbeddings({
+      openAIApiKey: process.env.OPENAI_API_KEY,
+      modelName: "text-embedding-3-small",
+      dimensions: 768, // Match Upstash index dimension
+    });
+
+    const embeddingsArrays = await embedder.embedDocuments(
+      chunks.map((chunk) => chunk.pageContent.replace(/\n/g, " "))
+    );
+    console.log("URL embeddings generated successfully");
 
     // Create all vectors for this text chunk (no shared state, no race condition)
     const vectors = chunks.map((chunk, idx) => {

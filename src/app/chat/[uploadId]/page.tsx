@@ -34,7 +34,7 @@ const ChatPage = async ({ params }: { params: Params }) => {
     personal = lastUpload.private;
     publisher = lastUpload.userId;
 
-    console.log("Upload Id", lastUpload);
+    //console.log("Upload Id", lastUpload);
 
     if (!lastUpload) {
       redirect("/sign-in");

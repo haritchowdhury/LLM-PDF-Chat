@@ -786,7 +786,7 @@
     zod "^3.22.4"
     zod-to-json-schema "^3.22.3"
 
-"@langchain/openai@~0.3.0":
+"@langchain/openai@^0.3.0", "@langchain/openai@~0.3.0":
   version "0.3.17"
   resolved "https://registry.npmjs.org/@langchain/openai/-/openai-0.3.17.tgz"
   integrity sha512-uw4po32OKptVjq+CYHrumgbfh4NuD7LqyE+ZgqY9I/LrLc6bHLMc+sisHmI17vgek0K/yqtarI0alPJbzrwyag==
