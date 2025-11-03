@@ -9,7 +9,6 @@ import { NextRequest, NextResponse } from "next/server";
 
 import getUserSession from "@/lib/user.server";
 import { queryUpstashAndLLM } from "@/lib/upstash";
-import { saveMessage } from "@/lib/redisChat";
 import { auth } from "@/lib/auth";
 import db from "@/lib/db/db";
 
@@ -160,22 +159,15 @@ export async function POST(request: NextRequest) {
       );
     } */
 
-    // Save user question to chat history
-    await saveMessage(effectiveSessionId, {
-      role: "user",
-      content: user_prompt,
-      sources: [],
-    });
-
-    // Query the vector store and LLM
+    // Query the vector store and LLM (chat history is now handled internally)
     const response = await queryUpstashAndLLM(
       index,
       effectiveNamespace,
-      //effectiveSessionId,
       user_prompt,
       userId,
       document.private,
-      document.userId
+      document.userId,
+      effectiveSessionId // Pass sessionId for conversational memory
     );
 
     console.log("LLM Result", response);
@@ -196,15 +188,10 @@ export async function POST(request: NextRequest) {
 
     // Ensure sources is an array
     if (!sources || !Array.isArray(sources) || !sources.length) {
-      sources = ["No Sources"];
+      sources = [];
     }
 
-    // Save AI response to chat history
-    await saveMessage(effectiveSessionId, {
-      role: "assistant",
-      content: responseContent,
-      sources: sources,
-    });
+    // Note: Chat history is now saved automatically in queryUpstashAndLLM
 
     // Increment rate limit counter
     await redis.set(`chat_rate_limit:${userId}`, requestCount + 1, {

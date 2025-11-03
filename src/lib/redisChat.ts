@@ -51,6 +51,57 @@ export async function saveMessage(
 }
 
 /**
+ * Retrieve chat history from Redis
+ * @param userId - The user's ID
+ * @param limit - Maximum number of messages to retrieve (default: 10)
+ * @returns Array of messages in chronological order (oldest first)
+ */
+export async function getChatHistory(
+  userId: string,
+  limit: number = 10
+): Promise<Message[]> {
+  try {
+    const chatHistoryKey = `chat:history:${userId}`;
+
+    // Get messages from Redis (LRANGE gets items from list)
+    // Since we use LPUSH, newest messages are at index 0
+    // We get the last 'limit' messages and reverse to get chronological order
+    const messages = await redis.lrange(chatHistoryKey, 0, limit - 1);
+
+    if (!messages || messages.length === 0) {
+      return [];
+    }
+
+    // Upstash Redis client returns objects directly (already parsed)
+    // Filter valid messages and reverse to get chronological order (oldest first)
+    const parsedMessages = messages
+      .map((msg) => {
+        try {
+          // If msg is already an object, use it directly
+          if (typeof msg === "object" && msg !== null) {
+            return msg as Message;
+          }
+          // If msg is a string, parse it
+          if (typeof msg === "string") {
+            return JSON.parse(msg) as Message;
+          }
+          return null;
+        } catch (e) {
+          console.error("Failed to parse message:", e);
+          return null;
+        }
+      })
+      .filter((msg): msg is Message => msg !== null)
+      .reverse(); // Reverse to get oldest first
+
+    return parsedMessages;
+  } catch (error) {
+    console.error("Failed to retrieve chat history from Redis:", error);
+    return [];
+  }
+}
+
+/**
  * Delete a user's chat history from Redis
  * @param userId - The user's ID
  */

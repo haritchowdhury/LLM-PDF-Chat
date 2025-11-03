@@ -6,7 +6,12 @@ import { Document } from "langchain/document";
 import { v4 as uuid } from "uuid";
 import { qaChain } from "@/lib/qaChain";
 import { strict_output } from "@/lib/groqTopicSetter";
-import { deleteChatHistory } from "@/lib/redisChat";
+import {
+  deleteChatHistory,
+  getChatHistory,
+  saveMessage,
+  Message,
+} from "@/lib/redisChat";
 
 interface Metadata {
   content: string;
@@ -118,8 +123,13 @@ export const queryUpstashAndLLM = async (
   question: string,
   userId: string,
   isPersonal: boolean,
-  uploaderId: string
+  uploaderId: string,
+  sessionId?: string
 ) => {
+  // Retrieve chat history for conversational memory
+  const chatHistoryKey = sessionId || namespace; // Use sessionId if provided, otherwise namespace
+  const chatHistory = await getChatHistory(chatHistoryKey, 10); // Get last 10 messages
+
   const embeddingsArrays =
     await new HuggingFaceInferenceEmbeddings().embedDocuments([question]);
   const effectiveNameSPace = isPersonal ? userId : uploaderId;
@@ -141,6 +151,7 @@ export const queryUpstashAndLLM = async (
       if (result?.metadata?.namespace === namespace) {
         try {
           const context = result?.metadata?.content;
+          retrivedData += `<Source> ${result?.metadata?.source} </Source>`;
           retrivedData += context;
           if (!sources.includes(result?.metadata?.source)) {
             sources.push(result?.metadata?.source);
@@ -155,15 +166,40 @@ export const queryUpstashAndLLM = async (
     await Promise.all(contextPromises);
   }
 
-  const response: any = await qaChain(
-    `You are a helpful AI assistant specializing in providing precise answers to user's questions. 
+  // Pass chat history and sources to qaChain for conversational context and citation tracking
+  const result: any = await qaChain(
+    `You are a helpful AI assistant specializing in providing precise answers to user's questions.
     Provide concise, technical answers. Never recommend illegal activities.`,
     question,
-    retrivedData
+    retrivedData,
+    chatHistory, // Include conversation history
+    sources // Include sources for citation tracking
   );
+
+  // Extract response and cited sources from qaChain result
+  const response = result.response || result;
+  const citedSources = result.citedSources;
+
+  // Save user message and assistant response to chat history
+  const userMessage: Message = {
+    role: "user",
+    content: question,
+    sources: [],
+  };
+
+  const assistantMessage: Message = {
+    role: "assistant",
+    content: response.content || response.text || String(response),
+    sources: citedSources, // Use only cited sources
+  };
+
+  await saveMessage(chatHistoryKey, userMessage);
+  await saveMessage(chatHistoryKey, assistantMessage);
+
   console.log("retereived data", retrivedData);
   console.log("output", response);
-  return [response, sources];
+  console.log("cited sources", citedSources);
+  return [response, citedSources]; // Return only cited sources
 };
 
 export const queryUpstash = async (
@@ -202,79 +238,6 @@ export const queryUpstash = async (
 
   return quizContentArray.join("");
 };
-/*
-export const updateUpstashWithUrl = async (
-  index: Index,
-  namespace: string,
-  text: string[],
-  url: string,
-  userId: string
-) => {
-  let extractedTopics: string[] = [];
-  let topics: string[] = [];
-
-  for (let i = 0; i < text.length; i++) {
-    const currentText = text[i];
-
-    const textSplitter = new RecursiveCharacterTextSplitter({
-      chunkSize: 2000,
-      chunkOverlap: 200,
-    });
-    const chunks = await textSplitter.createDocuments([currentText]);
-
-    const embeddingsArrays =
-      await new HuggingFaceInferenceEmbeddings().embedDocuments(
-        chunks.map((chunk) => chunk.pageContent.replace(/\n/g, " "))
-      );
-
-    const batchSize = 500;
-    let batch = [];
-    let pageContent = "";
-    const batchPromises = chunks.map(async (chunk, idx) => {
-      const sourceName = `Url: ${url}`;
-
-      const vector = {
-        id: uuid(),
-        vector: embeddingsArrays[idx],
-        metadata: {
-          content: chunk.pageContent,
-          source: sourceName,
-          fileName: url,
-          pageNumber: 0,
-          namespace: namespace,
-        },
-      };
-
-      pageContent += chunk.pageContent + " ";
-      batch.push(vector);
-
-      if (batch.length === batchSize || idx === chunks.length - 1) {
-        const response = await index.upsert(batch, { namespace: userId });
-        console.log(`response: ${JSON.stringify(response)}`);
-        topics = [];
-        topics = await strict_output(
-          `You are an Expert AI Instructor who can identify the theme of the summary and figure out the most important chapers
-        from the summary that will be useful for preparing the paper for exam,  you are to return the important chapters that most 
-        thoroughly capture the import aspects of the summary. The length of each topic must
-        not exceed 4 words. Store all options in a JSON array of the following structure:`,
-
-          `You are to generate main topics that thorougly capture the main subjects of the summary`,
-          pageContent
-        );
-        //console.log("upstash topics", topics);
-        extractedTopics = extractedTopics.concat(topics);
-        //console.log("upstash topics", topics, extractedTopics);
-
-        batch = [];
-        pageContent = "";
-      }
-    });
-
-    await Promise.all(batchPromises);
-  }
-
-  return Array.from(new Set(extractedTopics));
-}; */
 
 export const updateUpstashWithUrl = async (
   index: Index,
@@ -297,7 +260,7 @@ export const updateUpstashWithUrl = async (
 
     // Create all vectors for this text chunk (no shared state, no race condition)
     const vectors = chunks.map((chunk, idx) => {
-      const sourceName = `Url: ${url}`;
+      const sourceName = `Url: ${url}: chunk ${idx}`;
 
       return {
         id: uuid(),
@@ -371,7 +334,12 @@ export const deleteUpstash = async (
   await deleteChatHistory(sessionId);
   await redis.del(`${sessionId}*`);
 
-  console.log("Deleting vectors for namespace:", namespace, "in userId:", userId);
+  console.log(
+    "Deleting vectors for namespace:",
+    namespace,
+    "in userId:",
+    userId
+  );
 
   // Delete all vector embeddings where metadata.namespace === namespace
   // Using range to fetch all vectors, filter by metadata, and delete by IDs
@@ -409,14 +377,21 @@ export const deleteUpstash = async (
       if (vectorIdsToDelete.length > 0) {
         await index.delete(vectorIdsToDelete, { namespace: userId });
         totalDeleted += vectorIdsToDelete.length;
-        console.log(`Deleted ${vectorIdsToDelete.length} vectors (Total: ${totalDeleted})`);
+        console.log(
+          `Deleted ${vectorIdsToDelete.length} vectors (Total: ${totalDeleted})`
+        );
       }
 
       // Update cursor for next iteration
       cursor = rangeResult.nextCursor || "";
 
       // If cursor is empty or no more vectors, we're done
-      if (!cursor || cursor === "" || !rangeResult.vectors || rangeResult.vectors.length === 0) {
+      if (
+        !cursor ||
+        cursor === "" ||
+        !rangeResult.vectors ||
+        rangeResult.vectors.length === 0
+      ) {
         break;
       }
     } while (true);

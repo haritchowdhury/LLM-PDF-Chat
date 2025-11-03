@@ -10,7 +10,7 @@ by allowing you to chat with them, pointing out the important topics from the do
 to take dynamic quizzes from the topics of your choice from the documents.
 
 Educational content creators can compile their resources and content in a document and share it with
-other users by using the public upload functionality and share the chat room link across various social media websites. Creators earn money every time other users unlock the quiz component from any of their published documents. Creators can withdraw the collected amount any time they want from their profile section.
+other users by using the public upload functionality and share the chat room link across various social media websites.
 ```
 
 ---
@@ -21,7 +21,6 @@ other users by using the public upload functionality and share the chat room lin
 1. Chat module: allows users to chat with a document
 2. Quiz Module: allows users to take AI generated quizzes from any topic from the given document
 3. Topic Module: allows users to find the important topics from the document
-4. Contract Integrations: charges users to unlock the quiz, and processes refunds, lets users monetize their publications and withdraw funds.
 ```
 
 ---
@@ -33,28 +32,10 @@ other users by using the public upload functionality and share the chat room lin
 2. Only answers from the uploaded documents and not the LLM's own knowledgebase
 3. Takes care of catastrophic forgetting by restricting the agent's context
 4. Makes use of strict output parsing using JSON to create other functionalities
-5. JSON output parser extracts output from LLM in a formatted way which can be used by the frontend components.
-6. These structures outputs are used to create quizzes and important topics from the document
-7. The project is integrated with two smart contracts deployed on EDU test net
-8. The first (Milestones) charges users to unlock the Quiz component
-9. As the users take the AI generated quizzes from the dynamically created topics they get to claim milestones
-10. By claiming these milestones, they can claim refunds to their wallets
-11. If they do not claim these milestones within a given timeframe, they can't get the refunds
-12. The second contract (Creators-Economy) is used for articles that are shared with the community
-13. Users can upload their documents privately or publicly
-14. When the documents are publicly uploaded, they show up on the home page
-15. When users unlock the quiz component for these public documents 50% of the money is paid directly to the creators who uploaded the documents
-16. The users can claim the remaining 50% by completing the quizzes from the dynamically created topics
-17. Users need to complete the topics within a given timeframe of unlocking the quiz to get their refunds
-```
-
----
-
-## Contracts
-
-```
-1. Milestones Contract - For private uploads: 0x5e831A94139712C7C480d9B9fD3290f3c234875c
-2. Creator-Economy Contract - For public uploads: 0x8C8D84fB7CE0B68b8f5525CcB10fe4a2387B9C06
+5. JSON output parser extracts output from LLM in a formatted way which can be used by the frontend components
+6. These structured outputs are used to create quizzes and important topics from the document
+7. Users can upload their documents privately or publicly
+8. When the documents are publicly uploaded, they show up on the home page
 ```
 
 ---
@@ -133,10 +114,6 @@ iii. yarn dev - to run in localhost
 - Upstash Vectorstore
 - Neon ProstgreSQL
 - Huggingface Inference
-- Solidity
-- Wagmi
-- Ethers
-- Hardhat
 - Shadcn
 
 # aiversety
