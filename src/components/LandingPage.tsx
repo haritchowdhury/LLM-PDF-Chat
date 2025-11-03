@@ -111,8 +111,18 @@ const Share2 = ({ className }) => (
   </svg>
 );
 
+// Type definition for shares
+type Share = {
+  id: string;
+  name: string;
+  description?: string;
+  timeStarted: Date;
+  userId: string;
+  user: { id: string; name: string };
+};
+
 // Sample data
-const sampleShares = [
+const sampleShares: Share[] = [
   {
     id: "1",
     name: "Introduction to Machine Learning Fundamentals",
@@ -191,6 +201,10 @@ const LandingPage = ({
   id = "user1",
   platformlink = "/classroom/",
   shares = sampleShares,
+}: {
+  id?: string;
+  platformlink?: string;
+  shares?: Share[];
 }) => {
   const [articles, setArticles] = useState([]);
   const [displayedArticles, setDisplayedArticles] = useState([]);
