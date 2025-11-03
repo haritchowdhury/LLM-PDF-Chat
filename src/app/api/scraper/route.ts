@@ -14,7 +14,7 @@ import { auth } from "@/lib/auth";
 import { uploadValidator } from "@/lib/validation/upload-validation";
 
 // Function to chunk text into segments of specified length
-function chunkText(text, chunkSize = 7000) {
+function chunkText(text, chunkSize = 2000) {
   const chunks = [];
 
   for (let i = 0; i < text.length; i += chunkSize) {

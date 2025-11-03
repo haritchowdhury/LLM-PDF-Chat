@@ -30,10 +30,7 @@ export const updateUpstash = async (
   fileName: string,
   userId: string
 ) => {
-  // Extract topics
-  let extractedTopics: string[] = [];
-  let topics: string[] = [];
-
+  // Process all documents and collect content for topic generation
   const promiseList = docs.map(async (doc, counter) => {
     const text = doc["pageContent"];
 
@@ -51,14 +48,11 @@ export const updateUpstash = async (
         chunks.map((chunk) => chunk.pageContent.replace(/\n/g, " "))
       );
 
-    const batchSize = 500;
-    let batch = [];
-    let pageContent = "";
-
-    const batchPromises = chunks.map(async (chunk, idx) => {
+    // Create all vectors for this document (no shared state, no race condition)
+    const vectors = chunks.map((chunk, idx) => {
       const sourceName = `${fileName}, Page ${counter + 1}`;
 
-      const vector = {
+      return {
         id: uuid(),
         vector: embeddingsArrays[idx],
         metadata: {
@@ -69,37 +63,52 @@ export const updateUpstash = async (
           namespace: namespace,
         },
       };
-
-      pageContent += chunk.pageContent + " ";
-      batch.push(vector);
-
-      if (batch.length === batchSize || idx === chunks.length - 1) {
-        const response = await index.upsert(batch, { namespace: userId });
-        console.log(`Batch: ${counter} response: ${JSON.stringify(response)}`);
-        topics = [];
-        topics = await strict_output(
-          `You are an Expert AI Instructor who can identify the theme of the summary and figure out the most important chapers
-        from the summary that will be useful for preparing the paper for exam,  you are to return the important chapters that most 
-        thoroughly capture the import aspects of the summary. The length of each topic must
-        not exceed 4 words. Store all options in a JSON array of the following structure:`,
-
-          `You are to generate main topics that thorougly capture the main subjects of the summary`,
-          pageContent
-        );
-        //console.log("upstash topics", topics);
-        extractedTopics = extractedTopics.concat(topics);
-        //console.log("upstash topics", topics, extractedTopics);
-
-        batch = [];
-        pageContent = "";
-      }
     });
 
-    await Promise.all(batchPromises);
+    // Collect all content from this document for topic generation
+    const documentContent = chunks.map(chunk => chunk.pageContent).join(" ");
+
+    // Batch upsert sequentially to avoid race conditions
+    const batchSize = 500;
+    for (let i = 0; i < vectors.length; i += batchSize) {
+      const batch = vectors.slice(i, i + batchSize);
+      const response = await index.upsert(batch, { namespace: userId });
+      console.log(`Batch: ${counter} response: ${JSON.stringify(response)}`);
+    }
+
+    // Return content for topic generation
+    return documentContent;
   });
 
-  await Promise.all(promiseList);
-  //console.log("extracted at upstash", extractedTopics);
+  // Wait for all documents to be processed
+  const allDocumentContents = await Promise.all(promiseList);
+  const allContent = allDocumentContents.join("\n\n");
+
+  console.log("All upserting complete. Generating topics...");
+
+  // Generate topics once with all content (reduces 50+ LLM calls to 1-3)
+  const maxChunkSize = 15000;
+  const contentChunks = [];
+  for (let i = 0; i < allContent.length; i += maxChunkSize) {
+    contentChunks.push(allContent.slice(i, i + maxChunkSize));
+  }
+
+  const topicPromises = contentChunks.map(async (contentChunk) => {
+    const topics = await strict_output(
+      `You are an Expert AI Instructor who can identify the theme of the summary and figure out the most important chapers
+      from the summary that will be useful for preparing the paper for exam,  you are to return the important chapters that most
+      thoroughly capture the import aspects of the summary. The length of each topic must
+      not exceed 4 words. Store all options in a JSON array of the following structure:`,
+      `You are to generate main topics that thorougly capture the main subjects of the summary`,
+      contentChunk
+    );
+    return topics;
+  });
+
+  const topicsArrays = await Promise.all(topicPromises);
+  const extractedTopics = topicsArrays.flat();
+
+  console.log("Topic generation complete");
   return Array.from(new Set(extractedTopics));
 };
 
@@ -116,7 +125,7 @@ export const queryUpstashAndLLM = async (
   const effectiveNameSPace = isPersonal ? userId : uploaderId;
   const queryResponse: any[] = await index.query(
     {
-      topK: 10,
+      topK: 100,
       vector: embeddingsArrays[0],
       includeVectors: false,
       includeMetadata: true,
@@ -152,6 +161,7 @@ export const queryUpstashAndLLM = async (
     question,
     retrivedData
   );
+  console.log("retereived data", retrivedData);
   console.log("output", response);
   return [response, sources];
 };
@@ -285,15 +295,11 @@ export const updateUpstashWithUrl = async (
         chunks.map((chunk) => chunk.pageContent.replace(/\n/g, " "))
       );
 
-    const batchSize = 500;
-    let batch = [];
-    let pageContent = "";
-    let extractedTopics: string[] = [];
-
-    const batchPromises = chunks.map(async (chunk, idx) => {
+    // Create all vectors for this text chunk (no shared state, no race condition)
+    const vectors = chunks.map((chunk, idx) => {
       const sourceName = `Url: ${url}`;
 
-      const vector = {
+      return {
         id: uuid(),
         vector: embeddingsArrays[idx],
         metadata: {
@@ -304,38 +310,53 @@ export const updateUpstashWithUrl = async (
           namespace: namespace,
         },
       };
-
-      pageContent += chunk.pageContent + " ";
-      batch.push(vector);
-
-      if (batch.length === batchSize || idx === chunks.length - 1) {
-        const response = await index.upsert(batch, { namespace: userId });
-        console.log(`response: ${JSON.stringify(response)}`);
-
-        const topics = await strict_output(
-          `You are an Expert AI Instructor who can identify the theme of the summary and figure out the most important chapers
-        from the summary that will be useful for preparing the paper for exam,  you are to return the important chapters that most 
-        thoroughly capture the import aspects of the summary. The length of each topic must
-        not exceed 4 words. Store all options in a JSON array of the following structure:`,
-          `You are to generate main topics that thorougly capture the main subjects of the summary`,
-          pageContent
-        );
-
-        extractedTopics = extractedTopics.concat(topics);
-        batch = [];
-        pageContent = "";
-      }
     });
 
-    await Promise.all(batchPromises);
-    return extractedTopics;
+    // Collect all content from this text chunk for topic generation
+    const textContent = chunks.map(chunk => chunk.pageContent).join(" ");
+
+    // Batch upsert sequentially to avoid race conditions
+    const batchSize = 500;
+    for (let i = 0; i < vectors.length; i += batchSize) {
+      const batch = vectors.slice(i, i + batchSize);
+      const response = await index.upsert(batch, { namespace: userId });
+      console.log(`response: ${JSON.stringify(response)}`);
+    }
+
+    // Return content for topic generation
+    return textContent;
   });
 
-  const allTopicsArrays = await Promise.all(textPromises);
+  // Wait for all text chunks to be processed
+  const allTextContents = await Promise.all(textPromises);
+  const allContent = allTextContents.join("\n\n");
 
-  // Flatten and deduplicate all topics
-  const allTopics = allTopicsArrays.flat();
-  return Array.from(new Set(allTopics));
+  console.log("All upserting complete. Generating topics...");
+
+  // Generate topics once with all content (reduces 50+ LLM calls to 1-3)
+  const maxChunkSize = 15000;
+  const contentChunks = [];
+  for (let i = 0; i < allContent.length; i += maxChunkSize) {
+    contentChunks.push(allContent.slice(i, i + maxChunkSize));
+  }
+
+  const topicPromises = contentChunks.map(async (contentChunk) => {
+    const topics = await strict_output(
+      `You are an Expert AI Instructor who can identify the theme of the summary and figure out the most important chapers
+      from the summary that will be useful for preparing the paper for exam,  you are to return the important chapters that most
+      thoroughly capture the import aspects of the summary. The length of each topic must
+      not exceed 4 words. Store all options in a JSON array of the following structure:`,
+      `You are to generate main topics that thorougly capture the main subjects of the summary`,
+      contentChunk
+    );
+    return topics;
+  });
+
+  const topicsArrays = await Promise.all(topicPromises);
+  const extractedTopics = topicsArrays.flat();
+
+  console.log("Topic generation complete");
+  return Array.from(new Set(extractedTopics));
 };
 
 export const deleteUpstash = async (

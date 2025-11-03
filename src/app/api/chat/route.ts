@@ -142,7 +142,7 @@ export async function POST(request: NextRequest) {
     });
 
     // Apply rate limiting based on user type
-    if (!betaTester && requestCount >= MAX_REQUESTS_PER_DAY) {
+    /* if (!betaTester && requestCount >= MAX_REQUESTS_PER_DAY) {
       return NextResponse.json(
         {
           content: `You have exceeded the number of questions you can ask in a week. Weekly limit: ${MAX_REQUESTS_PER_DAY}`,
@@ -158,7 +158,7 @@ export async function POST(request: NextRequest) {
         },
         { status: 429 }
       );
-    }
+    } */
 
     // Save user question to chat history
     await saveMessage(effectiveSessionId, {
@@ -177,6 +177,8 @@ export async function POST(request: NextRequest) {
       document.private,
       document.userId
     );
+
+    console.log("LLM Result", response);
 
     // Extract response content and sources
     const result = response[0]; // LLM's answer
