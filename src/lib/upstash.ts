@@ -66,7 +66,7 @@ export const updateUpstash = async (
     });
 
     // Collect all content from this document for topic generation
-    const documentContent = chunks.map(chunk => chunk.pageContent).join(" ");
+    const documentContent = chunks.map((chunk) => chunk.pageContent).join(" ");
 
     // Batch upsert sequentially to avoid race conditions
     const batchSize = 500;
@@ -313,7 +313,7 @@ export const updateUpstashWithUrl = async (
     });
 
     // Collect all content from this text chunk for topic generation
-    const textContent = chunks.map(chunk => chunk.pageContent).join(" ");
+    const textContent = chunks.map((chunk) => chunk.pageContent).join(" ");
 
     // Batch upsert sequentially to avoid race conditions
     const batchSize = 500;
@@ -364,8 +364,66 @@ export const deleteUpstash = async (
   namespace: string,
   sessionId: string
 ) => {
-  //const responseReset = await index.reset({ namespace: namespace });
-  //console.log(responseReset);
+  // Extract userId from sessionId (format: upload_userId)
+  const userId = sessionId.split("_")[1];
+
+  // Delete chat history from Redis
   await deleteChatHistory(sessionId);
-  const history = await redis.keys(`${sessionId}*`);
+  await redis.del(`${sessionId}*`);
+
+  console.log("Deleting vectors for namespace:", namespace, "in userId:", userId);
+
+  // Delete all vector embeddings where metadata.namespace === namespace
+  // Using range to fetch all vectors, filter by metadata, and delete by IDs
+  try {
+    let cursor: string | number = "";
+    let totalDeleted = 0;
+    const limit = 1000; // Max batch size
+
+    // Keep fetching and deleting until no more vectors remain
+    do {
+      // Fetch a batch of vectors
+      const rangeResult: any = await index.range(
+        {
+          cursor,
+          limit,
+          includeMetadata: true,
+          includeVectors: false,
+        },
+        { namespace: userId }
+      );
+
+      console.log("Fetched vectors:", rangeResult.vectors?.length || 0);
+
+      // Filter vectors that match our namespace
+      const vectorIdsToDelete: string[] = [];
+      if (rangeResult.vectors) {
+        rangeResult.vectors.forEach((vector: any) => {
+          if (vector?.metadata?.namespace === namespace) {
+            vectorIdsToDelete.push(vector.id);
+          }
+        });
+      }
+
+      // Delete the matching vectors
+      if (vectorIdsToDelete.length > 0) {
+        await index.delete(vectorIdsToDelete, { namespace: userId });
+        totalDeleted += vectorIdsToDelete.length;
+        console.log(`Deleted ${vectorIdsToDelete.length} vectors (Total: ${totalDeleted})`);
+      }
+
+      // Update cursor for next iteration
+      cursor = rangeResult.nextCursor || "";
+
+      // If cursor is empty or no more vectors, we're done
+      if (!cursor || cursor === "" || !rangeResult.vectors || rangeResult.vectors.length === 0) {
+        break;
+      }
+    } while (true);
+
+    console.log(`Total vectors deleted: ${totalDeleted}`);
+  } catch (error) {
+    console.error("Error deleting vectors from Upstash:", error);
+    throw error;
+  }
 };
