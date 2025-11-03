@@ -15,7 +15,14 @@ const Header = async () => {
       <div className="max-w-7xl mx-auto px-2 sm:px-4 py-2 flex justify-between items-center min-h-16">
         {/* Logo on the left - Server rendered (static) */}
         <Link href={`/`}>
-          <div className="text-gray-800 text-sm sm:text-lg font-bold">
+          <div className="flex items-center gap-2 text-gray-800 text-sm sm:text-lg font-bold">
+            <Image
+              src="/cropped_circle_image.png"
+              alt="Aiversety Logo"
+              width={32}
+              height={32}
+              className="w-6 h-6 sm:w-8 sm:h-8"
+            />
             Aiversety
           </div>
         </Link>
