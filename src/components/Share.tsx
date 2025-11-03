@@ -12,11 +12,11 @@ import {
 import { motion } from "framer-motion";
 import { buttonVariants } from "@/components/ui/button";
 
-type User = {
+type Props = {
   namespace: string;
 };
 
-const Share = ({ namespace }: User) => {
+const Share = ({ namespace }: Props) => {
   const router = useRouter();
   const { toast } = useToast();
   const [disabled, setDisabled] = useState(false);

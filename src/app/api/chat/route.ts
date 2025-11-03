@@ -24,9 +24,10 @@ type Message = {
 // Define request interface
 interface ChatRequest {
   user_prompt: string; // New API uses user_prompt instead of messages array
-  upload?: string; // Document upload ID
+  uploadId?: string; // Document upload ID
   sessionId?: string; // Session identifier
   namespace?: string; // Vector namespace
+  isPersonal?: string;
 }
 
 // Initialize Redis client
@@ -74,8 +75,13 @@ export async function POST(request: NextRequest) {
     }
 
     // Parse request data
-    const { user_prompt, sessionId, namespace }: ChatRequest =
-      await request.json();
+    const {
+      user_prompt,
+      sessionId,
+      namespace,
+      isPersonal,
+      uploadId,
+    }: ChatRequest = await request.json();
 
     // Use provided sessionId or fallback to user session
     const effectiveSessionId = sessionId || user[0];
@@ -86,7 +92,17 @@ export async function POST(request: NextRequest) {
     // Validate namespace exists
     const namespaceList = await index.listNamespaces();
     console.log(namespaceList);
-    if (!namespaceList.includes(session?.user?.id)) {
+    if (isPersonal === "true" && !namespaceList.includes(session?.user?.id)) {
+      return NextResponse.json(
+        {
+          content:
+            "This namespace has not been created. Please upload a document first.",
+        },
+        { status: 404 }
+      );
+    }
+
+    if (isPersonal === "false" && !namespaceList.includes(uploadId)) {
       return NextResponse.json(
         {
           content:
