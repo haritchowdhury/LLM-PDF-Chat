@@ -25,9 +25,9 @@ const Page = async ({
           Log In to your account
         </h1>
         <ErrorToast />
-        <div className="text-black">
+        {/*  <div className="text-black">
           <GithubSignIn />
-        </div>
+        </div> */}
         <div className="text-black">
           <GoogleSignIn />
         </div>
