@@ -1,13 +1,11 @@
 "use client";
-import { Button } from "@/components/ui/button";
 import { useMutation } from "@tanstack/react-query";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { useToast } from "@/hooks/use-toast";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useRouter } from "next/navigation";
-import { Eraser, Trash2 } from "lucide-react";
-import { buttonVariants } from "@/components/ui/button";
+import { Trash2 } from "lucide-react";
 
 type Upload = {
   upload: string;
@@ -71,23 +69,18 @@ const Delete = ({ upload }: Upload) => {
   };
 
   return (
-    <div className="border-none ">
+    <div className="border-none">
       <form className="flex flex-grow" onSubmit={form.handleSubmit(onSubmit)}>
-        <Button
+        <button
           disabled={status === "pending"}
           type="submit"
           onClick={() => {
             form.setValue("upload", upload);
           }}
-          className={buttonVariants({
-            variant: "outline",
-            // size: "lg",
-            className:
-              "bg-gradient-to-b from-indigo-200 border-gray-300 text-gray-800 hover:bg-gray-800 my-2",
-          })}
+          className="p-2 hover:bg-red-50 rounded-full transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
         >
-          <Trash2 />
-        </Button>
+          <Trash2 className="h-5 w-5 text-gray-600 hover:text-red-600" />
+        </button>
       </form>
     </div>
   );

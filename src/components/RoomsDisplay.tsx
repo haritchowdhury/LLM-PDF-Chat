@@ -62,7 +62,7 @@ export default function RoomsDisplay({
                 onClick={() => setShowPublic(true)}
                 className={`px-4 py-2 rounded-md text-sm font-medium transition-all ${
                   showPublic
-                    ? "bg-indigo-600 text-white shadow-sm"
+                    ? "bg-blue-600 text-white shadow-sm"
                     : "text-gray-600 hover:text-gray-800"
                 }`}
               >
@@ -85,11 +85,11 @@ export default function RoomsDisplay({
           {/* Rooms Section - Conditional */}
           {showPublic ? (
             <Card className="bg-white border-none shadow-lg hover:shadow-xl transition-shadow duration-300">
-              <CardHeader className="pb-4 bg-gradient-to-r from-indigo-50 to-blue-50">
+              <CardHeader className="pb-4 bg-gradient-to-r from-blue-50 to-blue-50">
                 <div className="flex justify-between items-start">
                   <div className="flex items-center gap-3">
-                    <div className="p-2 rounded-lg bg-gradient-to-br from-indigo-100 to-indigo-200">
-                      <BookOpen size={20} className="text-indigo-600" />
+                    <div className="p-2 rounded-lg bg-gradient-to-br from-blue-100 to-blue-200">
+                      <BookOpen size={20} className="text-blue-600" />
                     </div>
                     <div>
                       <CardTitle className="text-xl font-semibold text-gray-800">
@@ -106,8 +106,8 @@ export default function RoomsDisplay({
               <CardContent className="pt-5 max-h-[45vh] overflow-y-auto">
                 {!shares.length ? (
                   <div className="flex flex-col items-center justify-center py-12 text-gray-500">
-                    <div className="p-4 rounded-full bg-indigo-50 mb-4">
-                      <Share2 size={32} className="text-indigo-300" />
+                    <div className="p-4 rounded-full bg-blue-50 mb-4">
+                      <Share2 size={32} className="text-blue-300" />
                     </div>
                     <p className="text-base font-medium text-gray-700">
                       No public classrooms yet
@@ -121,7 +121,7 @@ export default function RoomsDisplay({
                     {shares.map((share) => (
                       <div
                         key={share.id}
-                        className="group flex items-center justify-between p-4 rounded-lg bg-gradient-to-r from-gray-50 to-indigo-50 border border-gray-200 hover:border-indigo-300 hover:shadow-md transition-all duration-200"
+                        className="group flex items-center justify-between p-4 rounded-lg bg-gradient-to-r from-gray-50 to-blue-50 border border-gray-200 hover:border-blue-300 hover:shadow-md transition-all duration-200"
                       >
                         <div
                           className="overflow-hidden text-ellipsis whitespace-nowrap flex-1 text-gray-800 font-medium"
@@ -136,7 +136,7 @@ export default function RoomsDisplay({
                               variant: "outline",
                               size: "sm",
                               className:
-                                "bg-white border-indigo-200 text-indigo-700 hover:bg-indigo-600 hover:text-white hover:border-indigo-600 transition-all",
+                                "bg-white border-blue-200 text-blue-700 hover:bg-blue-600 hover:text-white hover:border-blue-600 transition-all",
                             })}
                           >
                             <MessageSquareText size={14} className="mr-1" />

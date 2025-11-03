@@ -57,10 +57,10 @@ const Profile = async ({ params }: { params: Params }) => {
         {/* Enhanced Profile Header */}
         {user && (
           <Card className="bg-white border-none mb-8 overflow-hidden shadow-lg">
-            <CardHeader className="pb-6 border-none bg-gradient-to-r from-indigo-50 via-blue-50 to-green-50">
+            <CardHeader className="pb-6 border-none bg-gradient-to-r from-blue-50 via-blue-50 to-green-50">
               <div className="flex flex-col sm:flex-row justify-between items-center gap-6">
                 <div className="flex items-center gap-4">
-                  <div className="relative w-20 h-20 rounded-full bg-gradient-to-br from-indigo-100 to-blue-200 ring-4 ring-white shadow-md overflow-hidden flex items-center justify-center">
+                  <div className="relative w-20 h-20 rounded-full bg-gradient-to-br from-blue-100 to-blue-200 ring-4 ring-white shadow-md overflow-hidden flex items-center justify-center">
                     {user.image ? (
                       <Image
                         src={user.image}
@@ -69,7 +69,7 @@ const Profile = async ({ params }: { params: Params }) => {
                         className="object-cover"
                       />
                     ) : (
-                      <User size={32} className="text-indigo-600" />
+                      <User size={32} className="text-blue-600" />
                     )}
                   </div>
                   <div>
@@ -88,7 +88,7 @@ const Profile = async ({ params }: { params: Params }) => {
                 {isOwnProfile && (
                   <div className="flex gap-6 bg-white px-6 py-3 rounded-lg shadow-sm">
                     <div className="text-center">
-                      <div className="text-2xl font-bold text-indigo-600">
+                      <div className="text-2xl font-bold text-blue-600">
                         {shares.length}
                       </div>
                       <div className="text-xs text-gray-500 uppercase tracking-wide">
@@ -134,11 +134,11 @@ const Profile = async ({ params }: { params: Params }) => {
                 Published Classrooms
               </h2>
               <Card className="bg-white border-none shadow-lg overflow-hidden">
-                <CardHeader className="pb-4 bg-gradient-to-r from-indigo-50 via-blue-50 to-green-50">
+                <CardHeader className="pb-4 bg-gradient-to-r from-blue-50 via-blue-50 to-green-50">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-3">
-                      <div className="p-2 rounded-lg bg-gradient-to-br from-indigo-100 to-indigo-200">
-                        <BookOpen size={20} className="text-indigo-600" />
+                      <div className="p-2 rounded-lg bg-gradient-to-br from-blue-100 to-blue-200">
+                        <BookOpen size={20} className="text-blue-600" />
                       </div>
                       <div>
                         <CardTitle className="text-xl font-semibold text-gray-800">
@@ -150,7 +150,7 @@ const Profile = async ({ params }: { params: Params }) => {
                       </div>
                     </div>
                     <div className="flex items-center gap-2 bg-white px-4 py-2 rounded-full shadow-sm">
-                      <BookOpen size={16} className="text-indigo-600" />
+                      <BookOpen size={16} className="text-blue-600" />
                       <span className="text-sm font-semibold text-gray-700">
                         {shares.length}{" "}
                         {shares.length === 1 ? "article" : "articles"}
@@ -162,8 +162,8 @@ const Profile = async ({ params }: { params: Params }) => {
                 <CardContent className="p-6">
                   {shares.length === 0 ? (
                     <div className="text-center py-16 text-gray-500">
-                      <div className="p-5 rounded-full bg-indigo-50 inline-flex items-center justify-center mb-4">
-                        <BookOpen size={36} className="text-indigo-300" />
+                      <div className="p-5 rounded-full bg-blue-50 inline-flex items-center justify-center mb-4">
+                        <BookOpen size={36} className="text-blue-300" />
                       </div>
                       <p className="text-lg font-semibold text-gray-700 mb-2">
                         No articles published yet
@@ -177,14 +177,14 @@ const Profile = async ({ params }: { params: Params }) => {
                       {shares.map((share, index) => (
                         <div
                           key={share.id}
-                          className="group flex items-center justify-between p-5 rounded-xl bg-gradient-to-r from-gray-50 to-indigo-50 border border-gray-200 hover:border-indigo-300 hover:shadow-lg transition-all duration-300"
+                          className="group flex items-center justify-between p-5 rounded-xl bg-gradient-to-r from-gray-50 to-blue-50 border border-gray-200 hover:border-blue-300 hover:shadow-lg transition-all duration-300"
                         >
                           <div className="flex items-center gap-4 flex-1 min-w-0">
-                            <div className="w-10 h-10 bg-gradient-to-br from-indigo-100 to-indigo-200 rounded-full flex items-center justify-center text-indigo-700 font-bold text-sm shadow-sm">
+                            <div className="w-10 h-10 bg-gradient-to-br from-blue-100 to-blue-200 rounded-full flex items-center justify-center text-blue-700 font-bold text-sm shadow-sm">
                               {index + 1}
                             </div>
                             <div
-                              className="overflow-hidden text-ellipsis whitespace-nowrap flex-1 text-gray-800 group-hover:text-indigo-800 font-semibold text-base"
+                              className="overflow-hidden text-ellipsis whitespace-nowrap flex-1 text-gray-800 group-hover:text-blue-800 font-semibold text-base"
                               title={share.name}
                             >
                               {share.name}
@@ -198,7 +198,7 @@ const Profile = async ({ params }: { params: Params }) => {
                                 variant: "outline",
                                 size: "sm",
                                 className:
-                                  "bg-white border-indigo-200 text-indigo-700 hover:bg-indigo-600 hover:text-white hover:border-indigo-600 transition-all duration-200 shadow-sm",
+                                  "bg-white border-blue-200 text-blue-700 hover:bg-blue-600 hover:text-white hover:border-blue-600 transition-all duration-200 shadow-sm",
                               })}
                             >
                               <MessageSquareText size={14} className="mr-2" />

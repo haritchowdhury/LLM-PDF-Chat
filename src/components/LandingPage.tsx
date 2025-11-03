@@ -1,20 +1,10 @@
 "use client";
 import React, { useState, useEffect, useRef, useCallback } from "react";
+import Link from "next/link";
+import ShareLinkModal from "@/components/ShareLink";
 
 // Mock components for demonstration - replace with your actual imports
-const Link = ({ href, children, className }) => (
-  <a href={href} className={className}>
-    {children}
-  </a>
-);
-
 const buttonVariants = ({ variant, className }) => className;
-
-const ShareLinkModel = ({ link }) => (
-  <button className="p-2 hover:bg-gray-100 rounded-full transition-colors">
-    <Share2 className="h-4 w-4 text-gray-600" />
-  </button>
-);
 
 // Icons
 const Calendar = ({ className }) => (
@@ -301,7 +291,7 @@ const LandingPage = ({
                 <p className="text-sm text-gray-500">{timeAgo}</p>
               </div>
             </Link>
-            <ShareLinkModel link={`${platformlink}${article.id}`} />
+            <ShareLinkModal link={`${platformlink}${article.id}`} />
           </div>
 
           <Link href={`/chat/${article.id}`} className="block group">
@@ -352,19 +342,13 @@ const LandingPage = ({
             </p>
           )}
 
-          <div className="flex gap-3 mt-4">
+          <div className="mt-4">
             <Link
               href={`/chat/${article.id}`}
-              className="flex-1 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-medium transition-colors flex items-center justify-center gap-2"
+              className="w-full bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-medium transition-colors flex items-center justify-center gap-2"
             >
               <MessageSquareText className="h-4 w-4" />
               Start Chat
-            </Link>
-            <Link
-              href={`/chat/${article.id}`}
-              className="border border-gray-300 hover:bg-gray-50 px-4 py-2 rounded-lg transition-colors flex items-center justify-center"
-            >
-              <ExternalLink className="h-4 w-4" />
             </Link>
           </div>
         </div>
