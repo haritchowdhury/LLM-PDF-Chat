@@ -98,7 +98,11 @@ export async function POST(request: NextRequest) {
         { status: 405 }
       );
     }
-    if (document.private && document.userId === session?.user.id) {
+    console.log(document.private, document.userId, session?.user.id);
+    if (
+      document.private &&
+      document.userId.trim() !== session?.user.id.trim()
+    ) {
       return NextResponse.json(
         {
           content:

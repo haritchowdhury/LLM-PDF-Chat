@@ -161,7 +161,7 @@ const CommunityQuizForm = ({ topic: topicParam, id: uploadId }: Props) => {
   form.watch();
 
   return showLoader ? (
-    <div className="flex gap-2 items-center justify-center bg-gradient-to-br from-blue-50 to-green-50 rounded p-2 my-2 w-full">
+    <div className="flex gap-2 items-center justify-center bg-gray-900 rounded p-2 my-2 w-full">
       <small className="text-xs text-white">Creating Quiz</small>
       <motion.div className="w-4 h-4 border-2 border-gray-300 border-t-blue-500 rounded-full animate-spin" />
     </div>
