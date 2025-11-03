@@ -27,7 +27,6 @@ interface ChatRequest {
   uploadId?: string; // Document upload ID
   sessionId?: string; // Session identifier
   namespace?: string; // Vector namespace
-  isPersonal?: string;
 }
 
 // Initialize Redis client
@@ -75,13 +74,8 @@ export async function POST(request: NextRequest) {
     }
 
     // Parse request data
-    const {
-      user_prompt,
-      sessionId,
-      namespace,
-      isPersonal,
-      uploadId,
-    }: ChatRequest = await request.json();
+    const { user_prompt, sessionId, namespace, uploadId }: ChatRequest =
+      await request.json();
 
     // Use provided sessionId or fallback to user session
     const effectiveSessionId = sessionId || user[0];
@@ -91,8 +85,20 @@ export async function POST(request: NextRequest) {
 
     // Validate namespace exists
     const namespaceList = await index.listNamespaces();
+    console.log("namespace list", namespaceList);
+    console.log("namespace", namespace);
+    console.log("uploadId", uploadId);
+
     console.log(namespaceList);
-    if (isPersonal === "true" && !namespaceList.includes(session?.user?.id)) {
+    const document = await db.upload.findFirst({ where: { id: uploadId } });
+
+    if (!document) {
+      return NextResponse.json(
+        { content: "No Document found." },
+        { status: 405 }
+      );
+    }
+    if (document.private && document.userId === session?.user.id) {
       return NextResponse.json(
         {
           content:
@@ -102,7 +108,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    if (isPersonal === "false" && !namespaceList.includes(uploadId)) {
+    if (!document.private && !namespaceList.includes(document.userId)) {
       return NextResponse.json(
         {
           content:
@@ -163,7 +169,9 @@ export async function POST(request: NextRequest) {
       effectiveNamespace,
       //effectiveSessionId,
       user_prompt,
-      userId
+      userId,
+      document.private,
+      document.userId
     );
 
     // Extract response content and sources

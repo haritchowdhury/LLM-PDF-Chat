@@ -107,10 +107,13 @@ export const queryUpstashAndLLM = async (
   index: Index,
   namespace: string,
   question: string,
-  userId: string
+  userId: string,
+  isPersonal: boolean,
+  uploaderId: string
 ) => {
   const embeddingsArrays =
     await new HuggingFaceInferenceEmbeddings().embedDocuments([question]);
+  const effectiveNameSPace = isPersonal ? userId : uploaderId;
   const queryResponse: any[] = await index.query(
     {
       topK: 10,
@@ -118,7 +121,7 @@ export const queryUpstashAndLLM = async (
       includeVectors: false,
       includeMetadata: true,
     },
-    { namespace: userId }
+    { namespace: effectiveNameSPace }
   );
   let retrivedData: string = "";
   let sources: string[] = [];
@@ -157,8 +160,12 @@ export const queryUpstash = async (
   index: Index,
   namespace: string,
   topic: string,
-  userId: string
+  userId: string,
+  isPersonal: boolean,
+  uploaderId: string
 ) => {
+  const effectiveNameSPace = isPersonal ? userId : uploaderId;
+
   const embeddingsArrays =
     await new HuggingFaceInferenceEmbeddings().embedDocuments([topic]);
 
@@ -169,7 +176,7 @@ export const queryUpstash = async (
       includeVectors: false,
       includeMetadata: true,
     },
-    { namespace: userId }
+    { namespace: effectiveNameSPace }
   );
 
   if (queryResponse.length === 0) return "";

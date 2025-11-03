@@ -5,6 +5,7 @@ import { NextResponse, NextRequest } from "next/server";
 import { ZodError } from "zod";
 import { queryUpstash } from "@/lib/upstash";
 import { Index } from "@upstash/vector";
+import db from "@/lib/db/db";
 
 export const runtime = "nodejs";
 export const maxDuration = 60;
@@ -19,7 +20,15 @@ export async function POST(request: NextRequest) {
     const { amount, topic, type, namespace, userId } =
       getQuestionsSchema.parse(body);
     console.log("quesionAPI", amount, topic, type, namespace);
-    const questionData = await queryUpstash(index, namespace, topic, userId);
+    const document = await db.upload.findFirst({ where: { id: namespace } });
+    const questionData = await queryUpstash(
+      index,
+      namespace,
+      topic,
+      userId,
+      document.private,
+      document.userId
+    );
     console.log("questiondata", questionData);
     console.log(amount, topic, type);
     let questions: any;
