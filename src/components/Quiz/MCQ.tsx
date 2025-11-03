@@ -134,7 +134,7 @@ const MCQ = ({ game }: Props) => {
   if (hasEnded) {
     return (
       <div className="absolute flex flex-col justify-center -translate-x-1/2 -translate-y-1/2 top-1/2 left-1/2">
-        <div className="px-4 py-2 mt-2 font-semibold text-white bg-green-500 rounded-md whitespace-nowrap">
+        <div className="px-4 py-2 mt-2 font-semibold bg-white border border-green-500 text-green-500 rounded-md whitespace-nowrap">
           You Completed in{" "}
           {formatTimeDelta(differenceInSeconds(now!, game.timeStarted))}
         </div>
@@ -143,6 +143,15 @@ const MCQ = ({ game }: Props) => {
           className={cn(buttonVariants({ size: "lg" }), "mt-2")}
         >
           View Statistics <BarChart className="w-4 h-4 ml-2" />
+        </Link>
+        <Link
+          href={`/chat/${game.uploadId}`}
+          className={cn(
+            buttonVariants({ size: "lg" }),
+            "mt-2 text-white bg-green-500 font-semibold"
+          )}
+        >
+          Back to Chat
         </Link>
       </div>
     );
