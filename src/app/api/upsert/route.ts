@@ -38,6 +38,7 @@ export async function POST(request: NextRequest) {
   const data = await request.formData();
   let namespace = data.get("namespace") as string;
   let personal = data.get("private") as string;
+  let customName = data.get("name") as string;
 
   let receivedNamespace = namespace;
   let uploadId: string;
@@ -84,7 +85,7 @@ export async function POST(request: NextRequest) {
         data: {
           id: uuid(),
           timeStarted: new Date(),
-          name: baseName,
+          name: customName || baseName,
           userId: userId,
           private: personal === "true" ? true : false,
           isDeleted: false,

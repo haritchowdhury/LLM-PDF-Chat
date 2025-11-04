@@ -17,6 +17,7 @@ import { headers } from "next/headers";
 import EditableUsername from "@/components/EditableUsername";
 import ShareLinkModel from "@/components/ShareLink";
 import RoomsDisplay from "@/components/RoomsDisplay";
+import LikeButton from "@/components/LikeButton";
 
 type Params = Promise<{ userId: any }>;
 
@@ -44,12 +45,26 @@ const Profile = async ({ params }: { params: Params }) => {
     where: { userId: session?.user.id },
     orderBy: { timeStarted: "desc" },
   });
-  const shares = await db.upload.findMany({
+  const isOwnProfile = user?.id === session?.user.id;
+
+  // Full data for RoomsDisplay (own profile) - includes likedBy
+  const sharesForOwnProfile = await db.upload.findMany({
     where: { userId: userId, private: false, isDeleted: false },
     orderBy: { timeStarted: "desc" },
   });
 
-  const isOwnProfile = user?.id === session?.user.id;
+  // Selective data with likes for public view (other users' profiles)
+  const sharesForPublicView = await db.upload.findMany({
+    where: { userId: userId, private: false, isDeleted: false },
+    select: {
+      id: true,
+      name: true,
+      userId: true,
+      timeStarted: true,
+      likedBy: true,
+    },
+    orderBy: { timeStarted: "desc" },
+  });
 
   return (
     <main className="flex relative justify-center bg-gradient-to-br from-blue-50 to-green-50 text-white min-h-screen overflow-hidden">
@@ -89,7 +104,7 @@ const Profile = async ({ params }: { params: Params }) => {
                   <div className="flex gap-6 bg-white px-6 py-3 rounded-lg shadow-sm">
                     <div className="text-center">
                       <div className="text-2xl font-bold text-blue-600">
-                        {shares.length}
+                        {sharesForOwnProfile.length}
                       </div>
                       <div className="text-xs text-gray-500 uppercase tracking-wide">
                         Public
@@ -122,10 +137,11 @@ const Profile = async ({ params }: { params: Params }) => {
 
         {isOwnProfile && user ? (
           <RoomsDisplay
-            shares={shares}
+            shares={sharesForOwnProfile}
             uploads={Uploads}
             games={games}
             platformlink={platformlink}
+            userId={session.user.id}
           />
         ) : (
           <div className="space-y-6">
@@ -152,15 +168,17 @@ const Profile = async ({ params }: { params: Params }) => {
                     <div className="flex items-center gap-2 bg-white px-4 py-2 rounded-full shadow-sm">
                       <BookOpen size={16} className="text-blue-600" />
                       <span className="text-sm font-semibold text-gray-700">
-                        {shares.length}{" "}
-                        {shares.length === 1 ? "article" : "articles"}
+                        {sharesForPublicView.length}{" "}
+                        {sharesForPublicView.length === 1
+                          ? "article"
+                          : "articles"}
                       </span>
                     </div>
                   </div>
                 </CardHeader>
 
                 <CardContent className="p-6">
-                  {shares.length === 0 ? (
+                  {sharesForPublicView.length === 0 ? (
                     <div className="text-center py-16 text-gray-500">
                       <div className="p-5 rounded-full bg-blue-50 inline-flex items-center justify-center mb-4">
                         <BookOpen size={36} className="text-blue-300" />
@@ -174,7 +192,7 @@ const Profile = async ({ params }: { params: Params }) => {
                     </div>
                   ) : (
                     <div className="space-y-3">
-                      {shares.map((share, index) => (
+                      {sharesForPublicView.map((share, index) => (
                         <div
                           key={share.id}
                           className="group flex items-center justify-between p-5 rounded-xl bg-gradient-to-r from-gray-50 to-blue-50 border border-gray-200 hover:border-blue-300 hover:shadow-lg transition-all duration-300"
@@ -191,7 +209,16 @@ const Profile = async ({ params }: { params: Params }) => {
                             </div>
                           </div>
 
-                          <div className="flex items-center gap-2 ml-4">
+                          <div className="flex items-center gap-3 ml-4">
+                            <LikeButton
+                              uploadId={share.id}
+                              initialLiked={
+                                share.likedBy?.includes(session.user.id) ||
+                                false
+                              }
+                              initialLikeCount={share.likedBy?.length || 0}
+                              userId={session.user.id}
+                            />
                             <Link
                               href={`/chat/${share.id}`}
                               className={buttonVariants({

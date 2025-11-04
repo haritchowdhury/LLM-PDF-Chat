@@ -133,14 +133,15 @@ model Upload {
   games             Game[]
   CommunityQuizes   Communityquiz[]
   uploadCount       Int?
-  options           Json? 
+  options           Json?
   timeStarted       DateTime
   isCompleted       Json?
   timeEnded         DateTime?
   isDeleted         Boolean?
   private           Boolean
+  likedBy           String[] @default([])
   user              User       @relation(fields: [userId], references: [id], onDelete: Cascade)
-  
+
   @@index([userId])
 }
 

@@ -28,6 +28,7 @@ const urlSchema = z.object({
   url: z.string().url(),
   namespace: z.string(),
   sharable: z.string(),
+  name: z.string().optional(),
 });
 
 type Schema = z.infer<typeof urlSchema>;
@@ -58,7 +59,7 @@ export async function POST(request: NextRequest) {
   let uploadId: string;
 
   try {
-    let { url, namespace, sharable } = urlSchema.parse(body);
+    let { url, namespace, sharable, name } = urlSchema.parse(body);
 
     receivedNamespace = namespace;
 
@@ -86,7 +87,7 @@ export async function POST(request: NextRequest) {
         data: {
           id: uuid(),
           timeStarted: new Date(),
-          name: url,
+          name: name || url,
           userId: userId,
           private: sharable === "false" ? true : false,
           isDeleted: false,

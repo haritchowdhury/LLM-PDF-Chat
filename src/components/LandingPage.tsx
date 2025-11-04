@@ -2,6 +2,8 @@
 import React, { useState, useEffect, useRef, useCallback } from "react";
 import Link from "next/link";
 import ShareLinkModal from "@/components/ShareLink";
+import UploadForm from "@/components/UploadForm";
+import LikeButton from "@/components/LikeButton";
 
 // Mock components for demonstration - replace with your actual imports
 const buttonVariants = ({ variant, className }) => className;
@@ -109,6 +111,7 @@ type Share = {
   timeStarted: Date;
   userId: string;
   user: { id: string; name: string };
+  likedBy?: string[];
 };
 
 // Sample data
@@ -327,13 +330,12 @@ const LandingPage = ({
               </div>
             </div>
 
-            <div className="flex items-center gap-2 text-gray-600">
-              <BookOpen className="h-4 w-4 text-blue-500" />
-              <div>
-                <p className="text-xs text-gray-500">Status</p>
-                <p className="text-sm font-medium text-green-600">Public</p>
-              </div>
-            </div>
+            <LikeButton
+              uploadId={article.id}
+              initialLiked={article.likedBy?.includes(id) || false}
+              initialLikeCount={article.likedBy?.length || 0}
+              userId={id}
+            />
           </div>
 
           {article.description && (
@@ -414,15 +416,8 @@ const LandingPage = ({
   return (
     <div className="bg-gradient-to-b from-gray-50 to-white min-h-screen">
       <section className="container mx-auto px-4 sm:px-6 py-12 pt-20 max-w-4xl">
-        <div className="text-center mb-12">
-          <h2 className="text-4xl font-bold text-gray-900 mb-4">
-            Explore Public Classrooms
-          </h2>
-          <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-            Discover and engage with classrooms created by educators around the
-            world. Start learning today!
-          </p>
-        </div>
+        {/* Upload Form - Facebook-feed style */}
+        <UploadForm userId={id} />
 
         {loading ? (
           <div>

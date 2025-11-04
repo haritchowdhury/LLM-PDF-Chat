@@ -22,12 +22,16 @@ const Home = async () => {
   if (session) {
     const Shares = await db.upload.findMany({
       where: { private: false, isDeleted: false },
-      include: {
+      select: {
+        id: true,
+        name: true,
+        userId: true,
+        timeStarted: true,
+        likedBy: true,
         user: {
           select: {
             id: true,
             name: true,
-            // Add other user fields you might need like email, image, etc.
           },
         },
       },

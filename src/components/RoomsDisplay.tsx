@@ -21,12 +21,14 @@ import {
 import Share from "@/components/Share";
 import Delete from "@/components/Delete";
 import ShareLinkModel from "@/components/ShareLink";
+import LikeButton from "@/components/LikeButton";
 
 interface Upload {
   id: string;
   name: string;
   private: boolean;
   isDeleted: boolean;
+  likedBy?: string[];
 }
 
 interface Game {
@@ -39,6 +41,7 @@ interface RoomsDisplayProps {
   uploads: Upload[];
   games: Game[];
   platformlink: string;
+  userId: string;
 }
 
 export default function RoomsDisplay({
@@ -46,6 +49,7 @@ export default function RoomsDisplay({
   uploads,
   games,
   platformlink,
+  userId,
 }: RoomsDisplayProps) {
   const [showPublic, setShowPublic] = useState(true);
 
@@ -100,7 +104,6 @@ export default function RoomsDisplay({
                       </CardDescription>
                     </div>
                   </div>
-                  <Share namespace={"undefined"} />
                 </div>
               </CardHeader>
               <CardContent className="pt-5 max-h-[45vh] overflow-y-auto">
@@ -130,6 +133,12 @@ export default function RoomsDisplay({
                           {share.name}
                         </div>
                         <div className="flex gap-2 items-center ml-3">
+                          <LikeButton
+                            uploadId={share.id}
+                            initialLiked={share.likedBy?.includes(userId) || false}
+                            initialLikeCount={share.likedBy?.length || 0}
+                            userId={userId}
+                          />
                           <Link
                             href={`/chat/${share.id}`}
                             className={buttonVariants({
