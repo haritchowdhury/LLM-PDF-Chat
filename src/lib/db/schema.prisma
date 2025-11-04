@@ -127,6 +127,7 @@ model Question {
 
 model Upload {
   id                String   @id @default(cuid())
+  description       String? 
   name              String
   wallet            String?
   userId            String

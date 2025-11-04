@@ -25,6 +25,7 @@ const Home = async () => {
       select: {
         id: true,
         name: true,
+        description: true,
         userId: true,
         timeStarted: true,
         likedBy: true,

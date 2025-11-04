@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent } from "@/components/ui/card";
 import { Upload, Link as LinkIcon } from "lucide-react";
 
@@ -14,6 +15,7 @@ interface UploadFormProps {
 
 export default function UploadForm({ userId }: UploadFormProps) {
   const [uploadName, setUploadName] = useState("");
+  const [description, setDescription] = useState("");
   const [url, setUrl] = useState("");
   const [isUploadingPDF, setIsUploadingPDF] = useState(false);
   const [isUploadingURL, setIsUploadingURL] = useState(false);
@@ -30,6 +32,17 @@ export default function UploadForm({ userId }: UploadFormProps) {
     if (!uploadName.trim()) {
       toast({
         description: "Please enter a name for your upload",
+        duration: 2000,
+        variant: "destructive",
+      });
+      event.target.value = "";
+      return;
+    }
+
+    // Validate description is provided
+    if (!description.trim()) {
+      toast({
+        description: "Please enter a description for your upload",
         duration: 2000,
         variant: "destructive",
       });
@@ -55,6 +68,7 @@ export default function UploadForm({ userId }: UploadFormProps) {
       formData.append("namespace", "undefined");
       formData.append("private", "false");
       formData.append("name", uploadName.trim());
+      formData.append("description", description.trim());
 
       const response = await fetch("/api/upsert", {
         method: "POST",
@@ -103,6 +117,16 @@ export default function UploadForm({ userId }: UploadFormProps) {
       return;
     }
 
+    // Validate description is provided
+    if (!description.trim()) {
+      toast({
+        description: "Please enter a description for your upload",
+        duration: 2000,
+        variant: "destructive",
+      });
+      return;
+    }
+
     if (!url.trim()) {
       toast({
         description: "Please enter a URL",
@@ -132,6 +156,7 @@ export default function UploadForm({ userId }: UploadFormProps) {
         namespace: "undefined",
         sharable: "true",
         name: uploadName.trim(),
+        description: description.trim(),
       };
 
       const response = await fetch("/api/scraper", {
@@ -156,6 +181,7 @@ export default function UploadForm({ userId }: UploadFormProps) {
       // Clear form
       setUrl("");
       setUploadName("");
+      setDescription("");
 
       // Redirect to chat with the new upload
       if (data.message) {
@@ -194,6 +220,18 @@ export default function UploadForm({ userId }: UploadFormProps) {
             value={uploadName}
             onChange={(e) => setUploadName(e.target.value)}
             className="w-full"
+            disabled={isUploadingPDF || isUploadingURL}
+            required
+          />
+        </div>
+
+        {/* Description Input - Required */}
+        <div className="mb-4">
+          <Textarea
+            placeholder="Enter a description for your upload *"
+            value={description}
+            onChange={(e) => setDescription(e.target.value)}
+            className="w-full min-h-[80px]"
             disabled={isUploadingPDF || isUploadingURL}
             required
           />
@@ -248,8 +286,7 @@ export default function UploadForm({ userId }: UploadFormProps) {
 
         {/* Helper text */}
         <p className="text-sm text-gray-500 mt-3 text-center">
-          Enter a name, then upload a PDF document or add a URL to start
-          chatting
+          Enter a name and description, then upload a PDF document or add a URL to start chatting
         </p>
       </CardContent>
     </Card>

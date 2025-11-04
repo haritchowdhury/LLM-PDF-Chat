@@ -39,6 +39,7 @@ export async function POST(request: NextRequest) {
   let namespace = data.get("namespace") as string;
   let personal = data.get("private") as string;
   let customName = data.get("name") as string;
+  let description = data.get("description") as string;
 
   let receivedNamespace = namespace;
   let uploadId: string;
@@ -86,6 +87,7 @@ export async function POST(request: NextRequest) {
           id: uuid(),
           timeStarted: new Date(),
           name: customName || baseName,
+          description: description || "",
           userId: userId,
           private: personal === "true" ? true : false,
           isDeleted: false,
