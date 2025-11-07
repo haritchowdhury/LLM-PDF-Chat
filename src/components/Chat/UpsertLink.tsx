@@ -53,23 +53,44 @@ const LinkSubmitDialog = ({ upload, isPersonal }: Upload) => {
 
       const data = await response.json();
 
-      if (!response.ok) {
+      // Handle 202 Accepted (background processing)
+      if (response.status === 202) {
         toast({
-          variant: "destructive",
-          description: "Something went wrong, can't scrape this url!",
-          duration: 2000,
+          description: "URL is being processed in the background. You'll be notified when it's ready.",
+          duration: 3000,
         });
-        //router.replace(`/chat/${upload}`);
-      } else {
+        setIsSuccess(true);
+
+        // If this is a new upload, navigate to it
+        // If adding to existing, stay on current page and refresh
+        if (upload === "undefined" && data.uploadId) {
+          setTimeout(() => {
+            router.replace(`/chat/${data.uploadId}`);
+          }, 100);
+        } else {
+          // Refresh the page to show processing state
+          router.refresh();
+        }
+      }
+      // Handle 200 OK (legacy sync processing)
+      else if (response.ok) {
         toast({
           description: "Added the URL to AI's knowledge successfully",
           duration: 2000,
         });
-        router.replace(`/chat/${data.message}`);
+        setIsSuccess(true);
+        router.replace(`/chat/${data.uploadId || data.message}`);
+      }
+      // Handle errors
+      else {
+        toast({
+          variant: "destructive",
+          description: data.error || "Something went wrong, can't scrape this url!",
+          duration: 2000,
+        });
       }
 
-      setIsSuccess(true);
-      console.log("Upload ID:", data.message);
+      console.log("Upload ID:", data.uploadId || data.message);
 
       // Reset after success
       setTimeout(() => {

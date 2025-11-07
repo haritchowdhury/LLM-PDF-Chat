@@ -4,7 +4,19 @@ import * as cheerio from "cheerio";
 export async function scrapeWebpage(url: string): Promise<string> {
   try {
     //console.log("Fetching URL:", url);
-    const { data } = await axios.get(url);
+    const { data } = await axios.get(url, {
+      headers: {
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+        'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8',
+        'Accept-Language': 'en-US,en;q=0.5',
+        'Accept-Encoding': 'gzip, deflate, br',
+        'DNT': '1',
+        'Connection': 'keep-alive',
+        'Upgrade-Insecure-Requests': '1',
+      },
+      timeout: 30000, // 30 second timeout
+      maxRedirects: 5, // Follow up to 5 redirects
+    });
     //console.log("Fetched data successfully");
 
     const $ = cheerio.load(data);
@@ -75,6 +87,22 @@ export async function scrapeWebpage(url: string): Promise<string> {
     return textContent;
   } catch (error) {
     //console.error("Error scraping webpage:", error);
-    throw error;
+
+    // Provide better error messages
+    if (axios.isAxiosError(error)) {
+      if (error.response?.status === 403) {
+        throw new Error(`Access denied (403): The website "${url}" is blocking automated access. Try a different URL or check if the site allows scraping.`);
+      } else if (error.response?.status === 404) {
+        throw new Error(`Page not found (404): The URL "${url}" does not exist.`);
+      } else if (error.response?.status) {
+        throw new Error(`Failed to fetch URL (${error.response.status}): ${error.message}`);
+      } else if (error.code === 'ENOTFOUND') {
+        throw new Error(`Invalid URL or DNS error: Cannot reach "${url}"`);
+      } else if (error.code === 'ETIMEDOUT') {
+        throw new Error(`Timeout: The website "${url}" took too long to respond.`);
+      }
+    }
+
+    throw new Error(`Failed to scrape webpage: ${error instanceof Error ? error.message : 'Unknown error'}`);
   }
 }

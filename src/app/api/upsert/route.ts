@@ -12,6 +12,9 @@ import db from "@/lib/db/db";
 import { v4 as uuid } from "uuid";
 import { auth } from "@/lib/auth";
 import { uploadValidator } from "@/lib/validation/upload-validation";
+import { uploadPdfToBlob } from "@/lib/blob-storage";
+import { publishPdfJob } from "@/lib/qstash";
+import { ProcessingStatus } from "@prisma/client";
 
 const index = new Index({
   url: process.env.UPSTASH_VECTOR_REST_URL,
@@ -32,7 +35,7 @@ function withTimeout<T>(promise: Promise<T>, timeoutMs: number): Promise<T> {
 }
 
 /*
- * Endpoint to create a chat room
+ * Endpoint to create a chat room with background processing
  */
 export async function POST(request: NextRequest) {
   const data = await request.formData();
@@ -41,8 +44,8 @@ export async function POST(request: NextRequest) {
   let customName = data.get("name") as string;
   let description = data.get("description") as string;
 
-  let receivedNamespace = namespace;
   let uploadId: string;
+  let isNewUpload = false;
 
   const file = data.get("file") as File;
   const baseName = file.name.replace(/\.[^/.]+$/, "");
@@ -52,6 +55,7 @@ export async function POST(request: NextRequest) {
 
   if (!file) return new Response(null, { status: 400 });
 
+  // Quick validation for PDF type and size (lightweight checks only)
   const arrayBuffer = await file.arrayBuffer();
   const fileSource = new Blob([arrayBuffer], { type: file.type });
   const loader = new PDFLoader(fileSource, {
@@ -81,7 +85,9 @@ export async function POST(request: NextRequest) {
   uploadId = namespace;
 
   try {
+    // Create or update Upload record
     if (namespace === "undefined") {
+      // Create new upload
       const Upload = await db.upload.create({
         data: {
           id: uuid(),
@@ -91,67 +97,62 @@ export async function POST(request: NextRequest) {
           userId: userId,
           private: personal === "true" ? true : false,
           isDeleted: false,
+          processingStatus: ProcessingStatus.PENDING,
         },
       });
 
       uploadId = Upload.id;
       namespace = uploadId;
+      isNewUpload = true;
+    } else {
+      // Adding to existing upload - keep the upload accessible
+      // Don't change processingStatus - let it stay COMPLETED
+      uploadId = namespace;
     }
-  } catch (err) {
-    throw new Error("Upload Could not be created");
-  }
 
-  try {
-    let topics = await withTimeout(
-      updateUpstash(index, namespace, docs, baseName, userId),
-      45000
-    );
-    const foundUpload = await db.upload.findFirst({
-      where: {
-        id: uploadId,
-      },
+    // Upload PDF to temporary blob storage
+    await uploadPdfToBlob(file, uploadId);
+
+    // Publish background job to QStash
+    await publishPdfJob({
+      type: "pdf",
+      uploadId,
+      userId,
+      fileName: baseName,
     });
-    const existingTopics: string[] = JSON.parse(foundUpload.options as string);
 
-    topics = topics.concat(existingTopics);
-    const filteredTopics = filterStringsOnly(topics);
-
-    await db.upload.update({
-      where: {
-        id: foundUpload.id,
-      },
-      data: {
-        options: JSON.stringify(filteredTopics),
-      },
-    });
-  } catch (err) {
-    if (err.message === "TIMEOUT") {
-      if ((receivedNamespace = "undefined")) {
-        await db.upload.delete({
-          where: {
-            id: uploadId,
-          },
-        });
-      }
-      return NextResponse.json(
-        {
-          error:
-            "Request timed out. The webpage is taking too long to process. Please try again or use a different URL.",
-          code: "TIMEOUT_ERROR",
-        },
-        { status: 408 } // 408 Request Timeout
-      );
-    }
-    console.log("error: ", err);
-    throw new Error("Upstash Could be Updated");
-  }
-
-  try {
     // Increment request count
     await uploadValidator.incrementRequestCount(userId);
-    return NextResponse.json({ message: uploadId }, { status: 200 });
+
+    // Return 202 Accepted with uploadId
+    return NextResponse.json(
+      {
+        uploadId,
+        status: "processing",
+        message: "Upload started. Processing in background.",
+      },
+      { status: 202 }
+    );
+
   } catch (err) {
-    throw new Error("Could not commit to redis");
+    console.error("Upload error:", err);
+
+    // Clean up on error - only delete if we created a new upload
+    if (uploadId && isNewUpload) {
+      try {
+        await db.upload.delete({ where: { id: uploadId } });
+      } catch (deleteErr) {
+        console.error("Failed to clean up failed upload:", deleteErr);
+      }
+    }
+
+    return NextResponse.json(
+      {
+        error: "Failed to start upload processing",
+        details: err instanceof Error ? err.message : "Unknown error",
+      },
+      { status: 500 }
+    );
   }
 }
 

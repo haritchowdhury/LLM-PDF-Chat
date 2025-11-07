@@ -75,20 +75,32 @@ export default function UploadForm({ userId }: UploadFormProps) {
         body: formData,
       });
 
-      if (!response.ok) {
-        throw new Error("Failed to upload PDF");
-      }
-
       const data = await response.json();
 
-      toast({
-        description: "PDF uploaded successfully!",
-        duration: 2000,
-      });
+      // Handle 202 Accepted (background processing)
+      if (response.status === 202) {
+        toast({
+          description: "Upload started! Processing in background...",
+          duration: 2000,
+        });
 
-      // Redirect to chat with the new upload
-      if (data.message) {
-        router.push(`/chat/${data.message}`);
+        // Redirect to chat immediately - it will show processing state
+        if (data.uploadId) {
+          router.push(`/chat/${data.uploadId}`);
+        }
+      }
+      // Handle 200 OK (legacy sync processing, if any)
+      else if (response.ok) {
+        toast({
+          description: "PDF uploaded successfully!",
+          duration: 2000,
+        });
+
+        if (data.uploadId || data.message) {
+          router.push(`/chat/${data.uploadId || data.message}`);
+        }
+      } else {
+        throw new Error(data.error || "Failed to upload PDF");
       }
     } catch (error) {
       console.error("Error uploading PDF:", error);
@@ -167,25 +179,42 @@ export default function UploadForm({ userId }: UploadFormProps) {
         body: JSON.stringify(body),
       });
 
-      if (!response.ok) {
-        throw new Error("Failed to scrape URL");
-      }
-
       const data = await response.json();
 
-      toast({
-        description: "URL content loaded successfully!",
-        duration: 2000,
-      });
+      // Handle 202 Accepted (background processing)
+      if (response.status === 202) {
+        toast({
+          description: "URL scraping started! Processing in background...",
+          duration: 2000,
+        });
 
-      // Clear form
-      setUrl("");
-      setUploadName("");
-      setDescription("");
+        // Clear form
+        setUrl("");
+        setUploadName("");
+        setDescription("");
 
-      // Redirect to chat with the new upload
-      if (data.message) {
-        router.push(`/chat/${data.message}`);
+        // Redirect to chat immediately - it will show processing state
+        if (data.uploadId) {
+          router.push(`/chat/${data.uploadId}`);
+        }
+      }
+      // Handle 200 OK (legacy sync processing, if any)
+      else if (response.ok) {
+        toast({
+          description: "URL content loaded successfully!",
+          duration: 2000,
+        });
+
+        // Clear form
+        setUrl("");
+        setUploadName("");
+        setDescription("");
+
+        if (data.uploadId || data.message) {
+          router.push(`/chat/${data.uploadId || data.message}`);
+        }
+      } else {
+        throw new Error(data.error || "Failed to scrape URL");
       }
     } catch (error) {
       console.error("Error scraping URL:", error);

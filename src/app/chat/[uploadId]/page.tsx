@@ -1,4 +1,5 @@
 import Chat from "@/components/Chat/Chat";
+import ChatWrapper from "@/components/Chat/ChatWrapper";
 import { auth } from "@/lib/auth";
 import { redirect } from "next/navigation";
 import db from "@/lib/db/db";
@@ -31,14 +32,16 @@ const ChatPage = async ({ params }: { params: Params }) => {
         id: uploadId,
       },
     });
-    personal = lastUpload.private;
-    publisher = lastUpload.userId;
 
     //console.log("Upload Id", lastUpload);
 
     if (!lastUpload) {
       redirect("/sign-in");
     }
+
+    personal = lastUpload.private;
+    publisher = lastUpload.userId;
+
     if (lastUpload.private == true && lastUpload.userId !== id) {
       redirect("/sign-in");
     }
@@ -69,7 +72,8 @@ const ChatPage = async ({ params }: { params: Params }) => {
   return (
     <>
       <main className="flex relative items-center justify-center min-h-screen bg-black pt-16 overflow-y-auto">
-        <Chat
+        <ChatWrapper
+          uploadId={uploadId}
           sessionId={chatSession}
           namespace={space}
           isPersonal={personal}

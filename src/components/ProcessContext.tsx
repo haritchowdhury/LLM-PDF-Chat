@@ -73,28 +73,48 @@ export default function ProcessContent({ session }) {
 
         const data = await response.json();
 
-        if (!response.ok) {
+        // Handle 202 Accepted (background processing)
+        if (response.status === 202) {
+          // Clear session storage
+          sessionStorage.removeItem("pendingType");
+          sessionStorage.removeItem("pendingUrl");
+          sessionStorage.removeItem("pendingFile");
+          sessionStorage.removeItem("pendingFileName");
+
+          toast({
+            description: "Processing started in background...",
+            duration: 2000,
+          });
+
+          // Redirect to chat page (will show processing state)
+          router.push(`/chat/${data.uploadId}`);
+        }
+        // Handle 200 OK (legacy sync processing)
+        else if (response.ok) {
+          // Clear session storage
+          sessionStorage.removeItem("pendingType");
+          sessionStorage.removeItem("pendingUrl");
+          sessionStorage.removeItem("pendingFile");
+          sessionStorage.removeItem("pendingFileName");
+
+          toast({
+            description: "Content processed successfully",
+            duration: 2000,
+          });
+
+          // Redirect to chat page
+          router.push(`/chat/${data.uploadId || data.message}`);
+        }
+        // Handle errors
+        else {
           router.push("/");
           toast({
             variant: "destructive",
-            description: "Something went wrong",
+            description: data.error || "Something went wrong",
             duration: 2000,
           });
           throw new Error(data.error || "Failed to process content");
         }
-
-        // Clear session storage
-        sessionStorage.removeItem("pendingType");
-        sessionStorage.removeItem("pendingUrl");
-        sessionStorage.removeItem("pendingFile");
-
-        toast({
-          description: "Content processed successfully",
-          duration: 2000,
-        });
-
-        // Redirect to chat page
-        router.push(`/chat/${data.message}`);
       } catch (error) {
         console.error("Error processing content:", error);
         toast({

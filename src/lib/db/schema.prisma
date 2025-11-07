@@ -88,6 +88,13 @@ enum GameType {
   open_ended
 }
 
+enum ProcessingStatus {
+  PENDING
+  PROCESSING
+  COMPLETED
+  FAILED
+}
+
 model Game {
   id          String     @id @default(cuid())
   userId      String
@@ -127,7 +134,7 @@ model Question {
 
 model Upload {
   id                String   @id @default(cuid())
-  description       String? 
+  description       String?
   name              String
   wallet            String?
   userId            String
@@ -141,9 +148,19 @@ model Upload {
   isDeleted         Boolean?
   private           Boolean
   likedBy           String[] @default([])
+
+  // Background processing fields
+  processingStatus       ProcessingStatus @default(PENDING)
+  errorMessage           String?
+  vectorCount            Int?
+  blobStorageKey         String?
+  processingStartedAt    DateTime?
+  processingCompletedAt  DateTime?
+
   user              User       @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId])
+  @@index([processingStatus])
 }
 
 model Communityquiz {

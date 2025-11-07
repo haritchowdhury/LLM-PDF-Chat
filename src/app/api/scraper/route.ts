@@ -12,6 +12,8 @@ import db from "@/lib/db/db";
 import { v4 as uuid } from "uuid";
 import { auth } from "@/lib/auth";
 import { uploadValidator } from "@/lib/validation/upload-validation";
+import { publishUrlScraperJob } from "@/lib/qstash";
+import { ProcessingStatus } from "@prisma/client";
 
 // Function to chunk text into segments of specified length
 function chunkText(text, chunkSize = 2000) {
@@ -56,13 +58,11 @@ export async function POST(request: NextRequest) {
   const body = await request.json();
   const session = await auth();
   const userId = String(session.user.id);
-  let receivedNamespace: string;
   let uploadId: string;
+  let isNewUpload = false;
 
   try {
     let { url, namespace, sharable, name, description } = urlSchema.parse(body);
-
-    receivedNamespace = namespace;
 
     // Use the validation service
     const validationResult = await uploadValidator.validateAll({
@@ -83,7 +83,10 @@ export async function POST(request: NextRequest) {
     }
 
     uploadId = namespace;
+
+    // Create or update Upload record
     if (namespace === "undefined") {
+      // Create new upload
       const Upload = await db.upload.create({
         data: {
           id: uuid(),
@@ -93,67 +96,53 @@ export async function POST(request: NextRequest) {
           userId: userId,
           private: sharable === "false" ? true : false,
           isDeleted: false,
+          processingStatus: ProcessingStatus.PENDING,
         },
       });
 
       uploadId = Upload.id;
       namespace = uploadId;
+      isNewUpload = true;
+    } else {
+      // Adding to existing upload - keep the upload accessible
+      // Don't change processingStatus - let it stay COMPLETED
+      uploadId = namespace;
     }
 
-    const scrappedText = await withTimeout(
-      scrapeWebpage(url),
-      45000 // 45 seconds timeout
-    );
-
-    // const scrappedText = await scrapeWebpage(url);
-    const textChunks = chunkText(scrappedText, 7000);
-
-    let topics = await withTimeout(
-      updateUpstashWithUrl(index, namespace, textChunks, url, userId),
-      45000
-    );
-    const foundUpload = await db.upload.findFirst({
-      where: {
-        id: uploadId,
-      },
-    });
-    const existingTopics: string[] = JSON.parse(foundUpload.options as string);
-
-    topics = topics.concat(existingTopics);
-    const filteredTopics = filterStringsOnly(topics);
-
-    await db.upload.update({
-      where: {
-        id: uploadId,
-      },
-      data: {
-        options: JSON.stringify(filteredTopics),
-      },
+    // Publish background job to QStash
+    await publishUrlScraperJob({
+      type: "url",
+      uploadId,
+      userId,
+      url,
     });
 
     // Increment request count
     await uploadValidator.incrementRequestCount(userId);
-    return NextResponse.json({ message: uploadId }, { status: 200 });
+
+    // Return 202 Accepted with uploadId
+    return NextResponse.json(
+      {
+        uploadId,
+        status: "processing",
+        message: "URL scraping started. Processing in background.",
+      },
+      { status: 202 }
+    );
+
   } catch (error) {
-    console.log(error);
-    // Check if it's a Zod validation error
-    if (error.message === "TIMEOUT") {
-      if ((receivedNamespace = "undefined")) {
-        await db.upload.delete({
-          where: {
-            id: uploadId,
-          },
-        });
+    console.error("Scraper error:", error);
+
+    // Clean up on error - only delete if we created a new upload
+    if (uploadId && isNewUpload) {
+      try {
+        await db.upload.delete({ where: { id: uploadId } });
+      } catch (deleteErr) {
+        console.error("Failed to clean up failed upload:", deleteErr);
       }
-      return NextResponse.json(
-        {
-          error:
-            "Request timed out. The webpage is taking too long to process. Please try again or use a different URL.",
-          code: "TIMEOUT_ERROR",
-        },
-        { status: 408 } // 408 Request Timeout
-      );
     }
+
+    // Check if it's a Zod validation error
     if (error instanceof ZodError) {
       return NextResponse.json(
         {
@@ -165,10 +154,10 @@ export async function POST(request: NextRequest) {
     } else {
       return NextResponse.json(
         {
-          error: "Failed to scrape url, please try another one!",
-          details: error.errors,
+          error: "Failed to start URL scraping",
+          details: error instanceof Error ? error.message : "Unknown error",
         },
-        { status: 400 }
+        { status: 500 }
       );
     }
   }

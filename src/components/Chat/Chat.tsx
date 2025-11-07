@@ -167,15 +167,34 @@ const Chat = ({
           description: data.error,
           duration: 2000,
         });
-      } else if (data.message) {
+      } else if (response.status === 202) {
+        // Async processing started
+        toast({
+          description: "PDF is being processed in the background. You'll be notified when it's ready.",
+          duration: 3000,
+        });
+
+        // If this is a new upload, navigate to it
+        // If adding to existing, stay on current page and refresh
+        if (namespace === "undefined" && data.uploadId) {
+          setTimeout(() => {
+            router.replace(`/chat/${data.uploadId}`);
+          }, 100);
+        } else {
+          // Refresh the page to show processing status
+          setTimeout(() => {
+            router.refresh();
+          }, 100);
+        }
+      } else if (data.message || data.uploadId) {
+        // Synchronous processing completed (legacy or immediate completion)
         toast({
           description: "Added the PDF to AI's knowledge successfully",
           duration: 2000,
         });
 
-        // Navigate to new chat with uploaded document
         setTimeout(() => {
-          router.replace(`/chat/${data.message}`);
+          router.replace(`/chat/${data.uploadId || data.message}`);
         }, 100);
       } else {
         throw new Error("Upload ID missing in response");
