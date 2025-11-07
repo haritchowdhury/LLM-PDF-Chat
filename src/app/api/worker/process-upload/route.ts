@@ -23,7 +23,7 @@ const index = new Index({
 });
 
 // Increase timeout for long-running processing
-export const maxDuration = 300; // 5 minutes
+export const maxDuration = 60; // 1 minutes
 
 /**
  * POST handler - Process upload jobs
@@ -167,7 +167,9 @@ async function processPdfUpload(
   const pdfBuffer = await getPdfFromBlob(uploadId);
 
   // 2. Convert Buffer to Blob (via Uint8Array for TypeScript compatibility)
-  const pdfBlob = new Blob([new Uint8Array(pdfBuffer)], { type: "application/pdf" });
+  const pdfBlob = new Blob([new Uint8Array(pdfBuffer)], {
+    type: "application/pdf",
+  });
 
   // 3. Load PDF with LangChain
   const loader = new PDFLoader(pdfBlob, { splitPages: true });
