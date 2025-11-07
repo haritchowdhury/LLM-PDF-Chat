@@ -241,7 +241,7 @@ export const queryUpstash = async (
 
   const queryResponse: any[] = await index.query(
     {
-      topK: 10,
+      topK: 100,
       vector: embeddingsArrays[0],
       includeVectors: false,
       includeMetadata: true,
@@ -252,14 +252,20 @@ export const queryUpstash = async (
   console.log(`[queryUpstash] Query returned ${queryResponse.length} results`);
 
   if (queryResponse.length === 0) {
-    console.log("[queryUpstash] No results from vector query - namespace may not exist or has no vectors");
+    console.log(
+      "[queryUpstash] No results from vector query - namespace may not exist or has no vectors"
+    );
     return "";
   }
 
   // Log the namespaces we got back
-  const returnedNamespaces = queryResponse.map(r => r?.metadata?.namespace).filter(Boolean);
-  console.log(`[queryUpstash] Found ${returnedNamespaces.length} results with metadata.namespace:`,
-    [...new Set(returnedNamespaces)]);
+  const returnedNamespaces = queryResponse
+    .map((r) => r?.metadata?.namespace)
+    .filter(Boolean);
+  console.log(
+    `[queryUpstash] Found ${returnedNamespaces.length} results with metadata.namespace:`,
+    [...new Set(returnedNamespaces)]
+  );
   console.log(`[queryUpstash] Filtering for namespace: "${namespace}"`);
 
   const quizContentArray = await Promise.all(
@@ -271,11 +277,15 @@ export const queryUpstash = async (
     })
   );
 
-  const matchedResults = quizContentArray.filter(c => c && c.length > 0);
-  console.log(`[queryUpstash] Matched ${matchedResults.length} results for namespace "${namespace}"`);
+  const matchedResults = quizContentArray.filter((c) => c && c.length > 0);
+  console.log(
+    `[queryUpstash] Matched ${matchedResults.length} results for namespace "${namespace}"`
+  );
 
   const finalContent = quizContentArray.join("");
-  console.log(`[queryUpstash] Returning ${finalContent.length} characters of content`);
+  console.log(
+    `[queryUpstash] Returning ${finalContent.length} characters of content`
+  );
 
   return finalContent;
 };
