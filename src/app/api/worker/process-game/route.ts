@@ -44,7 +44,9 @@ export async function POST(request: Request) {
     gameId = payload.gameId;
     const { uploadId, topic, amount, userId } = payload;
 
-    console.log(`[Worker] Processing game ${gameId}: generating ${amount} questions on topic "${topic}"`);
+    console.log(
+      `[Worker] Processing game ${gameId}: generating ${amount} questions on topic "${topic}"`
+    );
 
     // 4. Update status to PROCESSING
     await db.game.update({
@@ -140,6 +142,16 @@ async function processGameQuestions(
     throw new Error(`Upload ${uploadId} not found`);
   }
 
+  console.log(`[Worker] Document found:`, {
+    uploadId,
+    documentPrivate: document.private,
+    documentUserId: document.userId,
+    currentUserId: userId,
+    topic,
+  });
+
+  console.log("input for data", uploadId, userId);
+
   const questionData = await queryUpstash(
     index,
     uploadId,
@@ -149,6 +161,15 @@ async function processGameQuestions(
     document.userId
   );
 
+  console.log(
+    `[Worker] Query returned ${questionData.length} characters of context`
+  );
+  if (!questionData || questionData.length === 0) {
+    throw new Error(
+      `No relevant context found for topic "${topic}" in upload ${uploadId}. The document may not contain information about this topic.`
+    );
+  }
+
   console.log(`[Worker] Retrieved context, generating questions via LLM...`);
 
   // 2. Generate questions via LLM
@@ -157,9 +178,9 @@ async function processGameQuestions(
     and answers, the length of each answer should not be more than
     15 words.
 
-    IMPORTANT: You MUST return a JSON array. Even if generating one question, return it as an array with one element.
+    IMPORTANT: You MUST generate EXACTLY ${amount} questions and return them as a JSON array with ${amount} elements.
 
-    The structure should be an array like this:
+    The structure MUST be an array with exactly ${amount} objects like this:
     [
       {
        "question": "string",
@@ -168,18 +189,18 @@ async function processGameQuestions(
        "option2": "string",
        "option3": "string",
        "option4": "string"
-      }
+      },
+      ... (repeat for all ${amount} questions)
     ]`,
-    new Array(amount).fill(
-      `You are to generate a random hard mcq question about ${topic}.
-      The question should be strictly relevant to the topic and the answer should be clear, there should not be any ambiguity among the options for the question.`
-    ),
+    `You are to generate ${amount} different random hard mcq questions about ${topic}.
+    Each question should be strictly relevant to the topic and the answer should be clear, there should not be any ambiguity among the options for the question.
+    Make sure each question is unique and covers different aspects of the topic.`,
     questionData
   );
 
   // 3. Ensure questions is always an array
   if (!Array.isArray(questions)) {
-    if (questions && typeof questions === 'object') {
+    if (questions && typeof questions === "object") {
       questions = [questions];
     } else {
       questions = [];
@@ -190,7 +211,9 @@ async function processGameQuestions(
     throw new Error("No questions generated");
   }
 
-  console.log(`[Worker] Generated ${questions.length} questions, saving to database...`);
+  console.log(
+    `[Worker] Generated ${questions.length} questions, saving to database...`
+  );
 
   // 4. Process and save questions to database
   type mcqQuestion = {

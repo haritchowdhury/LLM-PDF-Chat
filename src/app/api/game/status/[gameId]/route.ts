@@ -67,10 +67,17 @@ export async function GET(
       );
     }
 
+    // Determine actual status - if game has questions but status is PENDING, mark as COMPLETED
+    // This handles old games that were created before the processingStatus field was added
+    let actualStatus = game.processingStatus.toLowerCase();
+    if (game.processingStatus === ProcessingStatus.PENDING && game._count.questions > 0) {
+      actualStatus = "completed";
+    }
+
     // Return game status
     return NextResponse.json({
       gameId: game.id,
-      status: game.processingStatus.toLowerCase(),
+      status: actualStatus,
       questionCount: game._count.questions,
       errorMessage: game.errorMessage,
       processingStartedAt: game.processingStartedAt,

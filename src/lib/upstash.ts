@@ -223,6 +223,15 @@ export const queryUpstash = async (
 ) => {
   const effectiveNameSPace = isPersonal ? userId : uploaderId;
 
+  console.log("[queryUpstash] Query parameters:", {
+    namespace,
+    topic,
+    userId,
+    isPersonal,
+    uploaderId,
+    effectiveNameSPace,
+  });
+
   const embedder = new OpenAIEmbeddings({
     openAIApiKey: process.env.OPENAI_API_KEY,
     modelName: "text-embedding-3-small",
@@ -240,7 +249,18 @@ export const queryUpstash = async (
     { namespace: effectiveNameSPace }
   );
 
-  if (queryResponse.length === 0) return "";
+  console.log(`[queryUpstash] Query returned ${queryResponse.length} results`);
+
+  if (queryResponse.length === 0) {
+    console.log("[queryUpstash] No results from vector query - namespace may not exist or has no vectors");
+    return "";
+  }
+
+  // Log the namespaces we got back
+  const returnedNamespaces = queryResponse.map(r => r?.metadata?.namespace).filter(Boolean);
+  console.log(`[queryUpstash] Found ${returnedNamespaces.length} results with metadata.namespace:`,
+    [...new Set(returnedNamespaces)]);
+  console.log(`[queryUpstash] Filtering for namespace: "${namespace}"`);
 
   const quizContentArray = await Promise.all(
     queryResponse.map(async (result) => {
@@ -251,7 +271,13 @@ export const queryUpstash = async (
     })
   );
 
-  return quizContentArray.join("");
+  const matchedResults = quizContentArray.filter(c => c && c.length > 0);
+  console.log(`[queryUpstash] Matched ${matchedResults.length} results for namespace "${namespace}"`);
+
+  const finalContent = quizContentArray.join("");
+  console.log(`[queryUpstash] Returning ${finalContent.length} characters of content`);
+
+  return finalContent;
 };
 
 export const updateUpstashWithUrl = async (

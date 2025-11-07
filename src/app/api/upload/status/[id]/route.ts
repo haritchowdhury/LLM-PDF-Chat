@@ -53,10 +53,17 @@ export async function GET(
       return NextResponse.json({ error: "Unauthorized" }, { status: 403 });
     }
 
+    // Determine actual status - if upload has vectors but status is PENDING, mark as COMPLETED
+    // This handles old uploads that were created before the processingStatus field was added
+    let actualStatus = upload.processingStatus;
+    if (upload.processingStatus === "PENDING" && upload.vectorCount && upload.vectorCount > 0) {
+      actualStatus = "COMPLETED";
+    }
+
     // Return status information
     return NextResponse.json({
       id: upload.id,
-      status: upload.processingStatus,
+      status: actualStatus,
       errorMessage: upload.errorMessage,
       vectorCount: upload.vectorCount,
       processingStartedAt: upload.processingStartedAt,
