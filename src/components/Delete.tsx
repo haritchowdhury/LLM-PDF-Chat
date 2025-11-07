@@ -36,7 +36,8 @@ const Delete = ({ upload }: Upload) => {
         body: JSON.stringify({ upload: upload, type: "delete" }),
       });
 
-      if (!response.ok) {
+      // Accept both 200 OK and 202 Accepted as successful responses
+      if (!response.ok && response.status !== 202) {
         const error = await response.json();
         throw new Error(error.error || "Could not be deleted");
       }
@@ -59,7 +60,9 @@ const Delete = ({ upload }: Upload) => {
         setTimeout(() => {
           toast({
             title: "Success",
-            description: "Upload deleted successfully!",
+            description: data.status === "deleting"
+              ? "Deletion started. Processing in background..."
+              : "Upload deleted successfully!",
             variant: "default",
           });
           router.push(`/profile/${data.userId}`);

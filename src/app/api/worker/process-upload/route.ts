@@ -10,7 +10,7 @@ import { Index } from "@upstash/vector";
 import { PDFLoader } from "@langchain/community/document_loaders/fs/pdf";
 import { verifyOrReturnError } from "@/lib/qstash-verify";
 import { getPdfFromBlob, deleteBlobFile } from "@/lib/blob-storage";
-import { updateUpstash, updateUpstashWithUrl } from "@/lib/upstash";
+import { updateUpstash, updateUpstashWithUrl, deleteUpstash } from "@/lib/upstash";
 import { UploadJobPayload } from "@/lib/qstash";
 import { scrapeWebpage } from "@/lib/cheerio";
 import db from "@/lib/db/db";
@@ -71,6 +71,15 @@ export async function POST(request: Request) {
       const result = await processUrlScraping(payload, index);
       topics = result.topics;
       vectorCount = result.vectorCount;
+    } else if (type === "delete") {
+      // Process deletion
+      await processDelete(payload, index);
+      console.log(`[Worker] Successfully deleted upload ${uploadId}`);
+      return NextResponse.json({
+        success: true,
+        uploadId,
+        message: "Deletion completed successfully",
+      });
     } else {
       throw new Error(`Unknown job type: ${type}`);
     }
@@ -241,4 +250,22 @@ async function processUrlScraping(
   );
 
   return { topics, vectorCount };
+}
+
+/**
+ * Process a deletion job
+ */
+async function processDelete(
+  payload: UploadJobPayload & { type: "delete" },
+  index: Index
+): Promise<void> {
+  const { uploadId, userId, sessionId } = payload;
+
+  console.log(`[Worker] Processing deletion for upload ${uploadId}`);
+
+  // Perform the heavy deletion operation
+  // This deletes vectors from Upstash Vector and cleans up Redis cache
+  await deleteUpstash(index, uploadId, sessionId);
+
+  console.log(`[Worker] Deletion complete for upload ${uploadId}`);
 }

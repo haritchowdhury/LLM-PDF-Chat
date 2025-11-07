@@ -152,9 +152,8 @@ const CommunityQuizForm = ({ topic: topicParam, id: uploadId }: Props) => {
           return;
         }
         setFinishedLoading(true);
-        setTimeout(() => {
-          router.push(`/play/mcq/${gameId as string}`);
-        }, 2000);
+        // Redirect immediately - questions will be generated in background
+        router.push(`/play/mcq/${gameId as string}`);
       },
     });
   };

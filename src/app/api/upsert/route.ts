@@ -13,7 +13,7 @@ import { v4 as uuid } from "uuid";
 import { auth } from "@/lib/auth";
 import { uploadValidator } from "@/lib/validation/upload-validation";
 import { uploadPdfToBlob } from "@/lib/blob-storage";
-import { publishPdfJob } from "@/lib/qstash";
+import { publishPdfJob, publishDeleteJob } from "@/lib/qstash";
 import { ProcessingStatus } from "@prisma/client";
 
 const index = new Index({
@@ -158,6 +158,7 @@ export async function POST(request: NextRequest) {
 
 /*
  * Endpoint to delete a chat room including Redis Cache
+ * Uses QStash for background processing
  */
 export async function DELETE(request: Request) {
   const { upload, type } = await request.json();
@@ -172,12 +173,15 @@ export async function DELETE(request: Request) {
       where: { id: upload },
     });
 
+    if (!Upload) {
+      return NextResponse.json({ error: "Upload not found" }, { status: 404 });
+    }
+
     if (session.user.id !== Upload.userId) {
       return NextResponse.json({ error: "Not allowed" }, { status: 403 });
     }
 
-    await deleteUpstash(index, upload, sessionId);
-
+    // Mark as deleted immediately in database
     if (type === "delete") {
       await db.upload.update({
         where: {
@@ -188,7 +192,25 @@ export async function DELETE(request: Request) {
         },
       });
     }
-    return NextResponse.json({ userId: session.user.id });
+
+    // Publish deletion job to QStash for background processing
+    await publishDeleteJob({
+      type: "delete",
+      uploadId: upload,
+      userId: session.user.id,
+      sessionId,
+    });
+
+    // Return 202 Accepted - deletion is processing in background
+    return NextResponse.json(
+      {
+        uploadId: upload,
+        status: "deleting",
+        message: "Deletion started. Processing in background.",
+        userId: session.user.id,
+      },
+      { status: 202 }
+    );
   } catch (error) {
     return NextResponse.json({ error: error.message }, { status: 500 });
   }

@@ -236,7 +236,7 @@ const Chat = ({
           user_prompt: input,
           sessionId: sessionId,
           namespace: namespace,
-          uploadId: upload.id,
+          uploadId: upload?.id,
         }),
       });
 

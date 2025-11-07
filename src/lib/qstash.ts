@@ -33,9 +33,31 @@ export interface UrlScraperJobPayload {
 }
 
 /**
+ * Job payload for deletion processing
+ */
+export interface DeleteJobPayload {
+  type: "delete";
+  uploadId: string;
+  userId: string;
+  sessionId: string;
+}
+
+/**
+ * Job payload for game/quiz question generation
+ */
+export interface GameJobPayload {
+  type: "game";
+  gameId: string;
+  uploadId: string;
+  topic: string;
+  amount: number;
+  userId: string;
+}
+
+/**
  * Union type for all job payloads
  */
-export type UploadJobPayload = PdfUploadJobPayload | UrlScraperJobPayload;
+export type UploadJobPayload = PdfUploadJobPayload | UrlScraperJobPayload | DeleteJobPayload | GameJobPayload;
 
 /**
  * Publish a PDF processing job to QStash
@@ -152,6 +174,120 @@ export async function publishUrlScraperJob(
 }
 
 /**
+ * Publish a deletion job to QStash
+ * In development mode, calls the worker endpoint directly
+ *
+ * @param payload - The deletion job payload
+ * @returns The QStash message ID (or "dev-mode" in development)
+ */
+export async function publishDeleteJob(
+  payload: DeleteJobPayload
+): Promise<string> {
+  const workerUrl = `${process.env.NEXT_PUBLIC_APP_URL}/api/worker/process-upload`;
+
+  // Development mode: Call worker directly
+  if (process.env.NODE_ENV === "development") {
+    console.log(`[QStash] DEV MODE: Calling worker directly for deletion ${payload.uploadId}`);
+
+    try {
+      const response = await fetch(workerUrl, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "x-dev-mode": "true",
+        },
+        body: JSON.stringify(payload),
+      });
+
+      if (!response.ok) {
+        const error = await response.text();
+        throw new Error(`Worker call failed: ${error}`);
+      }
+
+      console.log(`[QStash] DEV MODE: Worker called successfully for deletion ${payload.uploadId}`);
+      return "dev-mode";
+    } catch (error) {
+      console.error("[QStash] DEV MODE: Error calling worker:", error);
+      throw error;
+    }
+  }
+
+  // Production mode: Use QStash
+  try {
+    console.log(`[QStash] Publishing deletion job for upload ${payload.uploadId}`);
+
+    const result = await qstashClient.publishJSON({
+      url: workerUrl,
+      body: payload,
+      retries: 3,
+    });
+
+    console.log(`[QStash] Deletion job published with message ID: ${result.messageId}`);
+    return result.messageId;
+  } catch (error) {
+    console.error("[QStash] Error publishing deletion job:", error);
+    throw new Error("Failed to publish deletion job");
+  }
+}
+
+/**
+ * Publish a game/quiz question generation job to QStash
+ * In development mode, calls the worker endpoint directly
+ *
+ * @param payload - The game job payload
+ * @returns The QStash message ID (or "dev-mode" in development)
+ */
+export async function publishGameJob(
+  payload: GameJobPayload
+): Promise<string> {
+  const workerUrl = `${process.env.NEXT_PUBLIC_APP_URL}/api/worker/process-game`;
+
+  // Development mode: Call worker directly
+  if (process.env.NODE_ENV === "development") {
+    console.log(`[QStash] DEV MODE: Calling worker directly for game ${payload.gameId}`);
+
+    try {
+      const response = await fetch(workerUrl, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "x-dev-mode": "true",
+        },
+        body: JSON.stringify(payload),
+      });
+
+      if (!response.ok) {
+        const error = await response.text();
+        throw new Error(`Worker call failed: ${error}`);
+      }
+
+      console.log(`[QStash] DEV MODE: Worker called successfully for game ${payload.gameId}`);
+      return "dev-mode";
+    } catch (error) {
+      console.error("[QStash] DEV MODE: Error calling worker:", error);
+      throw error;
+    }
+  }
+
+  // Production mode: Use QStash
+  try {
+    console.log(`[QStash] Publishing game job for game ${payload.gameId}`);
+
+    const result = await qstashClient.publishJSON({
+      url: workerUrl,
+      body: payload,
+      retries: 3,
+    });
+
+    console.log(`[QStash] Game job published with message ID: ${result.messageId}`);
+    return result.messageId;
+  } catch (error) {
+    console.error("[QStash] Error publishing game job:", error);
+    throw new Error("Failed to publish game job");
+  }
+}
+
+/**
  * Generic publish function that routes to the appropriate publisher
  *
  * @param payload - The job payload
@@ -164,6 +300,10 @@ export async function publishUploadJob(
     return publishPdfJob(payload);
   } else if (payload.type === "url") {
     return publishUrlScraperJob(payload);
+  } else if (payload.type === "delete") {
+    return publishDeleteJob(payload);
+  } else if (payload.type === "game") {
+    return publishGameJob(payload);
   } else {
     throw new Error(`Unknown job type: ${(payload as any).type}`);
   }

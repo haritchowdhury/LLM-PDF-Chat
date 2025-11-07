@@ -107,7 +107,14 @@ model Game {
   user        User       @relation(fields: [userId], references: [id], onDelete: Cascade)
   upload Upload @relation(fields:[uploadId], references:[id])
 
+  // Question generation status tracking
+  processingStatus       ProcessingStatus @default(PENDING)
+  errorMessage           String?
+  processingStartedAt    DateTime?
+  processingCompletedAt  DateTime?
+
   @@index([userId, uploadId])
+  @@index([processingStatus])
 }
 
 model topic_count {

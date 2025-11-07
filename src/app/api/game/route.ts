@@ -9,6 +9,8 @@ import axios from "axios";
 import { headers } from "next/headers";
 import getUserSession from "@/lib/user.server";
 import { Redis } from "@upstash/redis";
+import { publishGameJob } from "@/lib/qstash";
+import { ProcessingStatus } from "@prisma/client";
 
 const redis = new Redis({
   url: process.env.UPSTASH_REDIS_REST_URL,
@@ -53,6 +55,7 @@ export async function POST(request: NextRequest) {
   const type = "mcq" as const;
   const headersList = await headers();
   const host = await headersList.get("host");
+  // Create game with PENDING status
   const game = await db.game.create({
     data: {
       gameType: type,
@@ -60,8 +63,11 @@ export async function POST(request: NextRequest) {
       userId: session.user.id,
       uploadId: id,
       topic: topic,
+      processingStatus: ProcessingStatus.PENDING,
     },
   });
+
+  // Update topic count
   await db.topic_count.upsert({
     where: {
       topic,
@@ -77,66 +83,28 @@ export async function POST(request: NextRequest) {
     },
   });
 
-  const { data } = await axios.post(`http://${host as string}/api/questions`, {
-    amount,
+  // Publish game job to QStash for background question generation
+  await publishGameJob({
+    type: "game",
+    gameId: game.id,
+    uploadId: id,
     topic,
-    type,
-    namespace,
+    amount,
     userId,
   });
-  let parsedData: any;
-  try {
-    parsedData = data.questions;
-    if (!Array.isArray(parsedData)) {
-      console.error("parsedData is not an array:", parsedData);
-      return NextResponse.json(
-        { error: "Invalid response format from questions API." },
-        { status: 500 }
-      );
-    }
-  } catch (err) {
-    console.log(err);
-    return NextResponse.json(
-      { error: "An unexpected error occurred." },
-      {
-        status: 500,
-      }
-    );
-  }
-  console.log("from questions api:", data);
 
-  if (type === "mcq") {
-    type mcqQuestion = {
-      question: string;
-      answer: string;
-      option1: string;
-      option2: string;
-      option3: string;
-      option4: string;
-    };
-    console.log("parsed data", parsedData);
-    const manyData = parsedData.map((question: mcqQuestion) => {
-      const options = [
-        question.option1,
-        question.option2,
-        question.option3,
-        question.option4,
-      ].sort(() => Math.random() - 0.5);
-      return {
-        question: question.question,
-        answer: question.answer,
-        options: JSON.stringify(options),
-        gameId: game.id,
-        questionType: "mcq" as const,
-      };
-    });
-    await db.question.createMany({
-      data: manyData,
-    });
-  }
-
+  // Update rate limit
   await redis.set(`game_rate_limit:${userId}`, requestCount + 1, {
     ex: EXPIRATION_TIME,
   });
-  return NextResponse.json({ gameId: game.id }, { status: 200 });
+
+  // Return 202 Accepted - questions are being generated in background
+  return NextResponse.json(
+    {
+      gameId: game.id,
+      status: "pending",
+      message: "Game created. Questions are being generated in background.",
+    },
+    { status: 202 }
+  );
 }

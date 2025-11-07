@@ -1,6 +1,7 @@
 import { auth } from "@/lib/auth";
 import db from "@/lib/db/db";
 import MCQ from "@/components/Quiz/MCQ";
+import GameStatusWrapper from "@/components/Quiz/GameStatusWrapper";
 import { redirect } from "next/navigation";
 import * as React from "react";
 
@@ -12,9 +13,6 @@ export default async function MCQPage({ params }: { params: Params }) {
     return redirect("/");
   }
   const { gameId } = await params;
-  const upload = await db.upload.findUnique({
-    where: { id: gameId },
-  });
 
   const game = await db.game.findUnique({
     where: {
@@ -30,12 +28,17 @@ export default async function MCQPage({ params }: { params: Params }) {
       },
     },
   });
+
   if (!game) {
-    return redirect(`/chat/${upload.id}`);
+    return redirect("/");
   }
+
+  // Wrap the game component with GameStatusWrapper to handle async question generation
   return (
-    <main className="flex relative items-center justify-center min-h-screen bg-gradient-to-br from-blue-50 to-green-50">
-      <MCQ key={game.id} game={game} />{" "}
-    </main>
+    <GameStatusWrapper gameId={game.id} uploadId={game.uploadId}>
+      <main className="flex relative items-center justify-center min-h-screen bg-gradient-to-br from-blue-50 to-green-50">
+        <MCQ key={game.id} game={game} />
+      </main>
+    </GameStatusWrapper>
   );
 }
