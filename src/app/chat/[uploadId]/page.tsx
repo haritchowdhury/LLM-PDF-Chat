@@ -71,7 +71,7 @@ const ChatPage = async ({ params }: { params: Params }) => {
   //console.log(personal, Uploads, Games);
   return (
     <>
-      <main className="flex relative items-center justify-center min-h-screen bg-black pt-16 overflow-y-auto">
+      <main className="flex relative items-center justify-center min-h-screen bg-white pt-16 overflow-y-auto">
         <ChatWrapper
           uploadId={uploadId}
           sessionId={chatSession}

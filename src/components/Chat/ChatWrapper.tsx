@@ -46,7 +46,7 @@ export default function ChatWrapper({
   // Loading initial status
   if (loading && !status) {
     return (
-      <div className="flex flex-col items-center justify-center min-h-[60vh] bg-gray-100 text-black">
+      <div className="flex flex-col items-center justify-center min-h-[60vh] text-black">
         <Loader2 className="h-12 w-12 animate-spin text-blue-500 mb-4" />
         <p className="text-lg">Loading...</p>
       </div>
@@ -56,7 +56,7 @@ export default function ChatWrapper({
   // Error fetching status
   if (error) {
     return (
-      <div className="flex flex-col items-center justify-center min-h-[60vh] text-white">
+      <div className="flex flex-col items-center justify-center min-h-[60vh] text-black">
         <AlertCircle className="h-12 w-12 text-red-500 mb-4" />
         <h2 className="text-2xl font-bold mb-2">Error</h2>
         <p className="text-gray-400">{error}</p>
@@ -67,7 +67,7 @@ export default function ChatWrapper({
   // Upload is still processing
   if (isProcessing(status)) {
     return (
-      <div className="flex flex-col items-center justify-center min-h-[60vh] text-black bg-gray-100 px-4">
+      <div className="flex flex-col items-center justify-center min-h-[60vh] text-black px-4">
         <div className="mb-6">
           <Loader2 className="h-16 w-16 animate-spin text-blue-500" />
         </div>
@@ -78,7 +78,7 @@ export default function ChatWrapper({
             : "We're generating embeddings and preparing your content for chat. This may take a few minutes..."}
         </p>
         <div className="mt-6 p-4 bg-gray-800 rounded-lg">
-          <p className="text-sm text-gray-300">
+          <p className="text-sm text-gray-100">
             You can safely close this page. Your content will continue
             processing in the background.
           </p>
