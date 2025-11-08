@@ -77,8 +77,8 @@ export default function ChatWrapper({
             ? "Your upload is queued and will start processing shortly..."
             : "We're generating embeddings and preparing your content for chat. This may take a few minutes..."}
         </p>
-        <div className="mt-6 p-4 bg-gray-800 rounded-lg">
-          <p className="text-sm text-gray-100">
+        <div className="mt-6 p-4 bg-white rounded-lg">
+          <p className="text-sm text-gray-800">
             You can safely close this page. Your content will continue
             processing in the background.
           </p>
