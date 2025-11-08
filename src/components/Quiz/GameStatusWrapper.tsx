@@ -3,7 +3,7 @@
 import { useGameStatus, isProcessing, isCompleted, isFailed } from "@/hooks/useGameStatus";
 import { motion } from "framer-motion";
 import { useRouter } from "next/navigation";
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 
 interface GameStatusWrapperProps {
   gameId: string;
@@ -24,17 +24,19 @@ export default function GameStatusWrapper({
   const { data, loading, error } = useGameStatus(gameId);
   const router = useRouter();
   const hasRefreshed = useRef(false);
+  const [isRefreshing, setIsRefreshing] = useState(false);
 
   // Refresh page when status becomes completed to fetch updated game data with questions
   useEffect(() => {
     if (data && isCompleted(data) && !hasRefreshed.current) {
       hasRefreshed.current = true;
+      setIsRefreshing(true);
       router.refresh();
     }
   }, [data, router]);
 
-  // Initial loading
-  if (loading) {
+  // Initial loading or refreshing after completion
+  if (loading || isRefreshing) {
     return (
       <main className="flex relative items-center justify-center min-h-screen bg-gradient-to-br from-blue-50 to-green-50">
         <div className="bg-white shadow-2xl rounded-2xl p-8 max-w-md w-full mx-4">
@@ -45,7 +47,7 @@ export default function GameStatusWrapper({
               transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
             />
             <h2 className="text-xl font-semibold text-gray-800">
-              Loading game...
+              {isRefreshing ? "Loading questions..." : "Loading game..."}
             </h2>
           </div>
         </div>
