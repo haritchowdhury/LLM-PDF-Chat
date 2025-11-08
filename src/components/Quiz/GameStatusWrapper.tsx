@@ -3,7 +3,7 @@
 import { useGameStatus, isProcessing, isCompleted, isFailed } from "@/hooks/useGameStatus";
 import { motion } from "framer-motion";
 import { useRouter } from "next/navigation";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef } from "react";
 
 interface GameStatusWrapperProps {
   gameId: string;
@@ -26,20 +26,22 @@ export default function GameStatusWrapper({
   const { data, loading, error } = useGameStatus(gameId);
   const router = useRouter();
   const hasRefreshed = useRef(false);
-  const [isRefreshing, setIsRefreshing] = useState(false);
 
-  // Refresh page when status becomes completed BUT game doesn't have questions yet
-  // This ensures we fetch the updated game data with questions
+  // Check if questions are ready from API status
+  const questionsReady = data && data.questionCount > 0;
+
+  // Reload page when status becomes completed AND questions are ready but not loaded yet
+  // This ensures we fetch the updated game data with questions from the server
   useEffect(() => {
-    if (data && isCompleted(data) && !hasQuestions && !hasRefreshed.current) {
+    if (data && isCompleted(data) && questionsReady && !hasQuestions && !hasRefreshed.current) {
       hasRefreshed.current = true;
-      setIsRefreshing(true);
-      router.refresh();
+      // Use full page reload to ensure server-side data is fetched
+      window.location.reload();
     }
-  }, [data, hasQuestions, router]);
+  }, [data, questionsReady, hasQuestions]);
 
-  // Initial loading or refreshing after completion
-  if (loading || isRefreshing) {
+  // Initial loading
+  if (loading) {
     return (
       <main className="flex relative items-center justify-center min-h-screen bg-gradient-to-br from-blue-50 to-green-50">
         <div className="bg-white shadow-2xl rounded-2xl p-8 max-w-md w-full mx-4">
@@ -50,7 +52,7 @@ export default function GameStatusWrapper({
               transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
             />
             <h2 className="text-xl font-semibold text-gray-800">
-              {isRefreshing ? "Loading questions..." : "Loading game..."}
+              Loading game...
             </h2>
           </div>
         </div>
@@ -93,8 +95,8 @@ export default function GameStatusWrapper({
     );
   }
 
-  // Processing state or waiting for questions to load after completion
-  if (data && (isProcessing(data) || (isCompleted(data) && !hasQuestions))) {
+  // Processing state or waiting for questions to be generated
+  if (data && (isProcessing(data) || (isCompleted(data) && !questionsReady))) {
     return (
       <main className="flex relative items-center justify-center min-h-screen bg-gradient-to-br from-blue-50 to-green-50">
         <div className="bg-white shadow-2xl rounded-2xl p-8 max-w-md w-full mx-4">
@@ -172,7 +174,7 @@ export default function GameStatusWrapper({
   }
 
   // Completed state with questions loaded - render the actual game
-  if (data && isCompleted(data) && hasQuestions) {
+  if (data && isCompleted(data) && questionsReady && hasQuestions) {
     return <>{children}</>;
   }
 
