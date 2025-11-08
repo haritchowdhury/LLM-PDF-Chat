@@ -57,7 +57,7 @@ export function HeaderNavigation({
           {shouldShowClassrooms && (
             <Link
               href="/"
-              className="flex gap-2 items-center bg-blue-600 text-white px-4 py-2 rounded-lg font-semibold hover:bg-blue-700 transition-colors"
+              className="flex gap-2 items-center border border-blue-600  text-blue-600 px-4 py-2 rounded-lg font-semibold hover:bg-blue-700 hover:text-white transition-colors"
             >
               <span className="hidden md:inline">Classrooms</span>
               <Landmark className="h-4 w-4" />
@@ -66,7 +66,7 @@ export function HeaderNavigation({
           {shouldShowMyPage && (
             <Link
               href={`/profile/${userId}`}
-              className="flex gap-2 items-center bg-blue-600 text-white px-4 py-2 rounded-lg font-semibold hover:bg-blue-700 transition-colors"
+              className="flex gap-2 items-center border border-blue-600 text-blue-600 px-4 py-2 rounded-lg font-semibold hover:bg-blue-700 hover:text-white transition-colors"
             >
               <span className="hidden sm:inline">My Page</span>
               <CircleUserRound className="h-4 w-4" />
@@ -81,7 +81,7 @@ export function HeaderNavigation({
         <div className="flex flex-row">
           <Link
             href={`/sign-in`}
-            className="flex gap-2 items-center bg-blue-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-blue-700 transition-colors"
+            className="flex gap-2 items-center border border-blue-600  text-blue-600 px-4 py-2 rounded-lg font-semibold hover:bg-blue-700 hover:text-white transition-colors"
           >
             <span className="hidden sm:inline">Sign in</span>
             <CircleUserRound className="h-4 w-4" />

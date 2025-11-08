@@ -21,7 +21,7 @@ const HeroSection = () => {
           </Link>
           <Link
             href="/demo"
-            className="border border-gray-300 text-gray-700 px-8 py-3 rounded-lg font-semibold hover:bg-gray-50 transition-colors"
+            className="border border-blue-600 text-blue-600 px-8 py-3 rounded-lg font-semibold hover:bg-blue-600 hover:text-white 0 transition-colors"
           >
             Watch Demo
           </Link>
