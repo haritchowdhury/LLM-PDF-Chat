@@ -1,6 +1,11 @@
 "use client";
 
-import { useGameStatus, isProcessing, isCompleted, isFailed } from "@/hooks/useGameStatus";
+import {
+  useGameStatus,
+  isProcessing,
+  isCompleted,
+  isFailed,
+} from "@/hooks/useGameStatus";
 import { motion } from "framer-motion";
 import { useRouter } from "next/navigation";
 import { useEffect, useRef } from "react";
@@ -33,7 +38,13 @@ export default function GameStatusWrapper({
   // Reload page when status becomes completed AND questions are ready but not loaded yet
   // This ensures we fetch the updated game data with questions from the server
   useEffect(() => {
-    if (data && isCompleted(data) && questionsReady && !hasQuestions && !hasRefreshed.current) {
+    if (
+      data &&
+      isCompleted(data) &&
+      questionsReady &&
+      !hasQuestions &&
+      !hasRefreshed.current
+    ) {
       hasRefreshed.current = true;
       // Use full page reload to ensure server-side data is fetched
       window.location.reload();
@@ -95,8 +106,13 @@ export default function GameStatusWrapper({
     );
   }
 
-  // Processing state or waiting for questions to be generated
-  if (data && (isProcessing(data) || (isCompleted(data) && !questionsReady))) {
+  // Processing state, waiting for questions to be generated, or loading questions
+  if (
+    data &&
+    (isProcessing(data) ||
+      (isCompleted(data) && !questionsReady) ||
+      (isCompleted(data) && questionsReady && !hasQuestions))
+  ) {
     return (
       <main className="flex relative items-center justify-center min-h-screen bg-gradient-to-br from-blue-50 to-green-50">
         <div className="bg-white shadow-2xl rounded-2xl p-8 max-w-md w-full mx-4">
@@ -107,17 +123,22 @@ export default function GameStatusWrapper({
               transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
             />
             <h2 className="text-xl font-semibold text-gray-800">
-              Generating Questions...
+              {questionsReady && !hasQuestions
+                ? "Loading questions..."
+                : "Generating Questions..."}
             </h2>
             <p className="text-gray-600">
-              Please wait while we generate quiz questions from your document.
+              {questionsReady && !hasQuestions
+                ? "Questions generated, loading quiz..."
+                : "Please wait while we generate quiz questions from your document."}
             </p>
             <p className="text-sm text-gray-500">
               Status: {data.status.toUpperCase()}
             </p>
             {data.questionCount > 0 && (
               <p className="text-sm text-blue-600">
-                {data.questionCount} question{data.questionCount !== 1 ? "s" : ""} generated
+                {data.questionCount} question
+                {data.questionCount !== 1 ? "s" : ""} generated
               </p>
             )}
           </div>
@@ -151,7 +172,8 @@ export default function GameStatusWrapper({
               Generation Failed
             </h2>
             <p className="text-gray-600">
-              {data.errorMessage || "Failed to generate quiz questions. Please try again."}
+              {data.errorMessage ||
+                "Failed to generate quiz questions. Please try again."}
             </p>
             <div className="flex gap-3 mt-4">
               <button
