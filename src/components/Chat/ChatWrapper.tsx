@@ -9,7 +9,12 @@
 
 import React from "react";
 import Chat from "./Chat";
-import { useUploadStatus, isProcessing, isCompleted, isFailed } from "@/hooks/useUploadStatus";
+import {
+  useUploadStatus,
+  isProcessing,
+  isCompleted,
+  isFailed,
+} from "@/hooks/useUploadStatus";
 import { Upload, Game } from "@prisma/client";
 import { Loader2, AlertCircle, CheckCircle2 } from "lucide-react";
 
@@ -41,7 +46,7 @@ export default function ChatWrapper({
   // Loading initial status
   if (loading && !status) {
     return (
-      <div className="flex flex-col items-center justify-center min-h-[60vh] text-white">
+      <div className="flex flex-col items-center justify-center min-h-[60vh] bg-gray-100 text-black">
         <Loader2 className="h-12 w-12 animate-spin text-blue-500 mb-4" />
         <p className="text-lg">Loading...</p>
       </div>
@@ -62,7 +67,7 @@ export default function ChatWrapper({
   // Upload is still processing
   if (isProcessing(status)) {
     return (
-      <div className="flex flex-col items-center justify-center min-h-[60vh] text-white px-4">
+      <div className="flex flex-col items-center justify-center min-h-[60vh] text-black bg-gray-100 px-4">
         <div className="mb-6">
           <Loader2 className="h-16 w-16 animate-spin text-blue-500" />
         </div>
@@ -74,7 +79,8 @@ export default function ChatWrapper({
         </p>
         <div className="mt-6 p-4 bg-gray-800 rounded-lg">
           <p className="text-sm text-gray-300">
-            You can safely close this page. Your content will continue processing in the background.
+            You can safely close this page. Your content will continue
+            processing in the background.
           </p>
         </div>
       </div>
@@ -86,9 +92,12 @@ export default function ChatWrapper({
     return (
       <div className="flex flex-col items-center justify-center min-h-[60vh] text-white px-4">
         <AlertCircle className="h-16 w-16 text-red-500 mb-4" />
-        <h2 className="text-3xl font-bold mb-2 text-red-400">Processing Failed</h2>
+        <h2 className="text-3xl font-bold mb-2 text-red-400">
+          Processing Failed
+        </h2>
         <p className="text-gray-400 text-center max-w-md mb-4">
-          {status?.errorMessage || "Something went wrong while processing your content."}
+          {status?.errorMessage ||
+            "Something went wrong while processing your content."}
         </p>
         <div className="mt-6 space-y-2">
           <button
@@ -98,7 +107,7 @@ export default function ChatWrapper({
             Retry
           </button>
           <button
-            onClick={() => window.location.href = "/"}
+            onClick={() => (window.location.href = "/")}
             className="ml-4 px-6 py-2 bg-gray-700 hover:bg-gray-600 rounded-lg transition-colors"
           >
             Go Home
