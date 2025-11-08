@@ -33,6 +33,8 @@ const MCQ = ({ game }: Props) => {
   });
   const [selectedChoice, setSelectedChoice] = useState<number | null>(null);
   const [now, setNow] = useState<Date | null>(null);
+  const [gameStatus, setGameStatus] = useState<string | null>(null);
+  const [isLoadingStatus, setIsLoadingStatus] = useState(true);
 
   const currentQuestion = useMemo(
     () => game.questions[questionIndex],
@@ -71,6 +73,42 @@ const MCQ = ({ game }: Props) => {
     }, 1000);
     return () => clearInterval(interval);
   }, [hasEnded]);
+
+  // Poll game status to check if it's completed
+  useEffect(() => {
+    const checkGameStatus = async () => {
+      try {
+        const response = await axios.get(`/api/game/status/${game.id}`);
+        const { status } = response.data;
+        setGameStatus(status);
+
+        if (status === "completed") {
+          setIsLoadingStatus(false);
+        } else if (status === "failed") {
+          setIsLoadingStatus(false);
+          toast({
+            title: "Error",
+            description: "Failed to generate questions for this game.",
+            variant: "destructive",
+          });
+        }
+      } catch (error) {
+        console.error("Error checking game status:", error);
+        setIsLoadingStatus(false);
+      }
+    };
+
+    checkGameStatus();
+
+    // Poll every 2 seconds if status is not completed
+    const interval = setInterval(() => {
+      if (gameStatus !== "completed" && gameStatus !== "failed") {
+        checkGameStatus();
+      }
+    }, 2000);
+
+    return () => clearInterval(interval);
+  }, [game.id, gameStatus, toast]);
 
   const handleNext = useCallback(() => {
     if (selectedChoice === null) return;
@@ -130,6 +168,28 @@ const MCQ = ({ game }: Props) => {
       document.removeEventListener("keydown", handleKeyDown);
     };
   }, [handleNext, options.length]);
+
+  // Show loading state while checking game status
+  if (isLoadingStatus || gameStatus !== "completed") {
+    return (
+      <div className="absolute flex flex-col justify-center items-center -translate-x-1/2 -translate-y-1/2 top-1/2 left-1/2">
+        <Loader2 className="w-16 h-16 animate-spin text-slate-600" />
+        <p className="mt-4 text-lg text-slate-600">
+          {gameStatus === "failed"
+            ? "Failed to generate questions"
+            : "Generating questions... Please wait"}
+        </p>
+        {gameStatus === "failed" && (
+          <Link
+            href={`/chat/${game.uploadId}`}
+            className={cn(buttonVariants({ size: "lg" }), "mt-4")}
+          >
+            Back to Chat
+          </Link>
+        )}
+      </div>
+    );
+  }
 
   if (hasEnded) {
     return (
