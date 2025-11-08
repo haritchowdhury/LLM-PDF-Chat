@@ -8,6 +8,7 @@ import { useEffect, useRef, useState } from "react";
 interface GameStatusWrapperProps {
   gameId: string;
   uploadId: string;
+  hasQuestions: boolean;
   children: React.ReactNode;
 }
 
@@ -19,6 +20,7 @@ interface GameStatusWrapperProps {
 export default function GameStatusWrapper({
   gameId,
   uploadId,
+  hasQuestions,
   children,
 }: GameStatusWrapperProps) {
   const { data, loading, error } = useGameStatus(gameId);
@@ -26,14 +28,15 @@ export default function GameStatusWrapper({
   const hasRefreshed = useRef(false);
   const [isRefreshing, setIsRefreshing] = useState(false);
 
-  // Refresh page when status becomes completed to fetch updated game data with questions
+  // Refresh page when status becomes completed BUT game doesn't have questions yet
+  // This ensures we fetch the updated game data with questions
   useEffect(() => {
-    if (data && isCompleted(data) && !hasRefreshed.current) {
+    if (data && isCompleted(data) && !hasQuestions && !hasRefreshed.current) {
       hasRefreshed.current = true;
       setIsRefreshing(true);
       router.refresh();
     }
-  }, [data, router]);
+  }, [data, hasQuestions, router]);
 
   // Initial loading or refreshing after completion
   if (loading || isRefreshing) {
@@ -90,8 +93,8 @@ export default function GameStatusWrapper({
     );
   }
 
-  // Processing state
-  if (data && isProcessing(data)) {
+  // Processing state or waiting for questions to load after completion
+  if (data && (isProcessing(data) || (isCompleted(data) && !hasQuestions))) {
     return (
       <main className="flex relative items-center justify-center min-h-screen bg-gradient-to-br from-blue-50 to-green-50">
         <div className="bg-white shadow-2xl rounded-2xl p-8 max-w-md w-full mx-4">
@@ -168,8 +171,8 @@ export default function GameStatusWrapper({
     );
   }
 
-  // Completed state - render the actual game
-  if (data && isCompleted(data)) {
+  // Completed state with questions loaded - render the actual game
+  if (data && isCompleted(data) && hasQuestions) {
     return <>{children}</>;
   }
 
