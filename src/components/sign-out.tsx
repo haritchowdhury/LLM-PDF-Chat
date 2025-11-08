@@ -11,7 +11,7 @@ const SignOut = () => {
   return (
     <div className="flex justify-center">
       <Button
-        className="flex gap-2 items-center border border-blue-600  text-blue-600 px-4 py-2 rounded-lg font-semibold hover:bg-blue-700 hover:text-white transition-colors"
+        className="flex gap-2 items-center border bg-white border-blue-600  text-blue-600 px-4 py-2 rounded-lg font-semibold hover:bg-blue-700 hover:text-white transition-colors"
         onClick={handleSignOut}
       >
         Sign Out
