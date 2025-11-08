@@ -3,7 +3,8 @@ import HeroSection from "@/components/LandingPage/HeroSection";
 import ContentInput from "@/components/LandingPage/ContentInput";
 import SampleQuiz from "@/components/LandingPage/SampleQuiz";
 import Features from "@/components/LandingPage/Features";
-
+import Link from "next/link";
+import Image from "next/image";
 const Landing = () => {
   return (
     <div className="min-h-screen bg-white pt-8">
@@ -16,14 +17,25 @@ const Landing = () => {
       {/* Footer */}
       <footer className="bg-gray-200 text-gray-600 py-12">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
             <div>
-              <h5 className="text-lg font-semibold mb-4">Aiversety</h5>
+              <Link href={`/`}>
+                <div className="flex items-center text-gray-800 text-sm sm:text-lg font-bold">
+                  <Image
+                    src="/image__1_-removebg-preview.png"
+                    alt="Aiversety Logo"
+                    width={128}
+                    height={128}
+                    className="w-25 h-25 sm:w-36 sm:h-36"
+                  />
+                </div>
+              </Link>{" "}
               <p className="text-gray-600">
                 Transforming content into eengaging activities for better
                 learning outcomes.
               </p>
             </div>
+
             {/*  <div>
               <h6 className="font-semibold mb-4">Product</h6>
               <ul className="space-y-2 text-gray-400">
