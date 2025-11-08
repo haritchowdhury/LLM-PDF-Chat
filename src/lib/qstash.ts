@@ -71,8 +71,9 @@ export async function publishPdfJob(
 ): Promise<string> {
   const workerUrl = `${process.env.NEXT_PUBLIC_APP_URL}/api/worker/process-upload`;
 
-  // Development mode: Call worker directly
-  if (process.env.NODE_ENV === "development") {
+  // Development mode: Call worker directly (unless FORCE_QSTASH is set)
+  const isDevelopment = process.env.NODE_ENV === "development" && process.env.FORCE_QSTASH !== "true";
+  if (isDevelopment) {
     console.log(`[QStash] DEV MODE: Calling worker directly for upload ${payload.uploadId}`);
 
     try {
@@ -128,8 +129,9 @@ export async function publishUrlScraperJob(
 ): Promise<string> {
   const workerUrl = `${process.env.NEXT_PUBLIC_APP_URL}/api/worker/process-upload`;
 
-  // Development mode: Call worker directly
-  if (process.env.NODE_ENV === "development") {
+  // Development mode: Call worker directly (unless FORCE_QSTASH is set)
+  const isDevelopment = process.env.NODE_ENV === "development" && process.env.FORCE_QSTASH !== "true";
+  if (isDevelopment) {
     console.log(`[QStash] DEV MODE: Calling worker directly for upload ${payload.uploadId} (URL scraping)`);
 
     try {
@@ -185,8 +187,9 @@ export async function publishDeleteJob(
 ): Promise<string> {
   const workerUrl = `${process.env.NEXT_PUBLIC_APP_URL}/api/worker/process-upload`;
 
-  // Development mode: Call worker directly
-  if (process.env.NODE_ENV === "development") {
+  // Development mode: Call worker directly (unless FORCE_QSTASH is set)
+  const isDevelopment = process.env.NODE_ENV === "development" && process.env.FORCE_QSTASH !== "true";
+  if (isDevelopment) {
     console.log(`[QStash] DEV MODE: Calling worker directly for deletion ${payload.uploadId}`);
 
     try {
@@ -242,8 +245,9 @@ export async function publishGameJob(
 ): Promise<string> {
   const workerUrl = `${process.env.NEXT_PUBLIC_APP_URL}/api/worker/process-game`;
 
-  // Development mode: Call worker directly
-  if (process.env.NODE_ENV === "development") {
+  // Development mode: Call worker directly (unless FORCE_QSTASH is set)
+  const isDevelopment = process.env.NODE_ENV === "development" && process.env.FORCE_QSTASH !== "true";
+  if (isDevelopment) {
     console.log(`[QStash] DEV MODE: Calling worker directly for game ${payload.gameId}`);
 
     try {
