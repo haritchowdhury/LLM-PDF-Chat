@@ -7,7 +7,6 @@ import AccuracyCard from "@/components/statistics/AccuracyCard";
 import TimeTakenCard from "@/components/statistics/TimeTakenCard";
 import QuestionsList from "@/components/statistics/QuestionsList";
 import { buttonVariants } from "@/components/ui/button";
-import { LucideLayoutDashboard } from "lucide-react";
 import Link from "next/link";
 import ClaimMilestones from "@/components/Quiz/ClaimMilestones";
 import ClaimCommunityMilestones from "@/components/Quiz/ClaimCommunityMilestones";
@@ -18,6 +17,7 @@ type Params = Promise<{ gameId: any }>;
 const Statistics = async ({ params }: { params: Params }) => {
   const { gameId } = await params;
   const session: any = await auth();
+
   const weekAgo = new Date();
   weekAgo.setDate(weekAgo.getDate() - 7);
 
@@ -27,16 +27,19 @@ const Statistics = async ({ params }: { params: Params }) => {
     where: { id: gameId },
     include: { questions: true },
   });
+
   if (!game) return redirect("/");
   const upload = await db.upload.findUnique({
     where: { id: game.uploadId },
   });
-  console.log(upload.id, "upload id");
+
+  //console.log(upload.id, "upload id");
+
   if (!game) return redirect("/");
+
   if (!upload) return redirect("/");
 
   let accuracy = 0;
-
   if (game.gameType === "mcq") {
     const totalCorrect = game.questions.filter((q) => q.isCorrect).length;
     accuracy = (totalCorrect / game.questions.length) * 100;
@@ -44,7 +47,7 @@ const Statistics = async ({ params }: { params: Params }) => {
   accuracy = Math.round(accuracy * 100) / 100;
   let isClaimable = false;
 
-  console.log(game.topic, upload.options);
+  //console.log(game.topic, upload.options);
 
   let quizId: string;
 
@@ -52,7 +55,7 @@ const Statistics = async ({ params }: { params: Params }) => {
     const completed: string[] = JSON.parse(upload.isCompleted as string) || [];
 
     if (!completed.includes(game?.topic)) {
-      console.log(" claimable true");
+      //console.log(" claimable true");
       isClaimable = true;
     }
   } else {
@@ -64,7 +67,7 @@ const Statistics = async ({ params }: { params: Params }) => {
     const completed: string[] =
       JSON.parse(communityQuiz.isCompleted as string) || [];
     if (!completed.includes(game?.topic)) {
-      console.log("true");
+      //console.log("true");
       isClaimable = true;
     }
   }
@@ -86,7 +89,6 @@ const Statistics = async ({ params }: { params: Params }) => {
               <ArrowLeft className="mr-2 h-4 w-4" />
               Back to Chat
             </Link>
-
             {isClaimable && (
               <div className="animate-pulse">
                 {upload.private ? (
@@ -101,9 +103,7 @@ const Statistics = async ({ params }: { params: Params }) => {
               </div>
             )}
           </div>
-
           <ResultsCard accuracy={accuracy} />
-
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <AccuracyCard accuracy={accuracy} />
             <TimeTakenCard
@@ -111,7 +111,6 @@ const Statistics = async ({ params }: { params: Params }) => {
               timeStarted={new Date(game.timeStarted ?? 0)}
             />
           </div>
-
           <div className="bg-white rounded-lg overflow-hidden border border-gray-200">
             <h2 className="px-4 py-3 text-lg font-semibold border-b border-gray-200 text-gray-800">
               Questions Review

@@ -18,9 +18,10 @@ const geistMono = Geist_Mono({
 });
 
 const metadata: Metadata = {
-  title: "aiversety",
+  title:
+    "aiversety | Free chat with PDF and URLs, AI generated topics and quizzes",
   description:
-    "Multi Agent Learning Platform. Upload your pdfs and start learning.",
+    "Multi Agent Learning Platform. Upload your pdfs or scrape educational urls and start learning.",
 };
 
 type LayoutProps = {

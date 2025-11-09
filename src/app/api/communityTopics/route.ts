@@ -191,13 +191,6 @@ export async function PUT(request: NextRequest) {
     if (!userExists) {
       throw new Error("User not found");
     }
-
-    /* const lastUpload = await db.upload.findFirst({
-      where: {
-        id: upload,
-        private: false,
-      },
-    }); */
     const lastCommunityQuiz = await db.communityquiz.findFirst({
       where: {
         id: upload,

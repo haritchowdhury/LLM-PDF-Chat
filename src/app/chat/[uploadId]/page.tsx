@@ -1,4 +1,3 @@
-import Chat from "@/components/Chat/Chat";
 import ChatWrapper from "@/components/Chat/ChatWrapper";
 import { auth } from "@/lib/auth";
 import { redirect } from "next/navigation";
@@ -14,7 +13,6 @@ const ChatPage = async ({ params }: { params: Params }) => {
     redirect(`/sign-in?callbackUrl=${encodeURIComponent(`/chat/${uploadId}`)}`);
   }
 
-  const email = String(session.user?.email);
   const id = String(session.user.id);
 
   let { uploadId } = await params;
@@ -67,8 +65,7 @@ const ChatPage = async ({ params }: { params: Params }) => {
     where: { userId: session?.user.id, uploadId: uploadId },
     orderBy: { timeStarted: "desc" },
   });
-  console.log("current upload: ", lastUpload);
-  //console.log(personal, Uploads, Games);
+  //console.log("current upload: ", lastUpload);
   return (
     <>
       <main className="flex relative items-center justify-center min-h-screen bg-white pt-16 overflow-y-auto">

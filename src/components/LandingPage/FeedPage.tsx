@@ -190,7 +190,7 @@ const sampleShares: Share[] = [
   },
 ];
 
-const LandingPage = ({
+const FeedPage = ({
   id = "user1",
   platformlink = "/classroom/",
   shares = sampleShares,
@@ -465,4 +465,4 @@ const LandingPage = ({
   );
 };
 
-export default LandingPage;
+export default FeedPage;
