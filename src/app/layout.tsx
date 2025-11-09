@@ -39,7 +39,7 @@ const Layout = async ({ children }: LayoutProps) => {
           <Header />
           {children}
           <Toaster />
-          <Footer />
+          {/*<Footer />*/}
         </Providers>
       </body>
     </html>
