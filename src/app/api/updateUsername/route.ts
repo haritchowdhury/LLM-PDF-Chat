@@ -1,8 +1,14 @@
 import db from "@/lib/db/db";
 import { NextResponse, NextRequest } from "next/server";
+import { auth } from "@/lib/auth";
 
 export async function POST(request: NextRequest) {
   try {
+    const session = await auth();
+    if (!session?.user?.id) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
     const body = await request.json();
 
     const { userId, newUsername } = body;
@@ -15,15 +21,29 @@ export async function POST(request: NextRequest) {
         }
       );
     }
+    const trimmedUsername = newUsername.trim();
+    if (trimmedUsername.length < 2 || trimmedUsername.length > 50) {
+      return NextResponse.json(
+        { error: "Username must be between 2 and 50 characters" },
+        { status: 400 }
+      );
+    }
+
+    // Prevent special characters abuse
+    if (!/^[a-zA-Z0-9_\s-]+$/.test(trimmedUsername)) {
+      return NextResponse.json(
+        {
+          error:
+            "Username can only contain letters, numbers, spaces, hyphens, and underscores",
+        },
+        { status: 400 }
+      );
+    }
 
     // Update the user's name in the database
     const updatedUser = await db.user.update({
-      where: {
-        id: userId,
-      },
-      data: {
-        name: newUsername.trim(),
-      },
+      where: { id: session.user.id }, // Use session ID
+      data: { name: trimmedUsername },
     });
 
     return NextResponse.json(

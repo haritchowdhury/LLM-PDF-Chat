@@ -11,7 +11,18 @@ import getUserSession from "@/lib/user.server";
 import { queryUpstashAndLLM } from "@/lib/upstash";
 import { auth } from "@/lib/auth";
 import db from "@/lib/db/db";
+import { z } from "zod";
 
+const ChatRequestSchema = z.object({
+  user_prompt: z
+    .string()
+    .min(1, "Question cannot be empty")
+    .max(2000, "Question must not exceed 2000 characters")
+    .trim(),
+  uploadId: z.string().cuid(),
+  sessionId: z.string().optional(),
+  namespace: z.string().optional(),
+});
 // Define message type for consistency
 type Message = {
   role: "user" | "assistant";
@@ -59,6 +70,15 @@ export async function POST(request: NextRequest) {
         { status: 403 }
       );
     }
+    const body = await request.json();
+    const validation = ChatRequestSchema.safeParse(body);
+
+    if (!validation.success) {
+      return NextResponse.json(
+        { content: "Invalid request", details: validation.error.errors },
+        { status: 400 }
+      );
+    }
 
     const userId = String(session.user.id);
     const userEmail = session.user.email;
@@ -73,8 +93,10 @@ export async function POST(request: NextRequest) {
     }
 
     // Parse request data
+    const { user_prompt, sessionId, namespace, uploadId } = validation.data;
+    /*
     const { user_prompt, sessionId, namespace, uploadId }: ChatRequest =
-      await request.json();
+      await request.json(); */
 
     // Use provided sessionId or fallback to user session
     const effectiveSessionId = sessionId || user[0];

@@ -1,9 +1,15 @@
 import db from "@/lib/db/db";
 import { endGameSchema } from "@/schemas/questions";
 import { NextResponse, NextRequest } from "next/server";
+import { auth } from "@/lib/auth";
 
 export async function POST(request: NextRequest) {
   try {
+    const session = await auth();
+    if (!session?.user?.id) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
     const body = await request.json();
     const { gameId } = endGameSchema.parse(body);
 
@@ -22,6 +28,14 @@ export async function POST(request: NextRequest) {
         }
       );
     }
+
+    if (game.userId !== session.user.id) {
+      return NextResponse.json(
+        { error: "Forbidden: You can only end your own games" },
+        { status: 403 }
+      );
+    }
+
     await db.game.update({
       where: {
         id: gameId,

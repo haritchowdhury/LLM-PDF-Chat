@@ -10,11 +10,26 @@ import { Index } from "@upstash/vector";
 import { PDFLoader } from "@langchain/community/document_loaders/fs/pdf";
 import { verifyOrReturnError } from "@/lib/qstash-verify";
 import { getPdfFromBlob, deleteBlobFile } from "@/lib/blob-storage";
-import { updateUpstash, updateUpstashWithUrl, deleteUpstash } from "@/lib/upstash";
+import {
+  updateUpstash,
+  updateUpstashWithUrl,
+  deleteUpstash,
+} from "@/lib/upstash";
 import { UploadJobPayload } from "@/lib/qstash";
 import { scrapeWebpage } from "@/lib/cheerio";
 import db from "@/lib/db/db";
 import { ProcessingStatus } from "@prisma/client";
+import { z } from "zod";
+
+const UploadJobPayloadSchema = z.object({
+  type: z.enum(["pdf", "url", "delete"]),
+  uploadId: z.string().cuid(),
+  userId: z.string(),
+  fileName: z.string().optional(),
+  url: z.string().url().optional(),
+  sessionId: z.string().optional(),
+  description: z.string().max(1000).optional(),
+});
 
 // Initialize Upstash Vector index
 const index = new Index({
@@ -34,6 +49,26 @@ export async function POST(request: Request) {
   try {
     // 1. Read the raw body for signature verification
     const body = await request.text();
+    let payload: UploadJobPayload;
+
+    try {
+      const parsed = JSON.parse(body);
+      const validation = UploadJobPayloadSchema.safeParse(parsed);
+
+      if (!validation.success) {
+        return NextResponse.json(
+          { error: "Invalid payload", details: validation.error.errors },
+          { status: 400 }
+        );
+      }
+
+      payload = validation.data as UploadJobPayload;
+    } catch (error) {
+      return NextResponse.json(
+        { error: "Invalid JSON payload" },
+        { status: 400 }
+      );
+    }
 
     // 2. Verify QStash signature (skipped in dev mode)
     const errorResponse = await verifyOrReturnError(request, body);
@@ -41,8 +76,7 @@ export async function POST(request: Request) {
       return errorResponse;
     }
 
-    // 3. Parse the job payload
-    const payload: UploadJobPayload = JSON.parse(body);
+    // 3. Extract job details from validated payload
     uploadId = payload.uploadId;
     const { type, userId } = payload;
 
@@ -89,7 +123,14 @@ export async function POST(request: Request) {
       where: { id: uploadId },
       select: { options: true },
     });
-
+    if (sessionStorage.user.id !== userId) {
+      return NextResponse.json({
+        success: true,
+        uploadId,
+        vectorCount,
+        topicsCount: [],
+      });
+    }
     let existingTopics: string[] = [];
     if (foundUpload?.options) {
       try {
@@ -260,6 +301,9 @@ async function processDelete(
   index: Index
 ): Promise<void> {
   const { uploadId, userId, sessionId } = payload;
+  if (sessionStorage.user.id !== userId) {
+    return;
+  }
 
   console.log(`[Worker] Processing deletion for upload ${uploadId}`);
 

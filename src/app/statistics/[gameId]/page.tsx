@@ -29,13 +29,15 @@ const Statistics = async ({ params }: { params: Params }) => {
   });
 
   if (!game) return redirect("/");
+  if (game.userId !== session.user.id) {
+    return redirect("/");
+  }
+
   const upload = await db.upload.findUnique({
     where: { id: game.uploadId },
   });
 
   //console.log(upload.id, "upload id");
-
-  if (!game) return redirect("/");
 
   if (!upload) return redirect("/");
 

@@ -20,9 +20,6 @@ export async function PATCH(
   try {
     // Check authentication
     const session = await auth();
-    if (!session?.user?.id) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
 
     const { id: uploadId } = await params;
     if (!uploadId) {
@@ -57,6 +54,9 @@ export async function PATCH(
         name: true,
       },
     });
+    if (!existingUpload) {
+      return NextResponse.json({ error: "Upload not found" }, { status: 404 });
+    }
 
     if (session.user.id !== existingUpload.userId) {
       return NextResponse.json(

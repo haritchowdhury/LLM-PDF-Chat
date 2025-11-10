@@ -32,6 +32,9 @@ export default async function MCQPage({ params }: { params: Params }) {
   if (!game) {
     return redirect("/");
   }
+  if (game.userId !== session.user.id) {
+    return redirect("/");
+  }
 
   // Wrap the game component with GameStatusWrapper to handle async question generation
   return (

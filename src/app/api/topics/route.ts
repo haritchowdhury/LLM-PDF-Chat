@@ -4,6 +4,12 @@ import { queryUpstash } from "@/lib/upstash";
 import { Index } from "@upstash/vector";
 import db from "@/lib/db/db";
 import { auth } from "@/lib/auth";
+import { z } from "zod";
+
+const updateTopicSchema = z.object({
+  topic: z.string().min(1).max(100),
+  upload: z.string().cuid(), // or .uuid() depending on ID format
+});
 
 export const runtime = "nodejs";
 export const maxDuration = 60;
@@ -63,6 +69,13 @@ export async function GET(request: NextRequest) {
 export async function PUT(request: NextRequest) {
   const session = await auth();
   const body = await request.json();
+  const validation = updateTopicSchema.safeParse(body);
+  if (!validation.success) {
+    return NextResponse.json(
+      { error: "Invalid input", details: validation.error.errors },
+      { status: 400 }
+    );
+  }
   const { topic, upload } = body;
   if (!session?.user.id) {
     throw new Error("User not found");
