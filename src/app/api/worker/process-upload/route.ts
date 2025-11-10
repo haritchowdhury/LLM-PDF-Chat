@@ -20,10 +20,11 @@ import { scrapeWebpage } from "@/lib/cheerio";
 import db from "@/lib/db/db";
 import { ProcessingStatus } from "@prisma/client";
 import { z } from "zod";
+import { auth } from "@/lib/auth";
 
 const UploadJobPayloadSchema = z.object({
   type: z.enum(["pdf", "url", "delete"]),
-  uploadId: z.string().cuid(),
+  uploadId: z.string().uuid(),
   userId: z.string(),
   fileName: z.string().optional(),
   url: z.string().url().optional(),
@@ -123,14 +124,7 @@ export async function POST(request: Request) {
       where: { id: uploadId },
       select: { options: true },
     });
-    if (sessionStorage.user.id !== userId) {
-      return NextResponse.json({
-        success: true,
-        uploadId,
-        vectorCount,
-        topicsCount: [],
-      });
-    }
+
     let existingTopics: string[] = [];
     if (foundUpload?.options) {
       try {
@@ -300,10 +294,9 @@ async function processDelete(
   payload: UploadJobPayload & { type: "delete" },
   index: Index
 ): Promise<void> {
+  const session = await auth();
+
   const { uploadId, userId, sessionId } = payload;
-  if (sessionStorage.user.id !== userId) {
-    return;
-  }
 
   console.log(`[Worker] Processing deletion for upload ${uploadId}`);
 

@@ -8,7 +8,7 @@ import { z } from "zod";
 
 const updateTopicSchema = z.object({
   topic: z.string().min(1).max(100),
-  upload: z.string().cuid(), // or .uuid() depending on ID format
+  upload: z.string().uuid(),
 });
 
 export const runtime = "nodejs";

@@ -19,7 +19,7 @@ const ChatRequestSchema = z.object({
     .min(1, "Question cannot be empty")
     .max(2000, "Question must not exceed 2000 characters")
     .trim(),
-  uploadId: z.string().cuid(),
+  uploadId: z.string().uuid(),
   sessionId: z.string().optional(),
   namespace: z.string().optional(),
 });
@@ -34,9 +34,9 @@ type Message = {
 // Define request interface
 interface ChatRequest {
   user_prompt: string; // New API uses user_prompt instead of messages array
-  uploadId?: string; // Document upload ID
   sessionId?: string; // Session identifier
   namespace?: string; // Vector namespace
+  uploadId?: string; // Document upload ID
 }
 
 // Initialize Redis client
@@ -71,6 +71,7 @@ export async function POST(request: NextRequest) {
       );
     }
     const body = await request.json();
+    console.log(body);
     const validation = ChatRequestSchema.safeParse(body);
 
     if (!validation.success) {

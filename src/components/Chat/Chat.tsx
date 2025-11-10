@@ -170,7 +170,8 @@ const Chat = ({
       } else if (response.status === 202) {
         // Async processing started
         toast({
-          description: "PDF is being processed in the background. You'll be notified when it's ready.",
+          description:
+            "PDF is being processed in the background. You'll be notified when it's ready.",
           duration: 3000,
         });
 
@@ -430,8 +431,8 @@ const Chat = ({
                   className={clsx(
                     "font-sans-semibold text-sm p-3 md:p-4 rounded-lg text-justify mt-2 mb-2",
                     message.role === "user"
-                      ? "text-white bg-blue-400 self-end ml-auto max-w-[85%] md:max-w-[80%]"
-                      : "text-gray-800 bg-gray-400 self-start mr-auto max-w-[85%] md:max-w-[80%] break-words"
+                      ? "text-white bg-blue-600 self-end ml-auto max-w-[85%] md:max-w-[80%]"
+                      : "text-gray-100 bg-gray-600 self-start font-semibold mr-auto max-w-[85%] md:max-w-[80%] break-words"
                   )}
                 >
                   <div className="w-full overflow-hidden break-words">

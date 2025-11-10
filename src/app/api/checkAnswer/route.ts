@@ -28,7 +28,7 @@ export async function POST(request: NextRequest) {
     }
     const game = await db.game.findFirst({ where: { id: question.gameId } });
 
-    if (question.gameId !== game.userId) {
+    if (question.gameId !== game.id) {
       return NextResponse.json(
         { error: "Forbidden: You can only answer your own questions" },
         { status: 403 }
