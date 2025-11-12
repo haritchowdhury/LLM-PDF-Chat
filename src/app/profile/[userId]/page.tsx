@@ -26,6 +26,11 @@ const Profile = async ({ params }: { params: Params }) => {
   if (!session) redirect("/sign-in");
   let { userId } = await params;
 
+  const headersList = await headers();
+  const host = await headersList.get("host");
+  const platformlink = `http://${host as string}/chat/`;
+
+  /*
   const betaTester = await db.betatesters.findFirst({
     where: {
       email: session?.user.email,
@@ -47,14 +52,12 @@ const Profile = async ({ params }: { params: Params }) => {
   });
   const isOwnProfile = user?.id === session?.user.id;
 
-  // Full data for RoomsDisplay (own profile) - includes likedBy
   const sharesForOwnProfile = await db.upload.findMany({
     where: { userId: userId, private: false, isDeleted: false },
     orderBy: { timeStarted: "desc" },
-  });
-
-  // Selective data with likes for public view (other users' profiles)
-  const sharesForPublicView = await db.upload.findMany({
+  }); 
+  
+    const sharesForPublicView = await db.upload.findMany({
     where: { userId: userId, private: false, isDeleted: false },
     select: {
       id: true,
@@ -65,6 +68,59 @@ const Profile = async ({ params }: { params: Params }) => {
     },
     orderBy: { timeStarted: "desc" },
   });
+  */
+
+  const [betaTester, user, privateUploads, games, publicShares] =
+    await Promise.all([
+      db.betatesters.findFirst({
+        where: { email: session?.user.email },
+      }),
+      db.user.findFirst({
+        where: { id: userId },
+      }),
+      // Only fetch private uploads for own profile
+      session?.user.id === userId
+        ? db.upload.findMany({
+            where: { userId: session.user.id, private: true, isDeleted: false },
+            orderBy: { timeStarted: "desc" },
+            take: 50, // Add pagination
+          })
+        : Promise.resolve([]),
+      // Only fetch games for own profile
+      session?.user.id === userId
+        ? db.game.findMany({
+            where: { userId: session.user.id },
+            orderBy: { timeStarted: "desc" },
+            take: 50, // Add pagination
+          })
+        : Promise.resolve([]),
+      // Always fetch public shares for the profile
+      db.upload.findMany({
+        where: { userId: userId, private: false, isDeleted: false },
+        select: {
+          id: true,
+          name: true,
+          description: true,
+          userId: true,
+          timeStarted: true,
+          likedBy: true,
+          private: true,
+          isDeleted: true,
+          user: {
+            select: {
+              id: true,
+              name: true,
+            },
+          },
+        },
+        orderBy: { timeStarted: "desc" },
+        take: 50, // Add pagination
+      }),
+    ]);
+  const isOwnProfile = user?.id === session?.user.id;
+  const Uploads = privateUploads;
+  const sharesForPublicView = publicShares;
+  const sharesForOwnProfile = publicShares;
 
   return (
     <main className="flex relative justify-center bg-gradient-to-br from-blue-50 to-green-50 text-white min-h-screen overflow-hidden">

@@ -63,10 +63,15 @@ const QuizForm = ({ topic: topicParam, id: uploadId }: Props) => {
         const res = await fetch(`/api/topics?upload=${uploadId}`).then((res) =>
           res.json()
         );
-        setTopics(JSON.parse(res.topics as string));
-        console.log("topics at client", topics);
-        setCompleted(res.completed);
-        console.log("completed at client", completed);
+
+        const newTopics = JSON.parse(res.topics as string) || [];
+        const newCompleted = res.completed;
+
+        // Only update if changed
+        if (JSON.stringify(newTopics) !== JSON.stringify(topics)) {
+          setTopics(newTopics);
+        }
+        setCompleted(newCompleted);
       } catch (error) {
         console.error("Error fetching topics:", error);
       }
@@ -75,10 +80,21 @@ const QuizForm = ({ topic: topicParam, id: uploadId }: Props) => {
 
     fetchTopics();
 
-    const interval = setInterval(fetchTopics, 5000);
+    // Stop polling after 1 minute
+    let pollCount = 0;
+    const maxPolls = 5; // 12 * 5s = 1 minute
+
+    const interval = setInterval(() => {
+      pollCount++;
+      if (pollCount >= maxPolls) {
+        clearInterval(interval);
+        return;
+      }
+      fetchTopics();
+    }, 5000);
 
     return () => clearInterval(interval);
-  }, []);
+  }, [uploadId]);
 
   useEffect(() => {
     if (uploadId) {

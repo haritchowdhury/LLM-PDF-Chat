@@ -31,7 +31,7 @@ const Landing = () => {
                 </div>
               </Link>{" "}
               <p className="text-gray-600">
-                Transforming content into eengaging activities for better
+                Transforming content into engaging activities for better
                 learning outcomes.
               </p>
             </div>

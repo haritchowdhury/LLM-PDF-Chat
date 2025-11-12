@@ -90,7 +90,25 @@ export async function PUT(request: NextRequest) {
       throw new Error("User not found");
     }
 
-    const lastUpload = await db.upload.findFirst({
+    const updatedUpload = await db.$transaction(async (tx) => {
+      const lastUpload = await tx.upload.findFirst({
+        where: { id: upload, userId: id, isDeleted: false },
+      });
+
+      if (!lastUpload) throw new Error("Upload not found");
+
+      let options: string[] =
+        JSON.parse(lastUpload.isCompleted as string) || [];
+      if (!options.includes(topic)) {
+        options.push(topic);
+      }
+
+      return await tx.upload.update({
+        where: { id: lastUpload.id },
+        data: { isCompleted: JSON.stringify(options) },
+      });
+    });
+    /*const lastUpload = await db.upload.findFirst({
       where: {
         id: upload,
         userId: id,
@@ -112,7 +130,7 @@ export async function PUT(request: NextRequest) {
       data: {
         isCompleted: JSON.stringify(options),
       },
-    });
+    }); */
     return NextResponse.json(
       {
         topics: "milestone updated succesfully!",

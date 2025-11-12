@@ -40,18 +40,31 @@ export async function POST(
 
     // Toggle like
     const hasLiked = upload.likedBy.includes(session.user.id);
-    const updatedLikedBy = hasLiked
+    /*  const updatedLikedBy = hasLiked
       ? upload.likedBy.filter((id) => id !== session.user.id)
-      : [...upload.likedBy, session.user.id];
+      : [...upload.likedBy, session.user.id]; */
 
     const updatedUpload = await db.upload.update({
+      where: { id: uploadId },
+      data: {
+        likedBy: hasLiked
+          ? { set: upload.likedBy.filter((id) => id !== session.user.id) }
+          : { push: session.user.id },
+      },
+      select: {
+        id: true,
+        likedBy: true,
+      },
+    });
+
+    /*  const updatedUpload = await db.upload.update({
       where: { id: uploadId },
       data: { likedBy: updatedLikedBy },
       select: {
         id: true,
         likedBy: true,
       },
-    });
+    }); */
 
     return NextResponse.json({
       liked: !hasLiked,

@@ -40,7 +40,7 @@ export class UploadValidator {
     return (await redis.get<number>(`upsert_rate_limit:${userId}`)) || 0;
   }
 
-  private async getCurrentSpaceCounts(userId: string) {
+  /*private async getCurrentSpaceCounts(userId: string) {
     const uploads = await db.upload.findMany({
       where: { userId, private: true, isDeleted: false },
       orderBy: { timeStarted: "desc" },
@@ -52,8 +52,19 @@ export class UploadValidator {
     });
 
     return { uploads: uploads.length, shares: shares.length };
-  }
+  } */
+  private async getCurrentSpaceCounts(userId: string) {
+    const [uploadsCount, sharesCount] = await Promise.all([
+      db.upload.count({
+        where: { userId, private: true, isDeleted: false },
+      }),
+      db.upload.count({
+        where: { userId, private: false, isDeleted: false },
+      }),
+    ]);
 
+    return { uploads: uploadsCount, shares: sharesCount };
+  }
   async validateRateLimit(
     options: ValidationOptions
   ): Promise<ValidationResult> {

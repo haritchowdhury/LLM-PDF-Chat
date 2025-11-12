@@ -28,6 +28,8 @@ const Home = async () => {
           },
         },
       },
+      orderBy: { timeStarted: "desc" },
+      take: 50, // Limit to 50 most recent
     });
     return (
       <FeedPage

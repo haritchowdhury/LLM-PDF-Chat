@@ -1,4 +1,5 @@
 # Database Security & Performance Audit Report
+
 **LLM-PDF-Chat Application**
 **Date:** 2025-11-07
 **Database:** PostgreSQL with Prisma ORM
@@ -12,18 +13,21 @@ This comprehensive audit analyzed all database interactions across 26 files in t
 ### Key Findings Overview
 
 #### Security Posture: ⚠️ **HIGH RISK**
+
 - **2 CRITICAL** vulnerabilities allow unauthorized game manipulation
 - **2 HIGH** severity issues enable account takeover and data modification
 - **8 MEDIUM** severity input validation and information disclosure issues
 - **2 LOW** severity logic errors
 
 #### Performance: ⚠️ **NEEDS IMPROVEMENT**
+
 - **1 CRITICAL** race condition causing data corruption
 - **3 HIGH** priority issues causing 2-10x slower queries
 - **6 MEDIUM** priority inefficiencies
 - **9 missing database indexes** reducing query performance by 50-90%
 
 #### Positive Findings: ✅
+
 - No SQL injection vulnerabilities (Prisma ORM protection)
 - Most endpoints implement authentication
 - Rate limiting in place for critical operations
@@ -31,14 +35,15 @@ This comprehensive audit analyzed all database interactions across 26 files in t
 
 ### Risk Level by Category
 
-| Category | Critical | High | Medium | Low | Total |
-|----------|----------|------|--------|-----|-------|
-| **Security** | 2 | 2 | 8 | 2 | 14 |
-| **Performance** | 1 | 3 | 6 | 0 | 10 |
-| **Database Design** | 4 | 3 | 2 | 0 | 9 |
-| **TOTAL** | 7 | 8 | 16 | 2 | 33 |
+| Category            | Critical | High | Medium | Low | Total |
+| ------------------- | -------- | ---- | ------ | --- | ----- |
+| **Security**        | 2        | 2    | 8      | 2   | 14    |
+| **Performance**     | 1        | 3    | 6      | 0   | 10    |
+| **Database Design** | 4        | 3    | 2      | 0   | 9     |
+| **TOTAL**           | 7        | 8    | 16     | 2   | 33    |
 
 ### Estimated Impact of Fixes
+
 - **Security:** Prevents account takeover, game manipulation, and data breaches
 - **Performance:** 50-90% improvement in query times, 40-50% reduction in database load
 - **User Experience:** 2-3x faster page loads, support for 2-3x more concurrent users
@@ -46,6 +51,7 @@ This comprehensive audit analyzed all database interactions across 26 files in t
 ---
 
 ## Table of Contents
+
 1. [Critical Security Vulnerabilities](#critical-security-vulnerabilities)
 2. [High Severity Security Issues](#high-severity-security-issues)
 3. [Medium Severity Security Issues](#medium-severity-security-issues)
@@ -69,9 +75,11 @@ This comprehensive audit analyzed all database interactions across 26 files in t
 **CVSS Score:** 9.1 (Critical)
 
 #### Issue Description
+
 The endpoint accepts question answers without any authentication or ownership verification. Any user (even unauthenticated) can submit answers for any question in any game.
 
 #### Current Code
+
 ```typescript
 export async function POST(request: NextRequest) {
   try {
@@ -106,12 +114,14 @@ export async function POST(request: NextRequest) {
 ```
 
 #### Security Risk
+
 - **Account Takeover:** Attackers can modify other users' quiz answers
 - **Game Manipulation:** Complete compromise of quiz integrity
 - **Score Tampering:** Manipulation of quiz results and statistics
 - **Data Integrity:** Corruption of question/answer data
 
 #### Exploitation Scenario
+
 ```bash
 # Attacker can submit answers for ANY question
 curl -X POST http://app/api/checkAnswer \
@@ -120,6 +130,7 @@ curl -X POST http://app/api/checkAnswer \
 ```
 
 #### Recommended Fix
+
 ```typescript
 import { auth } from "@/lib/auth";
 
@@ -128,10 +139,7 @@ export async function POST(request: NextRequest) {
     // 1. Check authentication
     const session = await auth();
     if (!session?.user?.id) {
-      return NextResponse.json(
-        { error: "Unauthorized" },
-        { status: 401 }
-      );
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
     const body = await request.json();
@@ -144,10 +152,10 @@ export async function POST(request: NextRequest) {
         game: {
           select: {
             userId: true,
-            timeEnded: true
-          }
-        }
-      }
+            timeEnded: true,
+          },
+        },
+      },
     });
 
     if (!question) {
@@ -182,7 +190,7 @@ export async function POST(request: NextRequest) {
         where: { id: questionId },
         data: {
           userAnswer: userInput,
-          isCorrect
+          isCorrect,
         },
       });
 
@@ -216,9 +224,11 @@ export async function POST(request: NextRequest) {
 **CVSS Score:** 8.2 (High)
 
 #### Issue Description
+
 Any user can end any game without authentication or ownership verification.
 
 #### Current Code
+
 ```typescript
 export async function POST(request: NextRequest) {
   try {
@@ -232,10 +242,7 @@ export async function POST(request: NextRequest) {
     });
 
     if (!game) {
-      return NextResponse.json(
-        { message: "Game not found" },
-        { status: 404 }
-      );
+      return NextResponse.json({ message: "Game not found" }, { status: 404 });
     }
 
     await db.game.update({
@@ -255,11 +262,13 @@ export async function POST(request: NextRequest) {
 ```
 
 #### Security Risk
+
 - **Game Manipulation:** Attackers can prematurely end any game
 - **User Experience Sabotage:** Disrupt other users' quiz sessions
 - **Statistics Corruption:** Affect game timing and completion statistics
 
 #### Recommended Fix
+
 ```typescript
 import { auth } from "@/lib/auth";
 
@@ -268,10 +277,7 @@ export async function POST(request: NextRequest) {
     // 1. Check authentication
     const session = await auth();
     if (!session?.user?.id) {
-      return NextResponse.json(
-        { error: "Unauthorized" },
-        { status: 401 }
-      );
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
     const body = await request.json();
@@ -283,15 +289,12 @@ export async function POST(request: NextRequest) {
       select: {
         id: true,
         userId: true,
-        timeEnded: true
+        timeEnded: true,
       },
     });
 
     if (!game) {
-      return NextResponse.json(
-        { message: "Game not found" },
-        { status: 404 }
-      );
+      return NextResponse.json({ message: "Game not found" }, { status: 404 });
     }
 
     // 3. Verify ownership
@@ -339,9 +342,11 @@ export async function POST(request: NextRequest) {
 **CVSS Score:** 8.1 (High)
 
 #### Issue Description
+
 The endpoint accepts `userId` from the request body without authentication, allowing any user to update any other user's username.
 
 #### Current Code
+
 ```typescript
 export async function POST(request: NextRequest) {
   try {
@@ -367,11 +372,13 @@ export async function POST(request: NextRequest) {
 ```
 
 #### Security Risk
+
 - **Account Takeover:** Change any user's username
 - **Impersonation:** Create confusion by mimicking other users
 - **Social Engineering:** Enable phishing attacks
 
 #### Exploitation Scenario
+
 ```bash
 # Attacker changes victim's username
 curl -X POST http://app/api/updateUsername \
@@ -380,6 +387,7 @@ curl -X POST http://app/api/updateUsername \
 ```
 
 #### Recommended Fix
+
 ```typescript
 import { auth } from "@/lib/auth";
 
@@ -388,14 +396,11 @@ export async function POST(request: NextRequest) {
     // 1. Get authenticated session
     const session = await auth();
     if (!session?.user?.id) {
-      return NextResponse.json(
-        { error: "Unauthorized" },
-        { status: 401 }
-      );
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
     const body = await request.json();
-    const { newUsername } = body;  // ✓ Only accept username
+    const { newUsername } = body; // ✓ Only accept username
 
     // 2. Validate input
     if (!newUsername || newUsername.trim() === "") {
@@ -417,14 +422,17 @@ export async function POST(request: NextRequest) {
     // Prevent special characters abuse
     if (!/^[a-zA-Z0-9_\s-]+$/.test(trimmedUsername)) {
       return NextResponse.json(
-        { error: "Username can only contain letters, numbers, spaces, hyphens, and underscores" },
+        {
+          error:
+            "Username can only contain letters, numbers, spaces, hyphens, and underscores",
+        },
         { status: 400 }
       );
     }
 
     // 4. Update only the authenticated user's name
     const updatedUser = await db.user.update({
-      where: { id: session.user.id },  // Use session ID
+      where: { id: session.user.id }, // Use session ID
       data: { name: trimmedUsername },
     });
 
@@ -436,10 +444,7 @@ export async function POST(request: NextRequest) {
     console.error("Error updating username:", error);
 
     if (error.code === "P2025") {
-      return NextResponse.json(
-        { error: "User not found" },
-        { status: 404 }
-      );
+      return NextResponse.json({ error: "User not found" }, { status: 404 });
     }
 
     return NextResponse.json(
@@ -459,9 +464,11 @@ export async function POST(request: NextRequest) {
 **Severity:** HIGH
 
 #### Issue Description
+
 The code checks ownership BEFORE verifying the upload exists, and has duplicate authorization checks.
 
 #### Current Code
+
 ```typescript
 const existingUpload = await db.upload.findUnique({
   where: { id: uploadId },
@@ -491,11 +498,13 @@ if (existingUpload.userId !== session.user.id) {
 ```
 
 #### Security Risk
+
 - **Information Disclosure:** Error messages reveal whether IDs exist
 - **Potential Crash:** Accessing null object properties
 - **Timing Attack:** Different response times leak information
 
 #### Recommended Fix
+
 ```typescript
 const existingUpload = await db.upload.findUnique({
   where: { id: uploadId },
@@ -508,10 +517,7 @@ const existingUpload = await db.upload.findUnique({
 
 // ✓ Check existence first
 if (!existingUpload) {
-  return NextResponse.json(
-    { error: "Upload not found" },
-    { status: 404 }
-  );
+  return NextResponse.json({ error: "Upload not found" }, { status: 404 });
 }
 
 // ✓ Single ownership check
@@ -536,9 +542,11 @@ if (existingUpload.userId !== session.user.id) {
 **Severity:** MEDIUM
 
 #### Issue Description
+
 No authentication check and `userId` comes from client request body.
 
 #### Current Code
+
 ```typescript
 export async function POST(request: NextRequest) {
   const body = await request.json();
@@ -560,10 +568,12 @@ export async function POST(request: NextRequest) {
 ```
 
 #### Security Risk
+
 - Users can generate questions using other users' private documents
 - Bypass access control by providing different userId
 
 #### Recommended Fix
+
 ```typescript
 import { auth } from "@/lib/auth";
 
@@ -571,10 +581,7 @@ export async function POST(request: NextRequest) {
   // Add authentication
   const session = await auth();
   if (!session?.user?.id) {
-    return NextResponse.json(
-      { error: "Unauthorized" },
-      { status: 401 }
-    );
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
   const body = await request.json();
@@ -584,14 +591,11 @@ export async function POST(request: NextRequest) {
   const userId = session.user.id;
 
   const document = await db.upload.findFirst({
-    where: { id: namespace }
+    where: { id: namespace },
   });
 
   if (!document) {
-    return NextResponse.json(
-      { error: "Document not found" },
-      { status: 404 }
-    );
+    return NextResponse.json({ error: "Document not found" }, { status: 404 });
   }
 
   // Check access permissions
@@ -624,9 +628,11 @@ export async function POST(request: NextRequest) {
 **Severity:** MEDIUM
 
 #### Issue Description
+
 Any authenticated user can view any game's statistics by knowing its ID.
 
 #### Current Code
+
 ```typescript
 const game = await db.game.findUnique({
   where: { id: gameId },
@@ -643,11 +649,13 @@ const upload = await db.upload.findUnique({
 ```
 
 #### Security Risk
+
 - **Information Disclosure:** View other users' quiz results
 - **Privacy Violation:** Access answers and performance data
 - **Competitive Advantage:** See correct answers to questions
 
 #### Recommended Fix
+
 ```typescript
 const Statistics = async ({ params }: { params: Params }) => {
   const { gameId } = await params;
@@ -674,7 +682,7 @@ const Statistics = async ({ params }: { params: Params }) => {
   if (!upload) return redirect("/");
 
   // Rest of the code...
-}
+};
 ```
 
 ---
@@ -686,9 +694,11 @@ const Statistics = async ({ params }: { params: Params }) => {
 **Severity:** MEDIUM
 
 #### Issue Description
+
 Any authenticated user can access and play any game by knowing its ID.
 
 #### Recommended Fix
+
 ```typescript
 export default async function MCQPage({ params }: { params: Params }) {
   const session: any = await auth();
@@ -739,9 +749,11 @@ export default async function MCQPage({ params }: { params: Params }) {
 **Severity:** MEDIUM
 
 #### Issue Description
+
 PUT endpoint doesn't validate topic and upload parameters.
 
 #### Recommended Fix
+
 ```typescript
 import { z } from "zod";
 
@@ -776,9 +788,11 @@ export async function PUT(request: NextRequest) {
 **Severity:** MEDIUM
 
 #### Issue Description
+
 JSON parsing without error handling could crash the application.
 
 #### Examples
+
 ```typescript
 // topics/route.ts line 89
 let options: string[] = JSON.parse(lastUpload.isCompleted as string) || [];
@@ -791,6 +805,7 @@ const completed: string[] = JSON.parse(upload.isCompleted as string) || [];
 ```
 
 #### Recommended Fix
+
 ```typescript
 // Create utility function
 function safeJSONParse<T>(json: string | null, fallback: T): T {
@@ -806,10 +821,7 @@ function safeJSONParse<T>(json: string | null, fallback: T): T {
 }
 
 // Usage
-const options = safeJSONParse<string[]>(
-  currentQuestion.options,
-  []
-);
+const options = safeJSONParse<string[]>(currentQuestion.options, []);
 ```
 
 ---
@@ -821,14 +833,17 @@ const options = safeJSONParse<string[]>(
 **Severity:** MEDIUM
 
 #### Issue Description
+
 User prompt used without length or content validation.
 
 #### Recommended Fix
+
 ```typescript
 import { z } from "zod";
 
 const ChatRequestSchema = z.object({
-  user_prompt: z.string()
+  user_prompt: z
+    .string()
     .min(1, "Question cannot be empty")
     .max(2000, "Question must not exceed 2000 characters")
     .trim(),
@@ -870,6 +885,7 @@ export async function POST(request: NextRequest) {
 **Severity:** MEDIUM
 
 #### Recommended Fix
+
 ```typescript
 import { z } from "zod";
 
@@ -897,10 +913,7 @@ try {
 
   payload = validation.data;
 } catch (error) {
-  return NextResponse.json(
-    { error: "Invalid JSON payload" },
-    { status: 400 }
-  );
+  return NextResponse.json({ error: "Invalid JSON payload" }, { status: 400 });
 }
 ```
 
@@ -912,9 +925,11 @@ try {
 **Severity:** MEDIUM
 
 #### Issue Description
+
 Extensive console.log statements may leak sensitive information in production.
 
 #### Examples
+
 ```typescript
 // chat/route.ts line 100
 console.log(document.private, document.userId, session?.user.id);
@@ -925,11 +940,12 @@ console.log("retrieved data", retrievedData);
 ```
 
 #### Recommended Fix
+
 ```typescript
 // Create logger utility (lib/logger.ts)
 export const logger = {
   debug: (message: string, data?: any) => {
-    if (process.env.NODE_ENV === 'development') {
+    if (process.env.NODE_ENV === "development") {
       console.log(`[DEBUG] ${message}`, data);
     }
   },
@@ -938,7 +954,7 @@ export const logger = {
   },
   error: (message: string, error?: any) => {
     console.error(`[ERROR] ${message}`, error);
-  }
+  },
 };
 
 function sanitize(data: any) {
@@ -949,9 +965,9 @@ function sanitize(data: any) {
 }
 
 // Usage
-logger.debug('Document access check', {
+logger.debug("Document access check", {
   uploadId: document.id,
-  isPrivate: document.private
+  isPrivate: document.private,
 });
 ```
 
@@ -966,9 +982,11 @@ logger.debug('Document access check', {
 **Severity:** LOW
 
 #### Recommended Fix
+
 ```typescript
 export const checkAnswerSchema = z.object({
-  userInput: z.string()
+  userInput: z
+    .string()
     .min(1, "Answer cannot be empty")
     .max(500, "Answer must not exceed 500 characters"),
   questionId: z.string().cuid("Invalid question ID format"), // or .uuid()
@@ -984,6 +1002,7 @@ export const checkAnswerSchema = z.object({
 **Severity:** LOW
 
 #### Recommended Fix
+
 ```typescript
 const urlSchema = z.object({
   url: z.string().url("Invalid URL format"),
@@ -1006,9 +1025,11 @@ const urlSchema = z.object({
 **Impact:** Data corruption in concurrent scenarios
 
 #### Issue Description
+
 Read-modify-write operation without transaction protection.
 
 #### Current Code
+
 ```typescript
 const hasLiked = upload.likedBy.includes(session.user.id);
 const updatedLikedBy = hasLiked
@@ -1022,9 +1043,11 @@ await db.upload.update({
 ```
 
 #### Performance Impact
+
 If two users like simultaneously, one update could be lost.
 
 #### Recommended Fix (Option 1: Atomic Operations)
+
 ```typescript
 // Use Prisma's atomic array operations
 const hasLiked = upload.likedBy.includes(session.user.id);
@@ -1034,7 +1057,7 @@ const updatedUpload = await db.upload.update({
   data: {
     likedBy: hasLiked
       ? { set: upload.likedBy.filter((id) => id !== session.user.id) }
-      : { push: session.user.id }
+      : { push: session.user.id },
   },
   select: {
     id: true,
@@ -1044,6 +1067,7 @@ const updatedUpload = await db.upload.update({
 ```
 
 #### Recommended Fix (Option 2: Separate Table - Best Practice)
+
 ```prisma
 // schema.prisma
 model Like {
@@ -1076,15 +1100,15 @@ export async function POST(request: NextRequest) {
     where: {
       userId_uploadId: {
         userId: session.user.id,
-        uploadId: uploadId
-      }
-    }
+        uploadId: uploadId,
+      },
+    },
   });
 
   if (existingLike) {
     // Unlike
     await db.like.delete({
-      where: { id: existingLike.id }
+      where: { id: existingLike.id },
     });
     return NextResponse.json({ liked: false });
   } else {
@@ -1092,8 +1116,8 @@ export async function POST(request: NextRequest) {
     await db.like.create({
       data: {
         userId: session.user.id,
-        uploadId: uploadId
-      }
+        uploadId: uploadId,
+      },
     });
     return NextResponse.json({ liked: true });
   }
@@ -1112,68 +1136,94 @@ export async function POST(request: NextRequest) {
 **Impact:** 3-6x slower page loads
 
 #### Issue Description
+
 6 sequential database queries that could be parallelized.
 
 #### Current Code
+
 ```typescript
-const betaTester = await db.betatesters.findFirst({ where: { email: session?.user.email } });
+const betaTester = await db.betatesters.findFirst({
+  where: { email: session?.user.email },
+});
 const user = await db.user.findFirst({ where: { id: userId } });
-const Uploads = await db.upload.findMany({ where: { userId: session?.user.id, private: true, isDeleted: false }, orderBy: { timeStarted: "desc" } });
-const games = await db.game.findMany({ where: { userId: session?.user.id }, orderBy: { timeStarted: "desc" } });
-const sharesForOwnProfile = await db.upload.findMany({ where: { userId: userId, private: false, isDeleted: false }, orderBy: { timeStarted: "desc" } });
-const sharesForPublicView = await db.upload.findMany({ where: { userId: userId, private: false, isDeleted: false }, select: { id: true, name: true, userId: true, timeStarted: true, likedBy: true }, orderBy: { timeStarted: "desc" } });
+const Uploads = await db.upload.findMany({
+  where: { userId: session?.user.id, private: true, isDeleted: false },
+  orderBy: { timeStarted: "desc" },
+});
+const games = await db.game.findMany({
+  where: { userId: session?.user.id },
+  orderBy: { timeStarted: "desc" },
+});
+const sharesForOwnProfile = await db.upload.findMany({
+  where: { userId: userId, private: false, isDeleted: false },
+  orderBy: { timeStarted: "desc" },
+});
+const sharesForPublicView = await db.upload.findMany({
+  where: { userId: userId, private: false, isDeleted: false },
+  select: {
+    id: true,
+    name: true,
+    userId: true,
+    timeStarted: true,
+    likedBy: true,
+  },
+  orderBy: { timeStarted: "desc" },
+});
 ```
 
 #### Performance Impact
+
 Total time: ~600ms → Optimized: ~100ms (6x improvement)
 
 #### Recommended Fix
+
 ```typescript
 // Parallelize independent queries
-const [betaTester, user, privateUploads, games, publicShares] = await Promise.all([
-  db.betatesters.findFirst({
-    where: { email: session?.user.email },
-  }),
-  db.user.findFirst({
-    where: { id: userId },
-  }),
-  // Only fetch private uploads for own profile
-  session?.user.id === userId
-    ? db.upload.findMany({
-        where: { userId: session.user.id, private: true, isDeleted: false },
-        orderBy: { timeStarted: "desc" },
-        take: 50, // Add pagination
-      })
-    : Promise.resolve([]),
-  // Only fetch games for own profile
-  session?.user.id === userId
-    ? db.game.findMany({
-        where: { userId: session.user.id },
-        orderBy: { timeStarted: "desc" },
-        take: 50, // Add pagination
-      })
-    : Promise.resolve([]),
-  // Always fetch public shares for the profile
-  db.upload.findMany({
-    where: { userId: userId, private: false, isDeleted: false },
-    select: {
-      id: true,
-      name: true,
-      description: true,
-      userId: true,
-      timeStarted: true,
-      likedBy: true,
-      user: {
-        select: {
-          id: true,
-          name: true
-        }
-      }
-    },
-    orderBy: { timeStarted: "desc" },
-    take: 50, // Add pagination
-  }),
-]);
+const [betaTester, user, privateUploads, games, publicShares] =
+  await Promise.all([
+    db.betatesters.findFirst({
+      where: { email: session?.user.email },
+    }),
+    db.user.findFirst({
+      where: { id: userId },
+    }),
+    // Only fetch private uploads for own profile
+    session?.user.id === userId
+      ? db.upload.findMany({
+          where: { userId: session.user.id, private: true, isDeleted: false },
+          orderBy: { timeStarted: "desc" },
+          take: 50, // Add pagination
+        })
+      : Promise.resolve([]),
+    // Only fetch games for own profile
+    session?.user.id === userId
+      ? db.game.findMany({
+          where: { userId: session.user.id },
+          orderBy: { timeStarted: "desc" },
+          take: 50, // Add pagination
+        })
+      : Promise.resolve([]),
+    // Always fetch public shares for the profile
+    db.upload.findMany({
+      where: { userId: userId, private: false, isDeleted: false },
+      select: {
+        id: true,
+        name: true,
+        description: true,
+        userId: true,
+        timeStarted: true,
+        likedBy: true,
+        user: {
+          select: {
+            id: true,
+            name: true,
+          },
+        },
+      },
+      orderBy: { timeStarted: "desc" },
+      take: 50, // Add pagination
+    }),
+  ]);
 
 const Uploads = privateUploads;
 const sharesForPublicView = publicShares;
@@ -1190,9 +1240,11 @@ const sharesForOwnProfile = publicShares;
 **Impact:** Memory bloat, slow page loads as data grows
 
 #### Issue Description
+
 No limit/pagination - could return thousands of records.
 
 #### Current Code
+
 ```typescript
 const Shares = await db.upload.findMany({
   where: { private: false, isDeleted: false },
@@ -1214,9 +1266,11 @@ const Shares = await db.upload.findMany({
 ```
 
 #### Performance Impact
+
 With 10,000 uploads: Several MB of data transfer, 2-5 second page loads
 
 #### Recommended Fix
+
 ```typescript
 const Shares = await db.upload.findMany({
   where: { private: false, isDeleted: false },
@@ -1259,6 +1313,7 @@ const totalShares = await db.upload.count({
 **Impact:** 10-50x slower than count(), wastes bandwidth
 
 #### Current Code
+
 ```typescript
 private async getCurrentSpaceCounts(userId: string) {
   const uploads = await db.upload.findMany({
@@ -1276,9 +1331,11 @@ private async getCurrentSpaceCounts(userId: string) {
 ```
 
 #### Performance Impact
+
 If user has 100 uploads: Fetches all data just to return "100"
 
 #### Recommended Fix
+
 ```typescript
 private async getCurrentSpaceCounts(userId: string) {
   const [uploadsCount, sharesCount] = await Promise.all([
@@ -1305,9 +1362,11 @@ private async getCurrentSpaceCounts(userId: string) {
 **Severity:** MEDIUM
 
 #### Issue Description
+
 Queries same data twice - unnecessary re-fetch after update.
 
 #### Recommended Fix
+
 ```typescript
 const lastUpload = await db.upload.findFirst({
   where: { id: upload, private: false },
@@ -1316,20 +1375,23 @@ const lastUpload = await db.upload.findFirst({
 // Update and return data in one query
 const communityQuiz = await db.communityquiz.update({
   where: {
-    uploadId_userId: { uploadId: lastUpload.id, userId: id }
+    uploadId_userId: { uploadId: lastUpload.id, userId: id },
   },
   data: { options: lastUpload?.options },
   select: {
     options: true,
     isCompleted: true,
-  }
+  },
 });
 
 // Use updated data directly - no need to re-fetch
-return NextResponse.json({
-  topics: communityQuiz.options,
-  completed: communityQuiz.isCompleted,
-}, { status: 200 });
+return NextResponse.json(
+  {
+    topics: communityQuiz.options,
+    completed: communityQuiz.isCompleted,
+  },
+  { status: 200 }
+);
 ```
 
 ---
@@ -1341,9 +1403,11 @@ return NextResponse.json({
 **Severity:** MEDIUM
 
 #### Issue Description
+
 Read-modify-write without transaction - race condition.
 
 #### Recommended Fix
+
 ```typescript
 // Use transaction
 const updatedUpload = await db.$transaction(async (tx) => {
@@ -1374,9 +1438,11 @@ const updatedUpload = await db.$transaction(async (tx) => {
 **Severity:** MEDIUM
 
 #### Issue Description
+
 Two sequential updates to same record instead of one.
 
 #### Recommended Fix
+
 ```typescript
 // Single update with both fields
 if (question.questionType === "mcq") {
@@ -1387,7 +1453,7 @@ if (question.questionType === "mcq") {
     where: { id: questionId },
     data: {
       userAnswer: userInput,
-      isCorrect
+      isCorrect,
     },
   });
 
@@ -1403,12 +1469,17 @@ if (question.questionType === "mcq") {
 **Severity:** MEDIUM
 
 #### Issue Description
+
 JSON parsing happens on every render in components, no error handling.
 
 #### Recommended Fix
+
 ```typescript
 // Create utility (lib/json-utils.ts)
-export function safeJSONParse<T>(json: string | null | undefined, fallback: T): T {
+export function safeJSONParse<T>(
+  json: string | null | undefined,
+  fallback: T
+): T {
   if (!json) return fallback;
   try {
     const parsed = JSON.parse(json);
@@ -1435,9 +1506,11 @@ const options = useMemo(() => {
 **Severity:** MEDIUM
 
 #### Issue Description
+
 Polls server every 5 seconds indefinitely.
 
 #### Recommended Fix
+
 ```typescript
 useEffect(() => {
   const fetchTopics = async () => {
@@ -1463,7 +1536,7 @@ useEffect(() => {
 
   // Stop polling after 1 minute
   let pollCount = 0;
-  const maxPolls = 12; // 12 * 5s = 1 minute
+  const maxPolls = 5; // 12 * 5s = 1 minute
 
   const interval = setInterval(() => {
     pollCount++;
@@ -1491,9 +1564,11 @@ useEffect(() => {
 **Severity:** MEDIUM
 
 #### Issue Description
+
 Multiple sequential DB calls that could be batched.
 
 #### Recommended Fix
+
 ```typescript
 // Use transaction for multi-step operations
 await db.$transaction(async (tx) => {
@@ -1524,6 +1599,7 @@ await db.$transaction(async (tx) => {
 ### Current Schema Analysis
 
 **Existing Indexes:**
+
 - Upload: `[userId]`, `[processingStatus]`
 - Game: `[userId, uploadId]`, `[processingStatus]`
 - Question: `[gameId]`
@@ -1534,6 +1610,7 @@ await db.$transaction(async (tx) => {
 #### 🔴 CRITICAL: Foreign Key Indexes
 
 **1. Account table - Missing userId index**
+
 ```prisma
 model Account {
   // ... existing fields ...
@@ -1541,9 +1618,11 @@ model Account {
   @@index([userId])  // CRITICAL - Foreign key without index
 }
 ```
+
 **Impact:** 80-95% faster authentication lookups
 
 **2. Session table - Missing userId index**
+
 ```prisma
 model Session {
   // ... existing fields ...
@@ -1552,6 +1631,7 @@ model Session {
   @@index([userId])  // CRITICAL - Foreign key without index
 }
 ```
+
 **Impact:** 80-95% faster session queries
 
 ---
@@ -1559,6 +1639,7 @@ model Session {
 #### 🟠 HIGH PRIORITY: Composite Indexes
 
 **3. Upload table - User's uploads list**
+
 ```prisma
 model Upload {
   // ... existing fields ...
@@ -1568,10 +1649,12 @@ model Upload {
   @@index([userId, private, isDeleted, timeStarted])  // HIGH PRIORITY
 }
 ```
+
 **Used in:** `chat/[uploadId]/page.tsx`, `profile/[userId]/page.tsx`
 **Impact:** 70-90% faster profile page loads
 
 **4. Upload table - Public shares**
+
 ```prisma
 model Upload {
   // ... existing fields ...
@@ -1579,10 +1662,12 @@ model Upload {
   @@index([private, isDeleted, timeStarted])  // HIGH PRIORITY
 }
 ```
+
 **Used in:** `page.tsx` (homepage)
 **Impact:** 60-80% faster homepage loads
 
 **5. Upload table - Ownership checks**
+
 ```prisma
 model Upload {
   // ... existing fields ...
@@ -1590,10 +1675,12 @@ model Upload {
   @@index([id, userId, isDeleted])  // HIGH PRIORITY
 }
 ```
+
 **Used in:** `api/topics/route.ts`
 **Impact:** 60-80% faster topic operations
 
 **6. Upload table - Visibility checks**
+
 ```prisma
 model Upload {
   // ... existing fields ...
@@ -1601,10 +1688,12 @@ model Upload {
   @@index([id, private])  // MEDIUM-HIGH PRIORITY
 }
 ```
+
 **Used in:** `api/communityTopics/route.ts`
 **Impact:** 50-70% faster community operations
 
 **7. Communityquiz table - Reverse index**
+
 ```prisma
 model Communityquiz {
   // ... existing fields ...
@@ -1613,6 +1702,7 @@ model Communityquiz {
   @@index([uploadId, userId])  // HIGH PRIORITY - Reverse order
 }
 ```
+
 **Used in:** `api/communityTopics/route.ts`, `statistics/[gameId]/page.tsx`
 **Impact:** 40-60% faster community quiz lookups
 
@@ -1621,6 +1711,7 @@ model Communityquiz {
 #### 🟡 MEDIUM PRIORITY: Covering Indexes
 
 **8. Game table - Sorted queries**
+
 ```prisma
 model Game {
   // ... existing fields ...
@@ -1630,10 +1721,12 @@ model Game {
   @@index([userId, uploadId, timeStarted])  // MEDIUM PRIORITY
 }
 ```
+
 **Used in:** `chat/[uploadId]/page.tsx`
 **Impact:** 30-50% faster sorted game queries
 
 **9. Communityquiz table - Update operations**
+
 ```prisma
 model Communityquiz {
   // ... existing fields ...
@@ -1641,6 +1734,7 @@ model Communityquiz {
   @@index([id, userId, uploadId])  // MEDIUM PRIORITY
 }
 ```
+
 **Used in:** `api/communityTopics/route.ts`
 **Impact:** 30-50% faster updates
 
@@ -1740,6 +1834,7 @@ model betatesters {
 Copy the recommended schema changes above.
 
 **Step 2: Generate migration**
+
 ```bash
 npx prisma migrate dev --name add_performance_indexes
 ```
@@ -1748,6 +1843,7 @@ npx prisma migrate dev --name add_performance_indexes
 Check `prisma/migrations/` for the new SQL.
 
 **Step 4: Test in development**
+
 ```bash
 npx prisma migrate dev
 npm run dev
@@ -1755,11 +1851,13 @@ npm run dev
 ```
 
 **Step 5: Deploy to production**
+
 ```bash
 npx prisma migrate deploy
 ```
 
 **Step 6: Verify index usage**
+
 ```sql
 -- PostgreSQL - Check index usage
 SELECT
@@ -1783,22 +1881,24 @@ ORDER BY "timeStarted" DESC;
 
 ### Expected Performance Improvements
 
-| Page/Operation | Before | After | Improvement |
-|----------------|--------|-------|-------------|
-| Homepage | 300-500ms | 30-50ms | **10x faster** |
-| Profile Page | 600-800ms | 100-150ms | **6x faster** |
-| Chat Page Load | 400-600ms | 50-100ms | **6-8x faster** |
-| Topic Operations | 200-400ms | 40-80ms | **5x faster** |
-| Session Lookup | 1000ms+ | 10-20ms | **100x faster** |
-| Community Quiz | 200-300ms | 40-60ms | **5x faster** |
+| Page/Operation   | Before    | After     | Improvement     |
+| ---------------- | --------- | --------- | --------------- |
+| Homepage         | 300-500ms | 30-50ms   | **10x faster**  |
+| Profile Page     | 600-800ms | 100-150ms | **6x faster**   |
+| Chat Page Load   | 400-600ms | 50-100ms  | **6-8x faster** |
+| Topic Operations | 200-400ms | 40-80ms   | **5x faster**   |
+| Session Lookup   | 1000ms+   | 10-20ms   | **100x faster** |
+| Community Quiz   | 200-300ms | 40-60ms   | **5x faster**   |
 
 ### Storage Overhead
 
 Each index adds approximately:
+
 - **Storage:** 10-20% of indexed column data
 - **Write overhead:** Minimal (indexes updated automatically)
 
 For a database with 10,000 uploads:
+
 - Upload table size: ~50MB
 - New indexes: ~10-15MB total
 - **Total overhead: ~20-30% of table size**
@@ -1816,6 +1916,7 @@ This is a worthwhile tradeoff for 5-100x query performance improvements.
 **Impact:** Performance, data integrity, queryability
 
 #### Current Design
+
 ```prisma
 model Upload {
   options      String?  @db.Text  // JSON array of topics
@@ -1833,6 +1934,7 @@ model Communityquiz {
 ```
 
 #### Problems
+
 1. **No type safety** - Must parse/stringify in application code
 2. **Cannot query** - Cannot use WHERE on JSON contents efficiently
 3. **Cannot index** - Cannot create indexes on array elements
@@ -1842,6 +1944,7 @@ model Communityquiz {
 #### Recommended Fix
 
 **For Question Options:**
+
 ```prisma
 model Question {
   id          String   @id @default(cuid())
@@ -1864,6 +1967,7 @@ model QuestionOption {
 ```
 
 **For Completed Topics:**
+
 ```prisma
 model Upload {
   id          String   @id @default(cuid())
@@ -1887,6 +1991,7 @@ model Topic {
 ```
 
 **Benefits:**
+
 - ✅ Type-safe queries
 - ✅ Can filter by topic: `WHERE topics: { some: { name: "Math" } }`
 - ✅ No JSON parsing errors
@@ -1902,6 +2007,7 @@ model Topic {
 **Impact:** Data loss in concurrent scenarios
 
 #### Current Design
+
 ```prisma
 model Upload {
   likedBy  String[]  // Array of user IDs
@@ -1909,9 +2015,11 @@ model Upload {
 ```
 
 #### Problem
+
 The read-modify-write pattern in `uploads/[id]/like/route.ts` is not atomic.
 
 #### Recommended Fix
+
 ```prisma
 model Upload {
   id     String  @id @default(cuid())
@@ -1936,6 +2044,7 @@ model Like {
 ```
 
 **Benefits:**
+
 - ✅ Atomic operations (INSERT/DELETE)
 - ✅ No race conditions
 - ✅ Can track when likes happened
@@ -1951,6 +2060,7 @@ model Like {
 **Impact:** Database bloat over time
 
 #### Current Design
+
 ```prisma
 model Upload {
   isDeleted  Boolean  @default(false)
@@ -1958,6 +2068,7 @@ model Upload {
 ```
 
 #### Problems
+
 1. Soft-deleted records accumulate forever
 2. Every query must filter `isDeleted: false`
 3. Indexes include deleted records
@@ -1966,6 +2077,7 @@ model Upload {
 #### Recommended Solutions
 
 **Option 1: Archival Table**
+
 ```prisma
 model Upload {
   // Remove isDeleted flag
@@ -1985,6 +2097,7 @@ model ArchivedUpload {
 ```
 
 **Migration query:**
+
 ```typescript
 // Move to archive instead of soft delete
 await db.$transaction([
@@ -1994,15 +2107,16 @@ await db.$transaction([
       userId: upload.userId,
       name: upload.name,
       // ... other fields
-    }
+    },
   }),
   db.upload.delete({
-    where: { id: upload.id }
-  })
+    where: { id: upload.id },
+  }),
 ]);
 ```
 
 **Option 2: Keep Soft Delete with TTL**
+
 ```typescript
 // Background job to clean up old soft-deleted records
 async function cleanupOldDeletes() {
@@ -2012,8 +2126,8 @@ async function cleanupOldDeletes() {
   await db.upload.deleteMany({
     where: {
       isDeleted: true,
-      updatedAt: { lt: thirtyDaysAgo }
-    }
+      updatedAt: { lt: thirtyDaysAgo },
+    },
   });
 }
 ```
@@ -2029,6 +2143,7 @@ async function cleanupOldDeletes() {
 #### Examples Needing Transactions
 
 **1. Game Creation (api/game/route.ts)**
+
 ```typescript
 // Current: Not atomic
 const game = await db.game.create({ ... });
@@ -2037,6 +2152,7 @@ await db.topic_count.upsert({ ... });
 ```
 
 **Fix:**
+
 ```typescript
 const [game, topicCount] = await db.$transaction([
   db.game.create({ ... }),
@@ -2045,6 +2161,7 @@ const [game, topicCount] = await db.$transaction([
 ```
 
 **2. Upload Processing (api/worker/process-upload/route.ts)**
+
 ```typescript
 // Current: Multiple status updates
 await db.upload.update({ data: { processingStatus: "PROCESSING" } });
@@ -2054,11 +2171,12 @@ await db.upload.update({ data: { processingStatus: "COMPLETED", options: ... } }
 ```
 
 **Fix:**
+
 ```typescript
 try {
   await db.upload.update({
     where: { id: uploadId },
-    data: { processingStatus: "PROCESSING" }
+    data: { processingStatus: "PROCESSING" },
   });
 
   // ... processing ...
@@ -2068,16 +2186,16 @@ try {
     data: {
       processingStatus: "COMPLETED",
       options: topics,
-      topics: topicCount
-    }
+      topics: topicCount,
+    },
   });
 } catch (error) {
   await db.upload.update({
     where: { id: uploadId },
     data: {
       processingStatus: "FAILED",
-      errorMessage: error.message
-    }
+      errorMessage: error.message,
+    },
   });
   throw error;
 }
@@ -2091,11 +2209,13 @@ try {
 **Impact:** Potential connection exhaustion under load
 
 #### Current Configuration
+
 Using default Prisma connection pooling.
 
 #### Recommended Configuration
 
 **In `schema.prisma`:**
+
 ```prisma
 datasource db {
   provider = "postgresql"
@@ -2107,6 +2227,7 @@ datasource db {
 ```
 
 **In environment variables:**
+
 ```env
 # Recommended connection string format
 NEXT_DATABASE_URL="postgresql://user:pass@host:5432/db?schema=public&connection_limit=20&pool_timeout=20"
@@ -2119,32 +2240,34 @@ NEXT_DATABASE_URL="postgresql://user:pass@pooler-host:6543/db?schema=public&pgbo
 ```
 
 **Prisma Client configuration:**
+
 ```typescript
 // lib/db/db.ts
-import { PrismaClient } from '@prisma/client'
+import { PrismaClient } from "@prisma/client";
 
 const prismaClientSingleton = () => {
   return new PrismaClient({
-    log: process.env.NODE_ENV === 'development'
-      ? ['query', 'error', 'warn']
-      : ['error'],
+    log:
+      process.env.NODE_ENV === "development"
+        ? ["query", "error", "warn"]
+        : ["error"],
     datasources: {
       db: {
         url: process.env.NEXT_DATABASE_URL,
       },
     },
-  })
-}
+  });
+};
 
 declare global {
-  var prismaGlobal: undefined | ReturnType<typeof prismaClientSingleton>
+  var prismaGlobal: undefined | ReturnType<typeof prismaClientSingleton>;
 }
 
-const db = globalThis.prismaGlobal ?? prismaClientSingleton()
+const db = globalThis.prismaGlobal ?? prismaClientSingleton();
 
-export default db
+export default db;
 
-if (process.env.NODE_ENV !== 'production') globalThis.prismaGlobal = db
+if (process.env.NODE_ENV !== "production") globalThis.prismaGlobal = db;
 ```
 
 ---
@@ -2154,16 +2277,19 @@ if (process.env.NODE_ENV !== 'production') globalThis.prismaGlobal = db
 These are the top 5 fixes that provide the highest impact with minimal implementation time:
 
 ### 🏆 QUICK WIN 1: Add Authentication to Critical Endpoints
+
 **Time:** 30 minutes
 **Impact:** Prevents critical security vulnerabilities
 **Files:** 3 files
 
 Add authentication to:
+
 1. `src/app/api/checkAnswer/route.ts`
 2. `src/app/api/endGame/route.ts`
 3. `src/app/api/updateUsername/route.ts`
 
 **Code pattern:**
+
 ```typescript
 import { auth } from "@/lib/auth";
 
@@ -2176,11 +2302,13 @@ if (!session?.user?.id) {
 ---
 
 ### 🏆 QUICK WIN 2: Add Critical Database Indexes
+
 **Time:** 15 minutes
 **Impact:** 80-95% faster queries
 **Files:** 1 file
 
 Add to `schema.prisma`:
+
 ```prisma
 model Account {
   @@index([userId])
@@ -2192,6 +2320,7 @@ model Session {
 ```
 
 Run:
+
 ```bash
 npx prisma migrate dev --name add_foreign_key_indexes
 ```
@@ -2199,11 +2328,13 @@ npx prisma migrate dev --name add_foreign_key_indexes
 ---
 
 ### 🏆 QUICK WIN 3: Replace findMany with count()
+
 **Time:** 10 minutes
 **Impact:** 10-50x faster counting
 **Files:** 1 file
 
 In `src/lib/validation/upload-validation.ts`:
+
 ```typescript
 private async getCurrentSpaceCounts(userId: string) {
   const [uploadsCount, sharesCount] = await Promise.all([
@@ -2217,30 +2348,39 @@ private async getCurrentSpaceCounts(userId: string) {
 ---
 
 ### 🏆 QUICK WIN 4: Add Pagination to Homepage
+
 **Time:** 15 minutes
 **Impact:** Prevents memory bloat as data grows
 **Files:** 1 file
 
 In `src/app/page.tsx`:
+
 ```typescript
 const Shares = await db.upload.findMany({
   where: { private: false, isDeleted: false },
-  select: { /* ... */ },
+  select: {
+    /* ... */
+  },
   orderBy: { timeStarted: "desc" },
-  take: 50,  // Add this line
+  take: 50, // Add this line
 });
 ```
 
 ---
 
 ### 🏆 QUICK WIN 5: Create Safe JSON Parse Utility
+
 **Time:** 20 minutes
 **Impact:** Prevents crashes across 37 locations
 **Files:** 1 new file + updates
 
 Create `src/lib/json-utils.ts`:
+
 ```typescript
-export function safeJSONParse<T>(json: string | null | undefined, fallback: T): T {
+export function safeJSONParse<T>(
+  json: string | null | undefined,
+  fallback: T
+): T {
   if (!json) return fallback;
   try {
     const parsed = JSON.parse(json);
@@ -2253,12 +2393,13 @@ export function safeJSONParse<T>(json: string | null | undefined, fallback: T): 
 ```
 
 Replace all `JSON.parse()` calls:
+
 ```typescript
 // Before
 const options = JSON.parse(question.options as string);
 
 // After
-import { safeJSONParse } from '@/lib/json-utils';
+import { safeJSONParse } from "@/lib/json-utils";
 const options = safeJSONParse<string[]>(question.options, []);
 ```
 
@@ -2267,6 +2408,7 @@ const options = safeJSONParse<string[]>(question.options, []);
 ## Implementation Roadmap
 
 ### Phase 1: Critical Security Fixes (2-4 hours)
+
 **Priority:** IMMEDIATE
 **Must complete before next deployment**
 
@@ -2298,6 +2440,7 @@ const options = safeJSONParse<string[]>(question.options, []);
 ---
 
 ### Phase 2: Critical Performance & Database (4-6 hours)
+
 **Priority:** HIGH
 **Should complete within 1 week**
 
@@ -2339,6 +2482,7 @@ const options = safeJSONParse<string[]>(question.options, []);
 ---
 
 ### Phase 3: Medium Priority Optimizations (6-8 hours)
+
 **Priority:** MEDIUM
 **Should complete within 2 weeks**
 
@@ -2377,6 +2521,7 @@ const options = safeJSONParse<string[]>(question.options, []);
 ---
 
 ### Phase 4: Database Design Improvements (8-12 hours)
+
 **Priority:** LOW
 **Plan for next major version**
 
@@ -2410,6 +2555,7 @@ const options = safeJSONParse<string[]>(question.options, []);
 ## Testing Checklist
 
 ### Security Testing
+
 - [ ] Test authentication on all endpoints
 - [ ] Verify ownership checks work correctly
 - [ ] Attempt to access other users' resources
@@ -2418,6 +2564,7 @@ const options = safeJSONParse<string[]>(question.options, []);
 - [ ] Test rate limiting functionality
 
 ### Performance Testing
+
 - [ ] Benchmark homepage load time
 - [ ] Benchmark profile page load time
 - [ ] Test query performance with EXPLAIN ANALYZE
@@ -2427,6 +2574,7 @@ const options = safeJSONParse<string[]>(question.options, []);
 - [ ] Monitor database CPU and memory usage
 
 ### Integration Testing
+
 - [ ] Test complete user flows
 - [ ] Test game creation and completion
 - [ ] Test community quiz functionality
@@ -2441,6 +2589,7 @@ const options = safeJSONParse<string[]>(question.options, []);
 ### Recommended Monitoring
 
 1. **Query Performance**
+
    ```sql
    -- PostgreSQL slow query log
    ALTER DATABASE your_db SET log_min_duration_statement = 1000; -- Log queries > 1s
@@ -2464,17 +2613,20 @@ const options = safeJSONParse<string[]>(question.options, []);
 ### Periodic Maintenance
 
 **Weekly:**
+
 - Review slow query logs
 - Check error logs for security issues
 - Monitor database size growth
 
 **Monthly:**
+
 - Review and optimize indexes
 - Clean up soft-deleted records (if kept)
 - Review and rotate logs
 - Performance testing
 
 **Quarterly:**
+
 - Security audit
 - Dependency updates
 - Load testing
@@ -2486,39 +2638,42 @@ const options = safeJSONParse<string[]>(question.options, []);
 
 ### Vulnerabilities by Severity
 
-| Severity | Security | Performance | Database | Total |
-|----------|----------|-------------|----------|-------|
-| Critical | 2 | 1 | 4 | 7 |
-| High | 2 | 3 | 3 | 8 |
-| Medium | 8 | 6 | 2 | 16 |
-| Low | 2 | 0 | 0 | 2 |
-| **Total** | **14** | **10** | **9** | **33** |
+| Severity  | Security | Performance | Database | Total  |
+| --------- | -------- | ----------- | -------- | ------ |
+| Critical  | 2        | 1           | 4        | 7      |
+| High      | 2        | 3           | 3        | 8      |
+| Medium    | 8        | 6           | 2        | 16     |
+| Low       | 2        | 0           | 0        | 2      |
+| **Total** | **14**   | **10**      | **9**    | **33** |
 
 ### Estimated Time to Fix
 
-| Phase | Time | Priority |
-|-------|------|----------|
-| Phase 1: Critical Security | 2-4 hours | IMMEDIATE |
-| Phase 2: Performance & Indexes | 4-6 hours | HIGH |
-| Phase 3: Optimizations | 6-8 hours | MEDIUM |
-| Phase 4: Design Improvements | 8-12 hours | LOW |
-| **Total** | **20-30 hours** | |
+| Phase                          | Time            | Priority  |
+| ------------------------------ | --------------- | --------- |
+| Phase 1: Critical Security     | 2-4 hours       | IMMEDIATE |
+| Phase 2: Performance & Indexes | 4-6 hours       | HIGH      |
+| Phase 3: Optimizations         | 6-8 hours       | MEDIUM    |
+| Phase 4: Design Improvements   | 8-12 hours      | LOW       |
+| **Total**                      | **20-30 hours** |           |
 
 ### Expected Impact
 
 **Security:**
+
 - Prevents account takeover
 - Prevents game manipulation
 - Prevents data breaches
 - Improves input validation
 
 **Performance:**
+
 - 50-90% faster queries
 - 2-3x more concurrent users
 - 40-50% less database load
 - Prevents memory bloat
 
 **User Experience:**
+
 - 2-3x faster page loads
 - More reliable operations
 - Better error handling
@@ -2531,18 +2686,16 @@ const options = safeJSONParse<string[]>(question.options, []);
 This audit revealed significant security vulnerabilities and performance issues that need immediate attention. The good news is that the application uses Prisma ORM, which protects against SQL injection, and has authentication implemented in most places.
 
 **Immediate Actions Required:**
+
 1. Fix the 2 critical authentication bypasses
 2. Add the 4 critical database indexes
 3. Implement the 5 quick wins
 
-**Within 1 Week:**
-4. Complete Phase 1 (Security) and Phase 2 (Performance)
+**Within 1 Week:** 4. Complete Phase 1 (Security) and Phase 2 (Performance)
 
-**Within 2 Weeks:**
-5. Complete Phase 3 (Optimizations)
+**Within 2 Weeks:** 5. Complete Phase 3 (Optimizations)
 
-**Plan for Next Version:**
-6. Phase 4 (Database redesign for JSON → Relational)
+**Plan for Next Version:** 6. Phase 4 (Database redesign for JSON → Relational)
 
 Following this roadmap will significantly improve the security, performance, and maintainability of the application.
 
