@@ -58,6 +58,7 @@ model Session {
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+  @@index([userId]) 
 }
 
 model VerificationToken {
@@ -116,6 +117,7 @@ model Game {
 
   @@index([userId, uploadId])
   @@index([processingStatus])
+  @@index([userId, uploadId, timeStarted]) 
 }
 
 model topic_count {
@@ -169,6 +171,10 @@ model Upload {
 
   @@index([userId])
   @@index([processingStatus])
+  @@index([userId, private, isDeleted, timeStarted]) 
+  @@index([private, isDeleted, timeStarted])          
+  @@index([id, userId, isDeleted])                   
+  @@index([id, private]) 
 }
 
 model Communityquiz {
@@ -184,6 +190,8 @@ model Communityquiz {
   upload            Upload @relation(fields:[uploadId], references:[id])
 
   @@index([userId, uploadId])
+  @@index([uploadId, userId])                      
+  @@index([id, userId, uploadId])  
 }
 
 model betatesters {
