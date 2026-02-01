@@ -20,22 +20,45 @@ import { CommunityTopicCreationButton } from "@/components/Quiz/CommunityTopicCr
 import axios, { AxiosError } from "axios";
 import { motion } from "framer-motion";
 import { buttonVariants } from "@/components/ui/button";
+import { useTopics } from "@/hooks/useTopics";
 
 type Props = {
   topic: string;
   id: string;
+  pollingEnabled?: boolean;
+  pollingKey?: number;
+  pollingBaseline?: string | null;
 };
 
 type Input = z.infer<typeof quizCreationSchema>;
 
-const CommunityQuizForm = ({ topic: topicParam, id: uploadId }: Props) => {
+const CommunityQuizForm = ({
+  topic: topicParam,
+  id: uploadId,
+  pollingEnabled,
+  pollingKey,
+  pollingBaseline,
+}: Props) => {
   const router = useRouter();
   const { toast } = useToast();
   const [showLoader, setShowLoader] = useState(false);
   const [finishedLoading, setFinishedLoading] = useState(false);
-  const [topicsCreated, setTopicsCreated] = useState(false);
-  const [topics, setTopics] = useState([]);
-  const [completed, setCompleted] = useState([]);
+
+  const {
+    data: topicsData,
+    isLoading: topicsLoading,
+    isFetched,
+    refetch: refetchTopics,
+  } = useTopics(uploadId, "community", {
+    pollingEnabled,
+    pollingKey,
+    pollingBaseline,
+  });
+
+  const topics = topicsData?.topics ?? [];
+  const completed = topicsData?.completed ?? [];
+  const topicsCreated = isFetched && !topicsLoading;
+
   const { mutate: getCommunityQuestions, status } = useMutation({
     mutationFn: async ({ amount, topic, id }: Input) => {
       try {
@@ -62,104 +85,11 @@ const CommunityQuizForm = ({ topic: topicParam, id: uploadId }: Props) => {
     },
   });
 
-  /* useEffect(() => {
-    const fetchTopics = async () => {
-      try {
-        const res = await fetch(`/api/communityTopics?upload=${uploadId}`).then(
-          (res) => res.json()
-        );
-        setTopics(JSON.parse(res?.topics) || []);
-        setCompleted(res.completed);
-      } catch (error) {
-        console.error("Error fetching topics:", error);
-      }
-      setTopicsCreated(true);
-    };
-
-    fetchTopics();
-
-    const interval = setInterval(fetchTopics, 5000);
-
-    return () => clearInterval(interval);
-  }, []); */
-
   useEffect(() => {
     if (uploadId) {
       form.setValue("id", uploadId);
     }
   }, [uploadId]);
-  useEffect(() => {
-    const fetchTopics = async () => {
-      try {
-        const res = await fetch(`/api/communityTopics?upload=${uploadId}`).then(
-          (res) => res.json()
-        );
-
-        const newTopics = JSON.parse(res.topics as string) || [];
-        const newCompleted = res.completed;
-
-        // Only update if changed
-        if (JSON.stringify(newTopics) !== JSON.stringify(topics)) {
-          setTopics(newTopics);
-        }
-        setCompleted(newCompleted);
-      } catch (error) {
-        console.error("Error fetching topics:", error);
-      }
-      setTopicsCreated(true);
-    };
-
-    fetchTopics();
-
-    // Stop polling after 1 minute
-    let pollCount = 0;
-    const maxPolls = 5; // 12 * 5s = 1 minute
-
-    const interval = setInterval(() => {
-      pollCount++;
-      if (pollCount >= maxPolls) {
-        clearInterval(interval);
-        return;
-      }
-      fetchTopics();
-    }, 5000);
-
-    return () => clearInterval(interval);
-  }, [uploadId]);
-  /*useEffect(() => {
-    const fetchTopics = async () => {
-      try {
-        const res = await fetch(`/api/communityTopics?upload=${uploadId}`).then(
-          (res) => res.json()
-        );
-
-        // Fix: Better handling of the topics parsing
-        const topicsData = res?.topics;
-        if (topicsData && topicsData !== "") {
-          try {
-            const parsedTopics = JSON.parse(topicsData);
-            setTopics(Array.isArray(parsedTopics) ? parsedTopics : []);
-          } catch (parseError) {
-            console.error("Error parsing topics JSON:", parseError);
-            console.log("Raw topics data:", topicsData); // This will help debug
-            setTopics([]);
-          }
-        } else {
-          setTopics([]);
-        }
-
-        setCompleted(res.completed);
-      } catch (error) {
-        console.error("Error fetching topics:", error);
-        setTopics([]); // Set empty array on error
-      }
-      setTopicsCreated(true);
-    };
-
-    fetchTopics();
-    const interval = setInterval(fetchTopics, 5000);
-    return () => clearInterval(interval);
-  }, [uploadId]); // Also added uploadId as dependency since you're using it */
 
   const onSubmit = async (data: Input) => {
     console.log("submitting data", data);
@@ -270,7 +200,7 @@ const CommunityQuizForm = ({ topic: topicParam, id: uploadId }: Props) => {
       )}
 
       <div className="py-1">
-        <CommunityTopicCreationButton upload={uploadId} />
+        <CommunityTopicCreationButton upload={uploadId} onSuccess={refetchTopics} />
       </div>
 
       {topics?.length > 0 && (
@@ -278,9 +208,7 @@ const CommunityQuizForm = ({ topic: topicParam, id: uploadId }: Props) => {
           <p className="text-xs text-gray-400 font-medium">Topics:</p>
           <div className="flex flex-wrap gap-1">
             {topics.map((topic, idx) => {
-              const milestones: string[] =
-                (JSON.parse(completed as any) as any) || [];
-              const isCompleted = milestones.includes(topic);
+              const isCompleted = completed.includes(topic);
               if (topic) {
                 return (
                   <Button

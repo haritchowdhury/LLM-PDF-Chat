@@ -11,12 +11,13 @@ import { ExternalLink, Link, Send, Loader2 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useToast } from "@/hooks/use-toast";
 
-type Upload = {
+type LinkSubmitDialogProps = {
   upload: string;
   isPersonal: boolean;
+  onUploadStarted?: (uploadId: string) => void;
 };
 
-const LinkSubmitDialog = ({ upload, isPersonal }: Upload) => {
+const LinkSubmitDialog = ({ upload, isPersonal, onUploadStarted }: LinkSubmitDialogProps) => {
   const [isOpen, setIsOpen] = useState(false);
   const [inputLink, setInputLink] = useState("");
   const [isLoading, setIsLoading] = useState(false);
@@ -68,6 +69,8 @@ const LinkSubmitDialog = ({ upload, isPersonal }: Upload) => {
             router.replace(`/chat/${data.uploadId}`);
           }, 100);
         } else {
+          // Notify parent to start polling for completion
+          onUploadStarted?.(upload);
           // Refresh the page to show processing state
           router.refresh();
         }

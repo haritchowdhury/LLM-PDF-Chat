@@ -12,10 +12,11 @@ import { motion } from "framer-motion";
 
 const schema = z.object({});
 type Input = z.infer<typeof schema>;
-type Upload = {
+type TopicCreationProps = {
   upload: string;
+  onSuccess?: () => void;
 };
-const TopicCreationButton = ({ upload }: Upload) => {
+const TopicCreationButton = ({ upload, onSuccess }: TopicCreationProps) => {
   const [created, setCreated] = useState(true);
   const { toast } = useToast();
   const form = useForm<Input>();
@@ -48,6 +49,7 @@ const TopicCreationButton = ({ upload }: Upload) => {
             variant: "default",
           });
           setCreated(true);
+          onSuccess?.();
         }, 2000);
       },
     });

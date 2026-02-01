@@ -12,8 +12,19 @@ type Props = {
   isPersonal: boolean;
   upload?: Upload;
   currentUserId?: string;
+  topicsPollingEnabled?: boolean;
+  topicsPollingKey?: number;
+  topicsPollingBaseline?: string | null;
 };
-function LeftSideBar({ namespace, isPersonal, upload, currentUserId }: Props) {
+function LeftSideBar({
+  namespace,
+  isPersonal,
+  upload,
+  currentUserId,
+  topicsPollingEnabled,
+  topicsPollingKey,
+  topicsPollingBaseline,
+}: Props) {
   const { toast } = useToast();
 
   const [isEditing, setIsEditing] = useState(false);
@@ -142,7 +153,13 @@ function LeftSideBar({ namespace, isPersonal, upload, currentUserId }: Props) {
         {namespace !== "undefined" ? (
           <div className="mb-4">
             {isPersonal ? (
-              <QuizForm topic="" id={namespace} />
+              <QuizForm
+                topic=""
+                id={namespace}
+                pollingEnabled={topicsPollingEnabled}
+                pollingKey={topicsPollingKey}
+                pollingBaseline={topicsPollingBaseline}
+              />
             ) : (
               <CommunityQuizForm topic="" id={namespace} />
             )}

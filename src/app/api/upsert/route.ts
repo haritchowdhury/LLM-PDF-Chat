@@ -105,9 +105,12 @@ export async function POST(request: NextRequest) {
       namespace = uploadId;
       isNewUpload = true;
     } else {
-      // Adding to existing upload - keep the upload accessible
-      // Don't change processingStatus - let it stay COMPLETED
+      // Adding to existing upload - set status to PENDING so frontend can poll for completion
       uploadId = namespace;
+      await db.upload.update({
+        where: { id: uploadId },
+        data: { processingStatus: ProcessingStatus.PENDING },
+      });
     }
 
     // Upload PDF to temporary blob storage

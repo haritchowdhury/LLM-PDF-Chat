@@ -13,10 +13,11 @@ import { buttonVariants } from "@/components/ui/button";
 
 const schema = z.object({});
 type Input = z.infer<typeof schema>;
-type Upload = {
+type CommunityTopicCreationProps = {
   upload: string;
+  onSuccess?: () => void;
 };
-const CommunityTopicCreationButton = ({ upload }: Upload) => {
+const CommunityTopicCreationButton = ({ upload, onSuccess }: CommunityTopicCreationProps) => {
   const { toast } = useToast();
   const [created, setCreated] = useState(true);
   const form = useForm<Input>();
@@ -49,6 +50,7 @@ const CommunityTopicCreationButton = ({ upload }: Upload) => {
             variant: "default",
           });
           setCreated(true);
+          onSuccess?.();
         }, 2000);
       },
     });

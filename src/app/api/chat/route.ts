@@ -70,7 +70,35 @@ export async function POST(request: NextRequest) {
         { status: 403 }
       );
     }
-    const body = await request.json();
+    const contentType = request.headers.get("content-type") || "";
+    const rawBody = await request.text();
+    if (!contentType.includes("application/json")) {
+      return NextResponse.json(
+        {
+          content: "Invalid content type. Expected application/json.",
+          details: { contentType },
+        },
+        { status: 415 }
+      );
+    }
+
+    let body: unknown = {};
+    try {
+      body = rawBody ? JSON.parse(rawBody) : {};
+    } catch (parseError) {
+      console.error("Invalid JSON payload:", parseError);
+      return NextResponse.json(
+        {
+          content: "Invalid JSON payload.",
+          details: {
+            contentType,
+            bodyPreview: rawBody.slice(0, 120),
+          },
+        },
+        { status: 400 }
+      );
+    }
+
     console.log(body);
     const validation = ChatRequestSchema.safeParse(body);
 

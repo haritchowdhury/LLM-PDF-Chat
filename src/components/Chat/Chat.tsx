@@ -1,7 +1,8 @@
 "use client";
 
-import React, { useEffect, useRef, useState } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
+import { useQueryClient } from "@tanstack/react-query";
 import { Input } from "@/components/ui/input";
 import { Upload, Send, Menu, X, Users, FileText } from "lucide-react";
 import {
@@ -57,6 +58,7 @@ const Chat = ({
   // Router and toast utilities
   const router = useRouter();
   const { toast } = useToast();
+  const queryClient = useQueryClient();
 
   // UI and interaction states
   const [input, setInput] = useState("");
@@ -64,6 +66,12 @@ const Chat = ({
   const [isLoading, setIsLoading] = useState(true);
   const [isProcessing, setIsProcessing] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
+
+  const [topicsPollingEnabled, setTopicsPollingEnabled] = useState(false);
+  const [topicsPollingKey, setTopicsPollingKey] = useState(0);
+  const [topicsPollingBaseline, setTopicsPollingBaseline] = useState<
+    string | null
+  >(null);
 
   // Mobile sidebar states
   const [leftSidebarOpen, setLeftSidebarOpen] = useState(false);
@@ -129,6 +137,16 @@ const Chat = ({
     return () => window.removeEventListener("resize", handleResize);
   }, []);
 
+  const startTopicsPolling = useCallback(() => {
+    if (!isPersonal || !namespace || namespace === "undefined") return;
+    const cached = queryClient.getQueryData<{
+      topics?: string[];
+    }>(["topics", "personal", namespace]);
+    setTopicsPollingBaseline(JSON.stringify(cached?.topics ?? []));
+    setTopicsPollingEnabled(true);
+    setTopicsPollingKey((prev) => prev + 1);
+  }, [isPersonal, namespace, queryClient]);
+
   /**
    * Handle file uploads for RAG processing
    */
@@ -182,6 +200,10 @@ const Chat = ({
             router.replace(`/chat/${data.uploadId}`);
           }, 100);
         } else {
+          startTopicsPolling();
+          queryClient.invalidateQueries({
+            queryKey: ["topics", "personal", namespace],
+          });
           // Refresh the page to show processing status
           setTimeout(() => {
             router.refresh();
@@ -338,6 +360,9 @@ const Chat = ({
           isPersonal={isPersonal}
           upload={upload}
           currentUserId={userId}
+          topicsPollingEnabled={topicsPollingEnabled}
+          topicsPollingKey={topicsPollingKey}
+          topicsPollingBaseline={topicsPollingBaseline}
         />
       </div>
 
@@ -379,7 +404,13 @@ const Chat = ({
                     <div className="mb-4">
                       {/* Import and render quiz components directly */}
                       {isPersonal ? (
-                        <QuizForm topic="" id={namespace} />
+                        <QuizForm
+                          topic=""
+                          id={namespace}
+                          pollingEnabled={topicsPollingEnabled}
+                          pollingKey={topicsPollingKey}
+                          pollingBaseline={topicsPollingBaseline}
+                        />
                       ) : (
                         <CommunityQuizForm topic="" id={namespace} />
                       )}
@@ -479,6 +510,7 @@ const Chat = ({
                   <LinkSubmitDialog
                     upload={namespace}
                     isPersonal={isPersonal}
+                    onUploadStarted={() => startTopicsPolling()}
                   />
                   <TooltipProvider>
                     <Tooltip>
