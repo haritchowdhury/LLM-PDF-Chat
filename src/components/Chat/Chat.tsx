@@ -23,6 +23,10 @@ import { Upload as PrismaUpload, Game } from "@prisma/client";
 import LinkSubmitDialog from "@/components/Chat/UpsertLink";
 import QuizForm from "@/components/Quiz/QuizForm";
 import CommunityQuizForm from "@/components/Quiz/CommunityQuizForm";
+import {
+  InlineSpinner,
+  Skeleton,
+} from "@/components/loading/LoadingPrimitives";
 
 // Define message types
 type Message = {
@@ -311,14 +315,12 @@ const Chat = ({
   };
 
   // Show appropriate loading states
-  if (isLoading || isUploading) {
+  if (isUploading) {
     return (
       <div className="fixed inset-0 flex items-center justify-center bg-gradient-to-br from-blue-50 to-green-50">
         <div className="flex gap-4 flex-row bg-white rounded p-4">
-          <motion.div className="w-5 h-5 border-4 border-gray-300 border-t-blue-500 rounded-full animate-spin" />
-          <span className="text-gray-800">
-            {isUploading ? "Uploading..." : "Loading..."}
-          </span>
+          <InlineSpinner className="h-5 w-5 text-blue-500" />
+          <span className="text-gray-800">Uploading...</span>
         </div>
       </div>
     );
@@ -445,7 +447,15 @@ const Chat = ({
           <CardContent className="flex-grow overflow-hidden flex flex-col p-0">
             <div className="h-full w-full overflow-y-auto custom-scrollbar flex flex-col p-4 pb-16">
               {/* Empty state messages */}
-              {!messages.length && (
+              {isLoading && (
+                <div className="flex flex-col gap-3">
+                  <Skeleton className="h-14 w-2/3 bg-white/80" />
+                  <Skeleton className="ml-auto h-14 w-1/2 bg-blue-100" />
+                  <Skeleton className="h-20 w-4/5 bg-white/80" />
+                </div>
+              )}
+
+              {!isLoading && !messages.length && (
                 <div className="p-4 rounded-lg bg-gradient-to-br from-blue-50 to-green-50 text-gray-800 text-center text-sm mx-auto max-w-md">
                   {!isPersonal
                     ? "Ask something about this content"
@@ -456,7 +466,7 @@ const Chat = ({
               )}
 
               {/* Message list - Responsive widths */}
-              {messages.map((message, idx) => (
+              {!isLoading && messages.map((message, idx) => (
                 <div
                   key={idx}
                   className={clsx(
@@ -488,8 +498,9 @@ const Chat = ({
 
               {/* Loading indicator for response */}
               {isProcessing && (
-                <div className="p-4 self-center">
-                  <motion.div className="w-5 h-5 border-4 border-gray-300 border-t-blue-500 rounded-full animate-spin" />
+                <div className="mt-2 mb-2 flex max-w-[85%] items-center gap-3 self-start rounded-lg bg-gray-600 p-4 text-sm font-semibold text-gray-100 md:max-w-[80%]">
+                  <InlineSpinner className="text-blue-200" />
+                  <span>Thinking through your question...</span>
                 </div>
               )}
 
@@ -550,7 +561,11 @@ const Chat = ({
                 className="bg-blue-600 hover:bg-blue-700 text-white flex-shrink-0"
                 size="icon"
               >
-                <Send className="h-4 w-4" />
+                {isProcessing ? (
+                  <InlineSpinner />
+                ) : (
+                  <Send className="h-4 w-4" />
+                )}
               </Button>
             </form>
           </div>

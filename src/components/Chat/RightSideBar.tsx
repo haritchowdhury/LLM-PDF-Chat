@@ -1,6 +1,6 @@
 import { Upload as PrismaUpload, Game } from "@prisma/client";
 import { FileText, ListTodo, Clock, User } from "lucide-react";
-import Link from "next/link";
+import { PendingLink } from "@/components/PendingLink";
 
 type Prompts = {
   workspaces?: PrismaUpload[];
@@ -34,9 +34,10 @@ function RightSideBar({ workspaces, games }: Prompts) {
           {workspaces && workspaces.length > 0 ? (
             <div className="p-2">
               {workspaces.map((workspace) => (
-                <Link
+                <PendingLink
                   href={`/chat/${workspace.id}`}
                   key={workspace.id}
+                  loadingLabel={workspace.name || "Opening"}
                   className="flex items-start p-3 md:p-2 hover:bg-gray-800 rounded-md group transition-colors border-b md:border-b-0 border-gray-300 last:border-b-0"
                 >
                   <FileText className="w-4 h-4 mt-0.5 text-gray-500 group-hover:text-blue-400 flex-shrink-0" />
@@ -50,7 +51,7 @@ function RightSideBar({ workspaces, games }: Prompts) {
                         : "Date unavailable"}
                     </p>
                   </div>
-                </Link>
+                </PendingLink>
               ))}
             </div>
           ) : (
@@ -80,9 +81,10 @@ function RightSideBar({ workspaces, games }: Prompts) {
           {games && games.length > 0 ? (
             <div className="p-2">
               {games.map((game) => (
-                <Link
+                <PendingLink
                   href={`/statistics/${game.id}`}
                   key={game.id}
+                  loadingLabel={game.topic || "Opening"}
                   className="flex items-start p-3 md:p-2 hover:bg-gray-800 rounded-md group transition-colors border-b md:border-b-0 border-gray-800 last:border-b-0"
                 >
                   <ListTodo className="w-4 h-4 mt-0.5 text-gray-500 group-hover:text-green-400 flex-shrink-0" />
@@ -95,7 +97,7 @@ function RightSideBar({ workspaces, games }: Prompts) {
                       <span>{formatDate(game.timeStarted)}</span>
                     </div>
                   </div>
-                </Link>
+                </PendingLink>
               ))}
             </div>
           ) : (

@@ -2,8 +2,8 @@
 "use client";
 import { usePathname } from "next/navigation";
 import { SignOut } from "@/components/sign-out";
-import Link from "next/link";
 import { CircleUserRound, Landmark } from "lucide-react";
+import { PendingLink } from "@/components/PendingLink";
 
 type HeaderNavigationProps = {
   isAuthenticated: boolean;
@@ -55,22 +55,24 @@ export function HeaderNavigation({
         <>
           {/* Conditionally show Classrooms button based on current route */}
           {shouldShowClassrooms && (
-            <Link
+            <PendingLink
               href="/"
+              loadingLabel="Classrooms"
               className="flex gap-2 items-center border border-blue-600  text-blue-600 px-4 py-2 rounded-lg font-semibold hover:bg-blue-700 hover:text-white transition-colors"
             >
               <span className="hidden md:inline">Classrooms</span>
               <Landmark className="h-4 w-4" />
-            </Link>
+            </PendingLink>
           )}
           {shouldShowMyPage && (
-            <Link
+            <PendingLink
               href={`/profile/${userId}`}
+              loadingLabel="My Page"
               className="flex gap-2 items-center border border-blue-600 text-blue-600 px-4 py-2 rounded-lg font-semibold hover:bg-blue-700 hover:text-white transition-colors"
             >
               <span className="hidden sm:inline">My Page</span>
               <CircleUserRound className="h-4 w-4" />
-            </Link>
+            </PendingLink>
           )}
 
           <div className="flex items-center">
@@ -79,13 +81,14 @@ export function HeaderNavigation({
         </>
       ) : (
         <div className="flex flex-row">
-          <Link
+          <PendingLink
             href={`/sign-in`}
+            loadingLabel="Sign in"
             className="flex gap-2 items-center border border-blue-600  text-blue-600 px-4 py-2 rounded-lg font-semibold hover:bg-blue-700 hover:text-white transition-colors"
           >
             <span className="hidden sm:inline">Sign in</span>
             <CircleUserRound className="h-4 w-4" />
-          </Link>
+          </PendingLink>
         </div>
       )}
     </nav>

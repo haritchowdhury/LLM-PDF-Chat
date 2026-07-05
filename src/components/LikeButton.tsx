@@ -2,6 +2,7 @@
 import React, { useState } from "react";
 import { Heart } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { InlineSpinner } from "@/components/loading/LoadingPrimitives";
 
 type LikeButtonProps = {
   uploadId: string;
@@ -71,13 +72,17 @@ const LikeButton = ({
       disabled={isLoading}
       className="flex items-center gap-2 text-gray-600 hover:text-blue-500 transition-colors disabled:opacity-50"
     >
-      <Heart
-        className={`h-5 w-5 transition-all ${
-          liked
-            ? "fill-blue-500 text-blue-500 scale-110"
-            : "text-gray-500 hover:scale-110"
-        }`}
-      />
+      {isLoading ? (
+        <InlineSpinner className="h-5 w-5 text-blue-500" />
+      ) : (
+        <Heart
+          className={`h-5 w-5 transition-all ${
+            liked
+              ? "fill-blue-500 text-blue-500 scale-110"
+              : "text-gray-500 hover:scale-110"
+          }`}
+        />
+      )}
       <div>
         <p className="text-xs text-gray-500">Likes</p>
         <p className="text-sm font-medium">{likeCount}</p>

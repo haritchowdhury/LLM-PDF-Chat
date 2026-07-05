@@ -6,6 +6,7 @@ import { useToast } from "@/hooks/use-toast";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useRouter } from "next/navigation";
 import { Trash2 } from "lucide-react";
+import { InlineSpinner } from "@/components/loading/LoadingPrimitives";
 
 type Upload = {
   upload: string;
@@ -82,7 +83,11 @@ const Delete = ({ upload }: Upload) => {
           }}
           className="p-2 hover:bg-red-50 rounded-full transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
         >
-          <Trash2 className="h-5 w-5 text-gray-600 hover:text-red-600" />
+          {status === "pending" ? (
+            <InlineSpinner className="h-5 w-5 text-red-600" />
+          ) : (
+            <Trash2 className="h-5 w-5 text-gray-600 hover:text-red-600" />
+          )}
         </button>
       </form>
     </div>

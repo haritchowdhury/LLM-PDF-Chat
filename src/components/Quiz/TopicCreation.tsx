@@ -9,6 +9,7 @@ import axios, { AxiosError } from "axios";
 import { Input } from "@/components/ui/input";
 import { z } from "zod";
 import { motion } from "framer-motion";
+import { InlineSpinner } from "@/components/loading/LoadingPrimitives";
 
 const schema = z.object({});
 type Input = z.infer<typeof schema>;
@@ -69,7 +70,8 @@ const TopicCreationButton = ({ upload, onSuccess }: TopicCreationProps) => {
           onSubmit={form.handleSubmit(onSubmit)}
         >
           <Button disabled={status === "pending"} type="submit">
-            Generate Topics
+            {status === "pending" && <InlineSpinner />}
+            {status === "pending" ? "Generating..." : "Generate Topics"}
           </Button>
         </form>
       )}

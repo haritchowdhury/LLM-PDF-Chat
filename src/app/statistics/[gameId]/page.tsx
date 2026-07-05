@@ -7,10 +7,10 @@ import AccuracyCard from "@/components/statistics/AccuracyCard";
 import TimeTakenCard from "@/components/statistics/TimeTakenCard";
 import QuestionsList from "@/components/statistics/QuestionsList";
 import { buttonVariants } from "@/components/ui/button";
-import Link from "next/link";
 import ClaimMilestones from "@/components/Quiz/ClaimMilestones";
 import ClaimCommunityMilestones from "@/components/Quiz/ClaimCommunityMilestones";
 import { ArrowLeft } from "lucide-react";
+import { PendingLink } from "@/components/PendingLink";
 
 type Params = Promise<{ gameId: any }>;
 
@@ -79,8 +79,9 @@ const Statistics = async ({ params }: { params: Params }) => {
       <div className="max-w-5xl mx-auto pt-16">
         <div className="mb-8 flex flex-col space-y-6">
           <div className="flex justify-between items-center">
-            <Link
+            <PendingLink
               href={`/chat/${upload.id}`}
+              loadingLabel="Back to Chat"
               className={buttonVariants({
                 variant: "outline",
                 //size: "lg",
@@ -90,7 +91,7 @@ const Statistics = async ({ params }: { params: Params }) => {
             >
               <ArrowLeft className="mr-2 h-4 w-4" />
               Back to Chat
-            </Link>
+            </PendingLink>
             {isClaimable && (
               <div className="animate-pulse">
                 {upload.private ? (

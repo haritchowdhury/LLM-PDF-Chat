@@ -1,7 +1,6 @@
 import { auth } from "@/lib/auth";
 import { redirect } from "next/navigation";
 import db from "@/lib/db/db";
-import Link from "next/link";
 import Image from "next/image";
 import { buttonVariants } from "@/components/ui/button";
 import { MessageSquareText, User, BookOpen } from "lucide-react";
@@ -18,6 +17,7 @@ import EditableUsername from "@/components/EditableUsername";
 import ShareLinkModel from "@/components/ShareLink";
 import RoomsDisplay from "@/components/RoomsDisplay";
 import LikeButton from "@/components/LikeButton";
+import { PendingLink } from "@/components/PendingLink";
 
 type Params = Promise<{ userId: any }>;
 
@@ -275,8 +275,9 @@ const Profile = async ({ params }: { params: Params }) => {
                               initialLikeCount={share.likedBy?.length || 0}
                               userId={session.user.id}
                             />
-                            <Link
+                            <PendingLink
                               href={`/chat/${share.id}`}
+                              loadingLabel="Open"
                               className={buttonVariants({
                                 variant: "outline",
                                 size: "sm",
@@ -286,7 +287,7 @@ const Profile = async ({ params }: { params: Params }) => {
                             >
                               <MessageSquareText size={14} className="mr-2" />
                               Open
-                            </Link>
+                            </PendingLink>
                             <ShareLinkModel
                               link={`${platformlink}${share.id}`}
                             />

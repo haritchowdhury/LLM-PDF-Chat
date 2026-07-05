@@ -3,7 +3,6 @@ import { Game, Question } from "@prisma/client";
 import { useEffect, useState, useMemo, useCallback } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { differenceInSeconds } from "date-fns";
-import Link from "next/link";
 import { BarChart, ChevronRight, Loader2, Timer } from "lucide-react";
 import { checkAnswerSchema, endGameSchema } from "@/schemas/questions";
 import { cn, formatTimeDelta } from "@/lib/utils";
@@ -18,6 +17,7 @@ import {
 } from "@/components/ui/card";
 import { Button, buttonVariants } from "@/components/ui/button";
 import MCQCounter from "@/components/Quiz/MCQCounter";
+import { PendingLink } from "@/components/PendingLink";
 
 type Props = {
   game: Game & { questions: Pick<Question, "id" | "options" | "question">[] };
@@ -138,21 +138,23 @@ const MCQ = ({ game }: Props) => {
           You Completed in{" "}
           {formatTimeDelta(differenceInSeconds(now!, game.timeStarted))}
         </div>
-        <Link
+        <PendingLink
           href={`/statistics/${game.id}`}
+          loadingLabel="Opening"
           className={cn(buttonVariants({ size: "lg" }), "mt-2")}
         >
           View Statistics <BarChart className="w-4 h-4 ml-2" />
-        </Link>
-        <Link
+        </PendingLink>
+        <PendingLink
           href={`/chat/${game.uploadId}`}
+          loadingLabel="Opening"
           className={cn(
             buttonVariants({ size: "lg" }),
             "mt-2 text-white bg-green-500 font-semibold"
           )}
         >
           Back to Chat
-        </Link>
+        </PendingLink>
       </div>
     );
   }

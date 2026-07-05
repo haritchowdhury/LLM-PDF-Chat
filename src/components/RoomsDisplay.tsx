@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import Link from "next/link";
 import { buttonVariants } from "@/components/ui/button";
 import {
   MessageSquareText,
@@ -22,6 +21,7 @@ import Share from "@/components/Share";
 import Delete from "@/components/Delete";
 import ShareLinkModel from "@/components/ShareLink";
 import LikeButton from "@/components/LikeButton";
+import { PendingLink } from "@/components/PendingLink";
 
 interface Upload {
   id: string;
@@ -139,8 +139,9 @@ export default function RoomsDisplay({
                             initialLikeCount={share.likedBy?.length || 0}
                             userId={userId}
                           />
-                          <Link
+                          <PendingLink
                             href={`/chat/${share.id}`}
+                            loadingLabel="Open"
                             className={buttonVariants({
                               variant: "outline",
                               size: "sm",
@@ -150,7 +151,7 @@ export default function RoomsDisplay({
                           >
                             <MessageSquareText size={14} className="mr-1" />
                             Open
-                          </Link>
+                          </PendingLink>
                           <ShareLinkModel link={`${platformlink}${share.id}`} />
                           <Delete upload={share.id as string} />
                         </div>
@@ -177,8 +178,9 @@ export default function RoomsDisplay({
                       </CardDescription>
                     </div>
                   </div>
-                  <Link
+                  <PendingLink
                     href={`/chat/undefined`}
+                    loadingLabel="New"
                     className={buttonVariants({
                       variant: "outline",
                       size: "sm",
@@ -188,7 +190,7 @@ export default function RoomsDisplay({
                   >
                     <PlusCircle size={14} className="mr-1" />
                     New
-                  </Link>
+                  </PendingLink>
                 </div>
               </CardHeader>
               <CardContent className="pt-5 max-h-[45vh] overflow-y-auto">
@@ -218,8 +220,9 @@ export default function RoomsDisplay({
                           {upload.name}
                         </div>
                         <div className="flex gap-2 items-center ml-3">
-                          <Link
+                          <PendingLink
                             href={`/chat/${upload.id}`}
+                            loadingLabel="Open"
                             className={buttonVariants({
                               variant: "outline",
                               size: "sm",
@@ -229,7 +232,7 @@ export default function RoomsDisplay({
                           >
                             <MessageSquareText size={14} className="mr-1" />
                             Open
-                          </Link>
+                          </PendingLink>
                           <Delete upload={upload.id as string} />
                         </div>
                       </div>
@@ -281,9 +284,10 @@ export default function RoomsDisplay({
               ) : (
                 <div className="space-y-3">
                   {games.map((game) => (
-                    <Link
+                    <PendingLink
                       key={game.id}
                       href={`/statistics/${game.id}`}
+                      loadingLabel={game.topic || "Opening"}
                       className="group flex items-center justify-between p-4 rounded-lg bg-gradient-to-r from-gray-50 to-green-50 border border-gray-200 hover:border-green-300 hover:shadow-md transition-all duration-200"
                     >
                       <div
@@ -296,7 +300,7 @@ export default function RoomsDisplay({
                         size={18}
                         className="text-green-400 group-hover:text-green-600 ml-2 transition-colors"
                       />
-                    </Link>
+                    </PendingLink>
                   ))}
                 </div>
               )}

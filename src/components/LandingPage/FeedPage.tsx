@@ -1,9 +1,9 @@
 "use client";
 import React, { useState, useEffect, useRef, useCallback } from "react";
-import Link from "next/link";
 import ShareLinkModal from "@/components/ShareLink";
 import UploadForm from "@/components/UploadForm";
 import LikeButton from "@/components/LikeButton";
+import { PendingLink } from "@/components/PendingLink";
 
 // Mock components for demonstration - replace with your actual imports
 const buttonVariants = ({ variant, className }) => className;
@@ -280,8 +280,9 @@ const FeedPage = ({
       <article className="bg-white rounded-xl shadow-md hover:shadow-xl transition-all duration-300 border border-gray-200 mb-6 overflow-hidden">
         <div className="p-6">
           <div className="flex items-start justify-between mb-4">
-            <Link
+            <PendingLink
               href={`/profile/${article.userId}`}
+              loadingLabel={article.user.name || "Profile"}
               className="flex items-center gap-3 hover:opacity-80 transition-opacity"
             >
               <div className="w-12 h-12 rounded-full bg-gradient-to-br from-blue-400 to-blue-600 flex items-center justify-center text-white font-bold text-lg">
@@ -293,15 +294,15 @@ const FeedPage = ({
                 </p>
                 <p className="text-sm text-gray-500">{timeAgo}</p>
               </div>
-            </Link>
+            </PendingLink>
             <ShareLinkModal link={`${platformlink}${article.id}`} />
           </div>
 
-          <Link href={`/chat/${article.id}`} className="block group">
+          <PendingLink href={`/chat/${article.id}`} className="block group">
             <h3 className="text-2xl font-bold mb-3 text-gray-900 group-hover:text-blue-600 transition-colors line-clamp-2 break-words">
               {article.name}
             </h3>
-          </Link>
+          </PendingLink>
 
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 py-4 border-y border-gray-200 my-4">
             <div className="flex items-center gap-2 text-gray-600">
@@ -345,13 +346,14 @@ const FeedPage = ({
           )}
 
           <div className="mt-4">
-            <Link
+            <PendingLink
               href={`/chat/${article.id}`}
+              loadingLabel="Opening"
               className="w-full bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-medium transition-colors flex items-center justify-center gap-2"
             >
               <MessageSquareText className="h-4 w-4" />
               Start Chat
-            </Link>
+            </PendingLink>
           </div>
         </div>
       </article>
@@ -451,13 +453,14 @@ const FeedPage = ({
             <p className="text-xl text-gray-600 mb-6">
               No classrooms published yet.
             </p>
-            <Link
+            <PendingLink
               href={`/profile/${id}`}
+              loadingLabel="Opening"
               className="inline-block border border-gray-600 text-gray-500 hover:bg-gray-100 hover:text-gray-900 px-6 py-2 rounded-lg transition-colors"
             >
               Publish your first classroom{" "}
               <ExternalLink className="ml-2 h-4 w-4 inline" />
-            </Link>
+            </PendingLink>
           </div>
         )}
       </section>

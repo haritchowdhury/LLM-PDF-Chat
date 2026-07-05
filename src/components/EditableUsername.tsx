@@ -1,6 +1,7 @@
 "use client";
 import { useState } from "react";
 import { UserRoundPen, Check, X } from "lucide-react";
+import { InlineSpinner } from "@/components/loading/LoadingPrimitives";
 
 type Props = {
   initialUsername: string;
@@ -93,7 +94,7 @@ const EditableUsername = ({ initialUsername, userId }: Props) => {
               }`}
               disabled={isLoading}
             >
-              <Check className="h-4 w-4" />
+              {isLoading ? <InlineSpinner /> : <Check className="h-4 w-4" />}
               <span className="hidden sm:inline">
                 {isLoading ? "Saving..." : "Save"}
               </span>

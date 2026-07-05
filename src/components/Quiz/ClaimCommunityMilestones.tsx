@@ -8,6 +8,7 @@ import { Input } from "@/components/ui/input";
 import { zodResolver } from "@hookform/resolvers/zod";
 import axios, { AxiosError } from "axios";
 import { useRouter } from "next/navigation";
+import { InlineSpinner } from "@/components/loading/LoadingPrimitives";
 
 type Upload = {
   id: string;
@@ -77,7 +78,8 @@ const ClaimCommunityMilestones = ({ id, topic, upload }: Upload) => {
             form.setValue("topic", topic);
           }}
         >
-          Mark as complete
+          {status === "pending" && <InlineSpinner />}
+          {status === "pending" ? "Marking..." : "Mark as complete"}
         </Button>
       </form>
     </div>

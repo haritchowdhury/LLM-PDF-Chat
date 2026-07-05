@@ -8,6 +8,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent } from "@/components/ui/card";
 import { Upload, Link as LinkIcon } from "lucide-react";
+import { InlineSpinner } from "@/components/loading/LoadingPrimitives";
 
 interface UploadFormProps {
   userId: string;
@@ -276,7 +277,11 @@ export default function UploadForm({ userId }: UploadFormProps) {
                 disabled={isUploadingPDF || isUploadingURL}
                 onClick={() => document.getElementById("pdf-upload")?.click()}
               >
-                <Upload className="w-4 h-4 mr-2" />
+                {isUploadingPDF ? (
+                  <InlineSpinner />
+                ) : (
+                  <Upload className="w-4 h-4 mr-2" />
+                )}
                 {isUploadingPDF ? "Uploading PDF..." : "Upload PDF"}
               </Button>
             </label>
@@ -306,7 +311,11 @@ export default function UploadForm({ userId }: UploadFormProps) {
                 className="bg-green-600 hover:bg-green-700 text-white"
                 disabled={isUploadingPDF || isUploadingURL}
               >
-                <LinkIcon className="w-4 h-4 mr-2" />
+                {isUploadingURL ? (
+                  <InlineSpinner />
+                ) : (
+                  <LinkIcon className="w-4 h-4 mr-2" />
+                )}
                 {isUploadingURL ? "Loading..." : "Add URL"}
               </Button>
             </div>

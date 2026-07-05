@@ -3,6 +3,7 @@ import { useState, useRef } from "react";
 import { Book } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useToast } from "@/hooks/use-toast";
+import { InlineSpinner } from "@/components/loading/LoadingPrimitives";
 
 const ContentInput = () => {
   const [activeTab, setActiveTab] = useState<"url" | "pdf">("url");
@@ -14,6 +15,7 @@ const ContentInput = () => {
 
   const handleUrlSubmit = async () => {
     if (!url.trim()) return;
+    setIsLoading(true);
 
     // Store URL in sessionStorage and redirect to sign-in with callback
     sessionStorage.setItem("pendingUrl", url.trim());
@@ -30,6 +32,7 @@ const ContentInput = () => {
   ) => {
     const file = event.target.files?.[0];
     if (!file) return;
+    setIsLoading(true);
 
     // Convert file to base64 and store in sessionStorage for unauthenticated users
     const reader = new FileReader();
@@ -43,6 +46,14 @@ const ContentInput = () => {
       router.push(
         `/sign-in?callbackUrl=${encodeURIComponent("/process-content")}`
       );
+    };
+    reader.onerror = () => {
+      setIsLoading(false);
+      toast({
+        description: "Could not read this PDF. Please try again.",
+        duration: 2000,
+        variant: "destructive",
+      });
     };
     reader.readAsDataURL(file);
   };
@@ -106,8 +117,9 @@ const ContentInput = () => {
                 <button
                   onClick={handleUrlSubmit}
                   disabled={!url || isLoading}
-                  className="bg-green-600 text-white px-8 py-3 rounded-lg font-semibold hover:bg-green-700 disabled:bg-gray-400 disabled:cursor-not-allowed transition-colors"
+                  className="inline-flex items-center justify-center gap-2 bg-green-600 text-white px-8 py-3 rounded-lg font-semibold hover:bg-green-700 disabled:bg-gray-400 disabled:cursor-not-allowed transition-colors"
                 >
+                  {isLoading && <InlineSpinner />}
                   {isLoading ? "Processing..." : "Continue"}
                 </button>
               </div>
@@ -129,15 +141,23 @@ const ContentInput = () => {
                   className="hidden"
                 />
                 <div
-                  onClick={() => fileInputRef.current?.click()}
+                  onClick={() => {
+                    if (!isLoading) fileInputRef.current?.click();
+                  }}
                   className="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center hover:border-blue-400 transition-colors cursor-pointer"
+                  aria-busy={isLoading || undefined}
                 >
                   <Book className="h-12 w-12 text-gray-400 mx-auto mb-4" />
                   <p className="text-gray-600 mb-2">
                     Drag and drop your PDF here, or
                   </p>
-                  <button className="text-blue-600 hover:text-blue-700 font-medium">
-                    browse files
+                  <button
+                    className="inline-flex items-center justify-center gap-2 text-blue-600 hover:text-blue-700 font-medium"
+                    disabled={isLoading}
+                    type="button"
+                  >
+                    {isLoading && <InlineSpinner />}
+                    {isLoading ? "Preparing file..." : "browse files"}
                   </button>
                   <p className="text-sm text-gray-500 mt-2">
                     Maximum file size: 10MB

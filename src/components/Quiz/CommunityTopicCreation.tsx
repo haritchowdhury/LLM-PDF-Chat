@@ -10,6 +10,7 @@ import { Input } from "@/components/ui/input";
 import { z } from "zod";
 import { motion } from "framer-motion";
 import { buttonVariants } from "@/components/ui/button";
+import { InlineSpinner } from "@/components/loading/LoadingPrimitives";
 
 const schema = z.object({});
 type Input = z.infer<typeof schema>;
@@ -79,7 +80,8 @@ const CommunityTopicCreationButton = ({ upload, onSuccess }: CommunityTopicCreat
                 "bg-gradient-to-b from-indigo-200 border-gray-300 text-gray-800 hover:bg-gray-800 my-2",
             })}
           >
-            Generate Topics
+            {status === "pending" && <InlineSpinner />}
+            {status === "pending" ? "Generating..." : "Generate Topics"}
           </Button>
         </form>
       )}
