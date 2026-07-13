@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import type { ComponentProps, MouseEvent, ReactNode } from "react";
 
 type PendingLinkProps = ComponentProps<typeof Link> & {
@@ -24,6 +24,20 @@ export function PendingLink({
   const pathname = usePathname();
   const [isPending, setIsPending] = useState(false);
   const hrefValue = typeof href === "string" ? href : href.pathname || "";
+
+  useEffect(() => {
+    setIsPending(false);
+  }, [pathname]);
+
+  useEffect(() => {
+    if (!isPending) return;
+
+    const timeout = window.setTimeout(() => {
+      setIsPending(false);
+    }, 8000);
+
+    return () => window.clearTimeout(timeout);
+  }, [isPending]);
 
   const handleClick = (event: MouseEvent<HTMLAnchorElement>) => {
     onClick?.(event);

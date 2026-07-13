@@ -1,5 +1,4 @@
 import { auth } from "@/lib/auth";
-import { GithubSignIn } from "@/components/github-sign-in";
 import { redirect } from "next/navigation";
 import ErrorToast from "@/components/ErrorToast";
 import { GoogleSignIn } from "@/components/google.sign-in";
@@ -21,7 +20,7 @@ const Page = async ({
         </h1>
         <ErrorToast />
         <div className="text-black">
-          <GoogleSignIn />
+          <GoogleSignIn callbackUrl={callbackUrl} />
         </div>
       </div>
     </main>

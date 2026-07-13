@@ -1,5 +1,6 @@
 // components/HeaderNavigation.tsx (CLIENT COMPONENT)
 "use client";
+import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { SignOut } from "@/components/sign-out";
 import { CircleUserRound, Landmark } from "lucide-react";
@@ -81,14 +82,13 @@ export function HeaderNavigation({
         </>
       ) : (
         <div className="flex flex-row">
-          <PendingLink
+          <Link
             href={`/sign-in`}
-            loadingLabel="Sign in"
             className="flex gap-2 items-center border border-blue-600  text-blue-600 px-4 py-2 rounded-lg font-semibold hover:bg-blue-700 hover:text-white transition-colors"
           >
             <span className="hidden sm:inline">Sign in</span>
             <CircleUserRound className="h-4 w-4" />
-          </PendingLink>
+          </Link>
         </div>
       )}
     </nav>

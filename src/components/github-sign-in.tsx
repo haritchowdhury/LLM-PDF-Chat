@@ -1,9 +1,8 @@
 import { signIn } from "@/lib/auth";
-import { Button } from "@/components/ui/button";
 import { Github } from "@/components/ui/github";
+import { AuthSubmitButton } from "@/components/auth-submit-button";
 
 const GithubSignIn = ({ callbackUrl = "/" }: { callbackUrl?: string }) => {
-  console.log("callback at github", callbackUrl);
   return (
     <form
       action={async () => {
@@ -11,10 +10,10 @@ const GithubSignIn = ({ callbackUrl = "/" }: { callbackUrl?: string }) => {
         await signIn("github", { callbackUrl, redirect: true });
       }}
     >
-      <Button className="w-full" variant="outline">
+      <AuthSubmitButton pendingLabel="Continuing with GitHub...">
         <Github />
         Continue with GitHub
-      </Button>
+      </AuthSubmitButton>
     </form>
   );
 };
